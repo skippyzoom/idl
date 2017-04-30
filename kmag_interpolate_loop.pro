@@ -7,6 +7,10 @@
 ;     so it can equivalently return an array
 ;     of (|k|,Theta,time[,Alpha]).
 ;
+; TO DO:
+; -- Consider separate routines (via an IF or CASE)
+;    for 2D and 3D, since that will affect
+;    how to index fftArray.
 ;-
 function kmag_interpolate_loop, fftArray, $
                                 dx,dy,dz, $
@@ -16,8 +20,6 @@ function kmag_interpolate_loop, fftArray, $
      message, "Please supply FFT array"
 
   ;;==Get physical dimension
-  ;; fftArray = reform(fftArray)
-  ;; fftSize = size(fftArray)
   fftSize = size(reform(fftArray))
   ndim_space = fftSize[0]-1
   if ndim_space ne 2 and ndim_space ne 3 then $
@@ -30,19 +32,14 @@ function kmag_interpolate_loop, fftArray, $
      message, "Please supply dz > 0"
 
   ;;==Get sizes for output array
-  ;--> Update this after adding /info keyword to kmag_interpolate?
   nOmega = fftSize[fftSize[0]]
   dummy = kmag_interpolate(fftArray[*,*,*,0],dx,dy,dz, $
-                           _EXTRA=ex)
+                           _EXTRA=ex,/info)
   nk = n_elements(dummy.kVals)
   if tag_exist(ex,'nTheta',/top_level) then nTheta = ex.nTheta $
   else nTheta = 360
   if tag_exist(ex,'nAlpha',/top_level) then nAlpha = ex.nAlpha $
   else nAlpha = 1
-  ;; if n_elements(ex.nTheta) eq 0 then nTheta = 360 $
-  ;; else nTheta = ex.nTheta
-  ;; if n_elements(ex.nAlpha) eq 0 then nAlpha = 1 $
-  ;; else nAlpha = ex.nAlpha
   kmagOmega = fltarr(nk,nTheta,nOmega,nAlpha)
 
   ;;==Loop over time/freq
