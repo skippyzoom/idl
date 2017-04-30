@@ -18,16 +18,6 @@
 ; 21Feb2017: TARGET may be a vector
 ;-
 
-;; function find_closest, array,target,double=double
-;;   if keyword_set(double) then begin
-;;      array = double(array)
-;;      target = double(target)
-;;   endif
-;;   absDiff = abs(array-target)
-;;   minVal = min(absDIff,iMin)
-;;   return, iMin
-;; end
-
 function find_closest, array,target,double=double
   if keyword_set(double) then begin
      array = double(array)
