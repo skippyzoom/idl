@@ -19,8 +19,6 @@ data = read_xxx_data(dataName, $
                      ny = grid.ny, $
                      nz = grid.nz, $
                      timestep = timestep, $
-                     ;; timestep = nout*(indgen(ntMax/2)+ntMax/2+1), $
-                     ;; timestep = nout*(indgen(2)+ntMax/2+1), $
                      path = 'parallel', $
                      /verbose)
 
