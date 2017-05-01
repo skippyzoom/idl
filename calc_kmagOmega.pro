@@ -41,7 +41,7 @@ kmagOmega = kmag_interpolate_loop(data,dx*nout_avg,dy*nout_avg,dz*nout_avg, $
                                   shape = 'cone', $
                                   nTheta = nTheta, $
                                   nAlpha = nAlpha)
-delvar, data
+data = !NULL
 
 kmagSize = size(kmagOmega)
 nOmega = kmagSize[kmagSize[0]]
