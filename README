@@ -1,3 +1,8 @@
 Created on 29Apr2017 (may)
 
-This is the code base of my IDL analysis code, originally written for analyzing PPIC3D and EPPIC simulations during my PhD research at BU. Note that this code base has some dependencies: NASA's IDL Astrolib (https://idlastro.gsfc.nasa.gov/), and Meers Oppenheim's EPPIC/PPIC3D IDL routines.
+This is the code base of my IDL analysis code, originally written for analyzing PPIC3D and EPPIC simulations during my PhD research at BU. 
+
+DEPENDENCIES: Below is a list of libraries that someone using my code may need to download and put in their IDL path. This list errs on the safe side, which is to say that having access to all routines in each of these libraries may not be strictly necessary but it's simplest to list them here just in case. For example, some Astrolib routines use the Coyote Graphics Library, so I've included the latter here. 
+-- NASA's IDL Astrolib (https://idlastro.gsfc.nasa.gov/)
+-- Coyote Graphics Library (http://www.idlcoyote.com/documents/programs.php#COYOTE_LIBRARY_DOWNLOAD)
+-- Meers Oppenheim's EPPIC/PPIC3D IDL routines.
