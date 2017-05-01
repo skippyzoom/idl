@@ -8,10 +8,10 @@
 ; --Also see ktw_moments_calc.pro
 ;-
 
-function calc_ktw_moments, kmagOmega,kVals,wVals,lambda, $
-                           nterms=nterms,width=width, $
-                           baseline=baseline,threshold=threshold, $
-                           relative=relative
+function calc_kmag_moments, kmagOmega,kVals,wVals,lambda, $
+                            nterms=nterms,width=width, $
+                            baseline=baseline,threshold=threshold, $
+                            relative=relative
 
   ;;==Defaults
   if n_elements(nterms) eq 0 then nterms = 0
@@ -20,9 +20,9 @@ function calc_ktw_moments, kmagOmega,kVals,wVals,lambda, $
 
   ;;==Set up array
   nLambda = n_elements(lambda)
-  ktwSize = size(kmagOmega)
-  nTheta = ktwSize[2]
-  nOmega = ktwSize[3]
+  kmagSize = size(kmagOmega)
+  nTheta = kmagSize[2]
+  nOmega = kmagSize[3]
   moments = fltarr(nLambda,nTheta,4)
   spectra = fltarr(nLambda,nTheta,nOmega)
 
