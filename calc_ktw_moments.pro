@@ -8,7 +8,7 @@
 ; --Also see ktw_moments_calc.pro
 ;-
 
-function calc_ktw_moments, kthetaomega,kVals,wVals,lambda, $
+function calc_ktw_moments, kmagOmega,kVals,wVals,lambda, $
                            nterms=nterms,width=width, $
                            baseline=baseline,threshold=threshold, $
                            relative=relative
@@ -20,7 +20,7 @@ function calc_ktw_moments, kthetaomega,kVals,wVals,lambda, $
 
   ;;==Set up array
   nLambda = n_elements(lambda)
-  ktwSize = size(kthetaomega)
+  ktwSize = size(kmagOmega)
   nTheta = ktwSize[2]
   nOmega = ktwSize[3]
   moments = fltarr(nLambda,nTheta,4)
@@ -32,7 +32,7 @@ function calc_ktw_moments, kthetaomega,kVals,wVals,lambda, $
         ;;==Extract sample spectrum
         ikWant = find_closest(kVals,2*!pi/lambda[iLambda])
         points = wVals/kVals[ikWant]
-        spectrum = reform(kthetaomega[ikWant,iTheta,*])
+        spectrum = reform(kmagOmega[ikWant,iTheta,*])
         spectrum_orig = spectrum
         nsp = n_elements(spectrum)
         ;;==Reduce the data
