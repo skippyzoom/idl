@@ -1,0 +1,7 @@
+;+
+; Sets default graphics parameters.
+;-
+
+plt_prm = {buffer: 1B}
+img_prm = {buffer: 1B}
+use_clr = 0B
