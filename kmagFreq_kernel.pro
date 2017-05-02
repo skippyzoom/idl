@@ -21,20 +21,15 @@
 save, filename=swap_extension(imgName,'.pdf','.sav'), $
       kmagFreq,tVals,wVals,kmag_info
 
+;--> This could go in its own script so users can call it
+;    without having to call calc_kmagFreq again
 ikWant = find_closest(kmag_info.kVals,2*!pi/lWant)
 imgData = reform(kmagFreq[ikWant,*,*])
 imgData = imgData^2
-;; imgData = 10*alog10(imgData)
-for it=0,nTheta-1 do imgData[it,*] /= max(abs(imgData[it,*]))
+imgData = 10*alog10(imgData)
+;; for it=0,nTheta-1 do imgData[it,*] /= max(abs(imgData[it,*]))
 xData = tVals
 yData = wVals/kmag_info.kVals[ikWant]
-;; @kmag_img.prm
-;; img = image(imgData,xData,yData,_EXTRA=prm)
-;; @kmag_clr.prm
-;; clr = colorbar(target=img,_EXTRA=prm)
-;; print, "Saving ",imgName,"..."
-;; img.save, imgName
-;; img.close
-;; print, "Finished"
+;<--
 @kmagFreq.prm
 @img_pdf
