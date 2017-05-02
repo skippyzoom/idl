@@ -40,14 +40,14 @@ function kmag_interpolate_loop, fftArray, $
   else nTheta = 360
   if tag_exist(ex,'nAlpha',/top_level) then nAlpha = ex.nAlpha $
   else nAlpha = 1
-  kmagOmega = fltarr(nk,nTheta,nOmega,nAlpha)
+  kmagFreq = fltarr(nk,nTheta,nOmega,nAlpha)
 
   ;;==Loop over time/freq
   for iw=0,nOmega-1 do begin
      dummy = kmag_interpolate(fftArray[*,*,*,iw],dx,dy,dz, $
                               _EXTRA=ex)
-     kmagOmega[*,*,iw,*] = dummy.kmag
+     kmagFreq[*,*,iw,*] = dummy.kmag
   endfor
 
-  return, kmagOmega
+  return, kmagFreq
 end

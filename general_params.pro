@@ -38,3 +38,8 @@ make_plots = 1B
 ; Spatial coordinate vectors ;
 ;----------------------------;
 .r set_grid
+
+;-----------------------------;
+; Default plotting parameters ;
+;-----------------------------;
+@default.prm

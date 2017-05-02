@@ -36,14 +36,14 @@ kmag_info = kmag_interpolate(data[*,*,*,0],dx*nout_avg,dy*nout_avg,dz*nout_avg, 
                              nTheta = nTheta, $
                              nAlpha = nAlpha, $
                              /info)
-kmagOmega = kmag_interpolate_loop(data,dx*nout_avg,dy*nout_avg,dz*nout_avg, $
+kmagFreq = kmag_interpolate_loop(data,dx*nout_avg,dy*nout_avg,dz*nout_avg, $
                                   aspect = alpha, $
                                   shape = 'cone', $
                                   nTheta = nTheta, $
                                   nAlpha = nAlpha)
 data = !NULL
 
-kmagSize = size(kmagOmega)
+kmagSize = size(kmagFreq)
 nOmega = kmagSize[kmagSize[0]]
 wMin = 1.0/dt/nout
 if strcmp(dataName,'den0') then wMin /= subcycle0
