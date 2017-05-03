@@ -76,7 +76,7 @@ endif
 ;--------;
 ; Hybrid ;
 ;--------;
-if efield_algorithm eq 1 then begin
+if efield_algorithm eq 1 or efield_algorithm eq 2 then begin
 
    ;;==Constant electron moments from input values
    moments0 = moments1*0.0
