@@ -22,8 +22,8 @@
 ;-
 
 @general_params
-timestep = nout*(indgen(ntMax/2)+ntMax/2+1)
-;; timestep = nout*(lindgen(ntMax)+1)
+;; timestep = nout*(indgen(ntMax/2)+ntMax/2+1)
+timestep = nout*(lindgen(ntMax-1)+1)
 dataName = 'den1'
 dataType = 'phdf'
 @calc_kmagFreq

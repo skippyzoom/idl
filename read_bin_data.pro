@@ -8,7 +8,7 @@
 ; NOTES
 ; -- This function assumes that nx is the full x size, not the
 ;    size of one subdomain. The reason is compatibility with
-;    similar function (e.g. read_ph5_data.pro), to provide a more
+;    similar functions (e.g. read_ph5_data.pro), to provide a more
 ;    unified interface for read_xxx_data.pro
 ;-
 

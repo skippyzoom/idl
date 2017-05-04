@@ -26,6 +26,22 @@ if file_test('domain000',/directory) then bp = 'domain*/' $
 else bp = './'
 ntMax = 0
 case 1 of
+   file_test('moments1.out'): begin
+      ntMax = file_lines('moments1.out')-1
+      print, "CALC_TIMESTEPS: Computed ntMax from 'moments1.out'"
+   end
+   file_test('moments0.out'): begin
+      ntMax = file_lines('moments0.out')-1
+      print, "CALC_TIMESTEPS: Computed ntMax from 'moments0.out'"
+   end
+   file_test('domain000/moments1.out'): begin
+      ntMax = file_lines('domain000/moments1.out')-1
+      print, "CALC_TIMESTEPS: Computed ntMax from 'domain000/moments1.out'"
+   end
+   file_test('domain000/moments0.out'): begin
+      ntMax = file_lines('domain000/moments0.out')-1
+      print, "CALC_TIMESTEPS: Computed ntMax from 'domain000/moments0.out'"
+   end
    file_test('parallel',/directory): begin
       !NULL = file_search('parallel/*.h5',count=count)
       ntMax = count
@@ -42,22 +58,6 @@ case 1 of
    file_test('den0.bin'): begin
       ntMax = timesteps('den0.bin',sizepertime,nsubdomains,basepath=bp)
       print, "CALC_TIMESTEPS: Computed ntMax from 'den0.bin'"
-   end
-   file_test('moments1.out'): begin
-      ntMax = file_lines('moments1.out')-1
-      print, "CALC_TIMESTEPS: Computed ntMax from 'moments1.out'"
-   end
-   file_test('moments0.out'): begin
-      ntMax = file_lines('moments0.out')-1
-      print, "CALC_TIMESTEPS: Computed ntMax from 'moments0.out'"
-   end
-   file_test('domain000/moments1.out'): begin
-      ntMax = file_lines('domain000/moments1.out')-1
-      print, "CALC_TIMESTEPS: Computed ntMax from 'domain000/moments1.out'"
-   end
-   file_test('domain000/moments0.out'): begin
-      ntMax = file_lines('domain000/moments0.out')-1
-      print, "CALC_TIMESTEPS: Computed ntMax from 'domain000/moments0.out'"
    end
    else: print, "CALC_TIMESTEPS: Could not compute ntMax"
 endcase

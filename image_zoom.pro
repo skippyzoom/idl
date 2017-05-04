@@ -3,6 +3,7 @@
 ; --Allow user to specify a center point,
 ;   with default = (nx/2,ny/2). May have to
 ;   do some bounds-checking.
+; --Allow user to change aspect ratio?
 ; --Check that factor <= 1
 ;-
 

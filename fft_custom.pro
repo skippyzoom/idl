@@ -2,16 +2,21 @@
 ; Takes the spatial (and, optionally, the temporal) FFT of data, 
 ; allowing for additional manipulation based on parameters. 
 ;
-; fftdims: Allows for zero-padding.
-; alpha: Hanning window parameter.
-; skip_time_fft: Do not compute the FFT in time.
+; FFTDIMS: Allows for zero-padding.
+; ALPHA: Hanning window parameter.
+; SKIP_TIME_FFT: Do not compute the FFT in time.
 ;                The default is to compute the FFT in time.
 ;                This keyword is only used to turn off the
 ;                boolean do_time_fft, which is used in the
 ;                remainder of the code.
-; zero_dc: Zero the DC component of the FFT.
-; normalize: Normalize the FFT to its max value.
-; swap_time: Reverse the order of the time (frequency) dimension.
+; ZERO_DC: Zero the DC component of the FFT.
+; NORMALIZE: Normalize the FFT to its max value.
+; SWAP_TIME: Reverse the order of the time (frequency) dimension.
+;
+; TO DO:
+; -- Check if the user has set ex.overwrite (i.e. has passed
+;    /overwrite to fft.pro). If so, this routine should act
+;    in a more memory efficient way.
 ;-
 function fft_custom, data, $
                      fftdims=fftdims, $
