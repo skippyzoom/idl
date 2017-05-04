@@ -17,6 +17,7 @@ baseLabel = curDir
 ;------------------------------------;
 @ppic3d.i
 @params_in.pro
+if n_elements(subcycle1) eq 0 then subcycle1 = 1
 if n_elements(den_out_subcycle1) eq 0 then den_out_subcycle1 = 1
 if n_elements(iskip) eq 0 then iskip = 1
 if n_elements(istart) eq 0 then istart = 0

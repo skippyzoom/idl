@@ -15,21 +15,37 @@
 ; tune graphics parameters for a specific 
 ; quantity, and to save them in one dedicated
 ; file. 
+;
+; Currently, this script assumes the user will
+; update it for a specific project by, e.g., 
+; changing timestep and lWant.
 ;-
 
+@general_params
+timestep = nout*(indgen(ntMax/2)+ntMax/2+1)
+;; timestep = nout*(lindgen(ntMax)+1)
+dataName = 'den1'
+dataType = 'phdf'
 @calc_kmagFreq
-save, filename=swap_extension(imgName,'.pdf','.sav'), $
+save, filename='kmagFreq-'+dataName+'.sav', $
       kmagFreq,tVals,wVals,kmag_info
 
-;--> This could go in its own script so users can call it
-;    without having to call calc_kmagFreq again
-ikWant = find_closest(kmag_info.kVals,2*!pi/lWant)
-imgData = reform(kmagFreq[ikWant,*,*])
-imgData = imgData^2
-imgData = 10*alog10(imgData)
-;; for it=0,nTheta-1 do imgData[it,*] /= max(abs(imgData[it,*]))
-xData = tVals
-yData = wVals/kmag_info.kVals[ikWant]
-;<--
+lWant = 3.0
+@prep_kmagFreq
+@kmagFreq.prm
+@img_pdf
+
+lWant = 8.0
+@prep_kmagFreq
+@kmagFreq.prm
+@img_pdf
+
+lWant = 12.0
+@prep_kmagFreq
+@kmagFreq.prm
+@img_pdf
+
+lWant = 24.0
+@prep_kmagFreq
 @kmagFreq.prm
 @img_pdf

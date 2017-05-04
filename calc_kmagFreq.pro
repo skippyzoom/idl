@@ -45,10 +45,10 @@ data = !NULL
 
 kmagSize = size(kmagFreq)
 nOmega = kmagSize[kmagSize[0]]
-wMin = 1.0/dt/nout
-if strcmp(dataName,'den0') then wMin /= subcycle0
-if strcmp(dataName,'den1') then wMin /= subcycle1
-if strcmp(dataName,'den2') then wMin /= subcycle2
-if strcmp(dataName,'den3') then wMin /= subcycle3
+wMin = 2*!pi/(dt*nOmega*nout)
+;; if strcmp(dataName,'den0') then wMin /= subcycle0
+;; if strcmp(dataName,'den1') then wMin /= subcycle1
+;; if strcmp(dataName,'den2') then wMin /= subcycle2
+;; if strcmp(dataName,'den3') then wMin /= subcycle3
 wVals = wMin*(dindgen(nOmega)-nOmega/2)
 tVals = indgen(nTheta)

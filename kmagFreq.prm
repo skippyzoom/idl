@@ -6,6 +6,12 @@
 ;
 ; img_prm will be passed to image().
 ; clr_prm will be passed to colorbar(), if called.
+;
+; TO DO:
+; -- Calculate quantities from imgData: ytickname,
+;    min_value, max_value,
+; -- Generate ytickname from ytickvalues (consider
+;    using plusminus_labels.pro)
 ;-
 
 position = [0.2,0.2,0.6,0.6]
@@ -19,23 +25,27 @@ xmajor = n_elements(xtickvalues)
 xminor = 5
 xrange = [xtickvalues[0],xtickvalues[xmajor-1]]
 ytickvalues = float([-500,-250,0,250,500])
-ytickname = ['-500','-250','0','+250','+500']
+ytickname = plusminus_labels(ytickvalues)
 ymajor = n_elements(ytickvalues)
 yminor = 4
 yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
 aspect_ratio = (xtickvalues[xmajor-1]-xtickvalues[0])/ $
                (ytickvalues[ymajor-1]-ytickvalues[0])
 title = string(lWant,format='(f4.1)')
-title = strcompress(title,/remove_all)
+title = "$\lambda$ = "+strcompress(title,/remove_all)+" m"
 
 img_prm = {axis_style: 2, $
            aspect_ratio: aspect_ratio, $
            position: position, $
-           min_value: -60, $
-           max_value: -20, $
+           ;; min_value: -60, $
+           ;; max_value: -20, $
            title: title, $
            xrange: xrange, $
            yrange: yrange, $
+           xtickvalues: xtickvalues, $
+           ytickvalues: ytickvalues, $
+           xtickname: xtickname, $
+           ytickname: ytickname, $
            xstyle: 1, $
            ystyle: 1, $
            xtitle: "$\theta$ [deg]", $
