@@ -13,7 +13,7 @@
 ;    how to index fftArray.
 ;-
 function kmag_interpolate_loop, fftArray, $
-                                dx,dy,dz, $
+                                dx=dx,dy=dy,dz=dz, $
                                 _EXTRA=ex
   ;;==Ensure correct input
   if n_elements(fftArray) eq 0 then $
@@ -33,7 +33,10 @@ function kmag_interpolate_loop, fftArray, $
 
   ;;==Get sizes for output array
   nOmega = fftSize[fftSize[0]]
-  dummy = kmag_interpolate(fftArray[*,*,*,0],dx,dy,dz, $
+  dummy = kmag_interpolate(fftArray[*,*,*,0], $
+                           dx = dx, $
+                           dy = dy, $
+                           dz = dz, $
                            _EXTRA=ex,/info)
   nk = n_elements(dummy.kVals)
   if tag_exist(ex,'nTheta',/top_level) then nTheta = ex.nTheta $
@@ -44,7 +47,10 @@ function kmag_interpolate_loop, fftArray, $
 
   ;;==Loop over time/freq
   for iw=0,nOmega-1 do begin
-     dummy = kmag_interpolate(fftArray[*,*,*,iw],dx,dy,dz, $
+     dummy = kmag_interpolate(fftArray[*,*,*,iw], $
+                              dx = dx, $
+                              dy = dy, $
+                              dz = dz, $
                               _EXTRA=ex)
      kmagFreq[*,*,iw,*] = dummy.kmag
   endfor

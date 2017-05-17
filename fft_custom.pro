@@ -17,6 +17,9 @@
 ; -- Check if the user has set ex.overwrite (i.e. has passed
 ;    /overwrite to fft.pro). If so, this routine should act
 ;    in a more memory efficient way.
+; -- Allow user to call this function for a single time step,
+;    to take advantage of options like /zero_dc. May be more 
+;    trouble than it's worth.
 ;-
 function fft_custom, data, $
                      fftdims=fftdims, $

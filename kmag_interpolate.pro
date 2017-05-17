@@ -31,7 +31,7 @@
 ;-
 
 function kmag_interpolate, fftArray, $
-                           dx,dy,dz, $
+                           dx=dx,dy=dy,dz=dz, $
                            aspect=aspect, $
                            nTheta=nTheta,nAlpha=nAlpha, $
                            shape=shape, $
@@ -49,16 +49,23 @@ function kmag_interpolate, fftArray, $
   ndim_space = fftSize[0]
   if ndim_space ne 2 and ndim_space ne 3 then $
      message, "Input must be 2D or 3D"
+  nx = fftSize[1]
+  ny = fftSize[2]
+  if ndim_space eq 3 then nz = fftSize[3]
 
   ;;==Defaults and guards
-  if n_elements(dx) eq 0 then message, "Please supply dx > 0"
-  if n_elements(dy) eq 0 then message, "Please supply dy > 0"
-  if ndim_space eq 3 and n_elements(dz) eq 0 then $
-     message, "Please supply dz > 0"
+  ;; if n_elements(dx) eq 0 then message, "Please supply dx > 0"
+  ;; if n_elements(dy) eq 0 then message, "Please supply dy > 0"
+  ;; if ndim_space eq 3 and n_elements(dz) eq 0 then $
+  ;;    message, "Please supply dz > 0"
+  if n_elements(dx) eq 0 then dx = 2.0/nx
+  if n_elements(dy) eq 0 then dy = 2.0/ny
+  if ndim_space eq 3 and n_elements(dz) eq 0 then dz = 2.0/nz
   if n_elements(nTheta) eq 0 then nTheta = 360
   if n_elements(nAlpha) eq 0 then nAlpha = 1
   if n_elements(aspect) eq 0 then aspect = 0.0
-  if n_elements(shape) eq 0 then shape = 'cone'
+  if n_elements(shape) eq 0 then $
+     if ndim_space eq 3 then shape = 'cone' else shape = 'disk'
   if strcmp(shape,'disk',/fold_case) or strcmp(shape,'cone',/fold_case) then begin
      if aspect lt -0.5*!pi or aspect gt 0.5*!pi then $
         message, "Must have -pi/2 <= aspect <= pi/2"
@@ -66,13 +73,15 @@ function kmag_interpolate, fftArray, $
   endif
 
   ;;==Calculate # of k values and make array
-  nx = fftSize[1]
-  ny = fftSize[2]
+  ;; nx = fftSize[1]
+  ;; ny = fftSize[2]
+  ;; nk = min([nx/2,ny/2])
+  ;; if ndim_space eq 3 then begin
+  ;;    nz = fftSize[3]
+  ;;    nk = min([nk,nz/2])
+  ;; endif
   nk = min([nx/2,ny/2])
-  if ndim_space eq 3 then begin
-     nz = fftSize[3]
-     nk = min([nk,nz/2])
-  endif
+  if ndim_space eq 3 then nk = min([nk,nz/2])
   xLen = dx*nx
   yLen = dy*ny
   kxMin = 2*!pi/xLen

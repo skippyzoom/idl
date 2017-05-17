@@ -53,7 +53,7 @@ img_prm = {axis_style: 2, $
            ymajor: ymajor, $
            yminor: yminor, $
            xticklen: 0.02, $
-           yticklen: 0.02/grid.aspect_ratio, $
+           yticklen: 0.02/aspect_ratio, $
            xsubticklen: 0.5, $
            ysubticklen: 0.5, $
            xtickdir: 1, $

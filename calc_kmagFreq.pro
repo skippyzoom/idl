@@ -24,23 +24,29 @@ data = read_xxx_data(dataName, $
 
 data = fft_custom(data,/overwrite, $
                   /center, $
-                  alpha=0.5, $
+                  alpha = 0.5, $
                   /normalize, $
                   /swap_time, $
                   /zero_dc, $
                   /verbose)
 
-kmag_info = kmag_interpolate(data[*,*,*,0],dx*nout_avg,dy*nout_avg,dz*nout_avg, $
+kmag_info = kmag_interpolate(data[*,*,*,0], $
+                             dx = dx*nout_avg, $
+                             dy = dy*nout_avg, $
+                             dz = dz*nout_avg, $
                              aspect = alpha, $
                              shape = 'cone', $
                              nTheta = nTheta, $
                              nAlpha = nAlpha, $
                              /info)
-kmagFreq = kmag_interpolate_loop(data,dx*nout_avg,dy*nout_avg,dz*nout_avg, $
-                                  aspect = alpha, $
-                                  shape = 'cone', $
-                                  nTheta = nTheta, $
-                                  nAlpha = nAlpha)
+kmagFreq = kmag_interpolate_loop(data, $
+                                 dx = dx*nout_avg, $
+                                 dy = dy*nout_avg, $
+                                 dz = dz*nout_avg, $
+                                 aspect = alpha, $
+                                 shape = 'cone', $
+                                 nTheta = nTheta, $
+                                 nAlpha = nAlpha)
 data = !NULL
 
 kmagSize = size(kmagFreq)
