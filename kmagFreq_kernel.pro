@@ -21,11 +21,11 @@
 ; changing timestep and lWant.
 ;-
 
-@general_params
+@load_default_params
 ;; timestep = nout*(indgen(ntMax/2)+ntMax/2+1)
 timestep = nout*(lindgen(ntMax-1)+1)
 dataName = 'den1'
-dataType = 'phdf'
+dataType = 'ph5'
 @calc_kmagFreq
 save, filename='kmagFreq-'+dataName+'.sav', $
       kmagFreq,tVals,wVals,kmag_info

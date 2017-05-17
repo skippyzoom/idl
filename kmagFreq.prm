@@ -52,6 +52,8 @@ img_prm = {axis_style: 2, $
            xminor: xminor, $
            ymajor: ymajor, $
            yminor: yminor, $
+           xtickfont_size = 10.0, $
+           ytickfont_size = 10.0, $
            xticklen: 0.02, $
            yticklen: 0.02/aspect_ratio, $
            xsubticklen: 0.5, $
@@ -68,5 +70,6 @@ clr_prm = {orientation: 1, $
            title: "Power [dB]", $
            textpos: 1, $
            tickdir: 1, $
+           ticklen = 0.2, $
            font_name: "Times", $
            font_size: 14}

@@ -23,7 +23,7 @@
 
 function load_eppic_data, dataName,dataType, $
                           timestep=timestep
-@load_default_params
+@load_eppic_params
 
   if n_elements(dataName) gt 0 then begin
      nData = n_elements(dataName)

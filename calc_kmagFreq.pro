@@ -7,7 +7,7 @@
 
 @general_params
 if n_elements(dataName) eq 0 then dataName = 'den1'
-if n_elements(dataType) eq 0 then dataType = 'phdf'
+if n_elements(dataType) eq 0 then dataType = 'ph5'
 if n_elements(nTheta) eq 0 then nTheta = 360
 if n_elements(nAlpha) eq 0 then nAlpha = 1
 if n_elements(alpha) eq 0 then alpha = 0.0
