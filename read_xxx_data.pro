@@ -10,28 +10,21 @@
 ; Perhaps keep a global array of the data names that
 ; have been read.
 ;
-; The binary and phdf keywords exist for backward com-
-; patibility. The prefered method is to supply a string
-; for dataType.
 ;-
 
 function read_xxx_data, dataName, $
                         dataType, $
-                        binary=binary,phdf=phdf, $                        
                         _EXTRA=ex
 
-  if keyword_set(binary) then dataType = 'binary'
-  if keyword_set(phdf) then dataType = 'phdf'
   if size(dataType,/type) ne 7 then $
      message, "Please supply data type as a string"
-  ;; case 1 of
-  ;;    keyword_set(binary): data = read_bin_data(dataName,_EXTRA=ex)
-  ;;    keyword_set(phdf): data = read_ph5_data(dataName,_EXTRA=ex)
-  ;; endcase
   case 1 of
-     strcmp(dataType,'binary',/fold_case): data = read_bin_data(dataName,_EXTRA=ex)
-     strcmp(dataType,'phdf',/fold_case): data = read_ph5_data(dataName,_EXTRA=ex)
-     default: message, "Currently supported data types: [binary,phdf]"
+     strcmp(dataType,'bin',/fold_case): data = read_bin_data(dataName,_EXTRA=ex)
+     strcmp(dataType,'ph5',/fold_case): data = read_ph5_data(dataName,_EXTRA=ex)
+     else: begin 
+        print, "READ_XXX_DATA: Currently supported data types are [bin,ph5]"
+        data = 0.0
+     end
   endcase
 
   return, data

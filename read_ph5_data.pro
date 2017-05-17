@@ -21,6 +21,11 @@
 ;    can request the raw orientation by
 ;    calling the function with /NO_ROTATE
 ;    or NO_ROTATE=1.
+;
+; TO DO:
+; -- Consider getting dimensions from one
+;    file, then defining ndim_space instead
+;    of using nz as a proxy for dimensionality.
 ;-
 function read_ph5_data, dataName, $
                         verbose=verbose, $
@@ -54,16 +59,10 @@ function read_ph5_data, dataName, $
      message, errmsg
   endelse
 
-  if n_elements(timestep) ne 0 then begin
-     ;; tsInd = all_timesteps[timestep/nout]
-     h5File = h5File(timestep/nout)
-  endif
+  if n_elements(timestep) ne 0 then h5File = h5File(timestep/nout)
 
   nt = n_elements(h5File)
   data = make_array(nx,ny,nz,nt,type=type)
-
-  ;-->Get dimensions from one file, then
-  ;   define ndim_space and do dims check?
 
   if keyword_set(verbose) then print,"Reading ",dataName,"..."
   for it=0,nt-1 do begin
@@ -71,11 +70,6 @@ function read_ph5_data, dataName, $
      dataID = h5d_open(fileID,dataName)
      temp = h5d_read(dataID)
      if rotate_data then begin
-        ;; case ndim_space of
-        ;;    2: temp = rotate(temp,4)
-        ;;    3: for iz=0,nz-1 do $
-        ;;          temp[*,*,iz] = rotate(temp[*,*,iz],5)
-        ;; endcase
         if nz eq 1 then temp = rotate(temp,4) $
         else for iz=0,nz-1 do $
               temp[*,*,iz] = rotate(temp[*,*,iz],5)
