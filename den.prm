@@ -1,0 +1,67 @@
+;+
+; Parameters for plotting density
+;-
+
+imgSize = size(imgData)
+aspect_ratio = 1.0
+position = [[0.10,0.50,0.40,0.80], $ ;Top left
+            [0.50,0.50,0.80,0.80], $ ;Top right
+            [0.10,0.10,0.40,0.40], $ ;Bottom left
+            [0.50,0.10,0.80,0.40]]   ;Bottom right
+max_abs = max(abs(imgData))
+min_value = -max_abs
+max_value = max_abs
+title = strcompress(string(dt*timestep*1e3,format='(f5.1)'),/remove_all)
+title = "t = "+title+" ms"
+xmajor = 5
+xminor = 7
+xtickvalues = imgSize[1]*indgen(xmajor)/(xmajor-1)
+xtickname = strcompress(xtickvalues,/remove_all)
+xrange = [xtickvalues[0],xtickvalues[xmajor-1]]
+ymajor = 5
+yminor = 7
+ytickvalues = imgSize[2]*indgen(ymajor)/(ymajor-1)
+ytickname = strcompress(ytickvalues,/remove_all)
+yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
+
+img_prm = {axis_style: 2, $
+           aspect_ratio: aspect_ratio, $
+           position: position, $
+           min_value: min_value, $
+           max_value: max_value, $
+           title: title, $
+           xrange: xrange, $
+           yrange: yrange, $
+           xtickvalues: xtickvalues, $
+           ytickvalues: ytickvalues, $
+           xtickname: xtickname, $
+           ytickname: ytickname, $
+           xstyle: 1, $
+           ystyle: 1, $
+           xtitle: "Zonal [m]", $
+           ytitle: "Vertical [m]", $
+           xmajor: xmajor, $
+           xminor: xminor, $
+           ymajor: ymajor, $
+           yminor: yminor, $
+           xtickfont_size: 8.0, $
+           ytickfont_size: 8.0, $
+           xticklen: 0.02, $
+           yticklen: 0.02/aspect_ratio, $
+           xsubticklen: 0.5, $
+           ysubticklen: 0.5, $
+           xtickdir: 1, $
+           ytickdir: 1, $
+           font_size: 10.0, $
+           font_name: "Times", $
+           rgb_table: 5, $
+           buffer: 1B}
+
+use_clr = 1B
+clr_prm = {orientation: 1, $
+           title: "$\delta n/n_0$", $
+           textpos: 1, $
+           tickdir: 1, $
+           ticklen: 0.2, $
+           font_name: "Times", $
+           font_size: 14}
