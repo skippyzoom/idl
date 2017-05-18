@@ -17,11 +17,11 @@
 ; and place panels via the layout keyword.
 ;
 ; TO DO:
-; -- Make it possible for user to call 'multi_img, imgData'
+; -- Make it possible for user to call 'multi_image, imgData'
 ;    as a first pass.
 ;-
 
-pro multi_img, imgData,xData,yData, $
+pro multi_image, imgData,xData,yData, $
                name=name, $
                position=position, $
                img_prm=img_prm
@@ -38,7 +38,9 @@ pro multi_img, imgData,xData,yData, $
      if tag_exist(img_prm,'position') then begin
         position = img_prm.position
         remove_tag, img_prm,'position'
-        print, "MULTI_IMG: Placing plots according to implicitly passed position array"
+        if n_elements(position) ne np then $
+           message, "Please provide at least as many positions as plots"
+        print, "MULTI_IMAGE: Placing plots according to implicitly passed position array"
         for ip=0,np-1 do begin
            img = image(imgData[*,*,ip],xData,yData, $
                        current = (ip gt 0), $
@@ -48,7 +50,7 @@ pro multi_img, imgData,xData,yData, $
      endif else begin
         nc = fix(sqrt(np))+((sqrt(np) mod 1) gt 0)
         nr = nc
-        print, "MULTI_IMG: Placing plots with layout keyword."
+        print, "MULTI_IMAGE: Placing plots with layout keyword."
         for ip=0,np-1 do begin
            img = image(imgData[*,*,ip],xData,yData, $
                        current = (ip gt 0), $
@@ -58,12 +60,18 @@ pro multi_img, imgData,xData,yData, $
      endelse
   endif else begin
      if tag_exist(img_prm,'position') then remove_tag, img_prm,'position'
-     print, "MULTI_IMG: Placing plots according to explicitly passed position array"
+     if n_elements(position) ne np then $
+        message, "Please provide at least as many positions as plots"
+     print, "MULTI_IMAGE: Placing plots according to explicitly passed position array"
      for ip=0,np-1 do begin
+        img = image(imgData[*,*,ip],xData,yData, $
+                    current = (ip gt 0), $
+                    position = position[*,ip], $
+                    _EXTRA = img_prm)
      endfor     
   endelse
   
-  if n_elements(imgName) eq 0 then imgName = "multi_img.pdf"
+  if n_elements(imgName) eq 0 then imgName = "multi_image.pdf"
   print, "Saving ",imgName,"..."
   img.save, imgName
   img.close
