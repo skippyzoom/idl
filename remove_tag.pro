@@ -6,9 +6,11 @@
 ; the create_struct function. For some reason, the 
 ; documentation doesn't mention this useful keyword!
 ; https://harrisgeospatial.com/docs/CREATE_STRUCT.html
+;
+; SILENT: Suppress non-fatal warnings.
 ;-
 
-pro remove_tag, str,tag
+pro remove_tag, str,tag,silent=silent
 
   if n_params() ne 2 then $
      message, "Please provide struct and tag name." $
@@ -20,7 +22,9 @@ pro remove_tag, str,tag
   endelse
 
   ind = where(strcmp(tag_names(str),tag,/fold_case),count)
-  if count eq 0 then print, "tag '"+tag+"' is not a member of struct" $
-  else str = create_struct(str,remove=ind)
+  if count eq 0 then begin
+     if not(keyword_set(silent)) then $
+        print, "tag '"+tag+"' is not a member of struct"
+  endif else str = create_struct(str,remove=ind)
   
 end

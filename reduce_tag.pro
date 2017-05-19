@@ -26,9 +26,11 @@
 ; function to reset the field to a single blank string.
 ; Finally, I assign each string in title to the reset 'title'
 ; field in the parameter struct.
+;
+; SILENT: Suppress non-fatal warnings.
 ;-
 
-function reduce_tag, str,tag
+function reduce_tag, str,tag,silent=silent
 
   nTags = n_elements(tag)
   success = make_array(nTags,value=0B)
@@ -50,7 +52,8 @@ function reduce_tag, str,tag
         str = create_struct(str,tag[it],val)
         success[it] = 1B
      endif else begin
-        print, "tag '"+tag[it]+"' is not a member of struct"
+        if not(keyword_set(silent)) then $
+           print, "tag '"+tag[it]+"' is not a member of struct"
         success[it] = 0B
      endelse
   endfor

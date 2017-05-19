@@ -16,8 +16,6 @@
 ; that will override the hardcoded layout keyword.
 ;
 ; TO DO:
-; -- Make it possible for user to call 'multi_image, imgData'
-;    as a first pass.
 ; -- Add colorbar options.
 ; -- Add text options.
 ; -- Add axes-manipulation options.
@@ -31,7 +29,10 @@ pro multi_image, imgData,xData,yData, $
                  name=name, $
                  image_keywords=image_keywords, $
                  colorbar_keywords=colorbar_keywords, $
-                 text_keywords=text_keywords
+                 text_keywords=text_keywords, $
+                 colorbar_on=colorbar_on, $
+                 _EXTRA=ex
+
 
   ;;==Back-up keyword structs
   if keyword_set(image_keywords) then image_keywords_orig = image_keywords
@@ -40,47 +41,78 @@ pro multi_image, imgData,xData,yData, $
 
   ;;==Defaults and guards
   imgSize = size(imgData)
-  if imgSize[0] ne 3 then $
-     message, "Image data must have dimensions (nx,ny,np), where np = # of panels."
   nx = imgSize[1]
   ny = imgSize[2]
-  np = imgSize[3]
+  ;; if imgSize[0] ne 3 then $
+  ;;    message, "Image data must have dimensions (nx,ny,np), where np = # of panels."
+  ;; np = imgSize[3]
   if n_elements(xData) eq 0 then xData = indgen(nx)
   if n_elements(yData) eq 0 then yData = indgen(ny)
 
   ;;==Make image
-  if keyword_set(image_keywords) then begin
-     nc = fix(sqrt(np))+((sqrt(np) mod 1) gt 0)
-     nr = nc
-     timestep_tags = ['title','position']
-     title = image_keywords.title
-     position = image_keywords.position
-     timestep_keywords = create_struct(timestep_tags,title,position)
-     flag = reduce_tag(image_keywords,timestep_tags)
-     for ip=0,np-1 do begin
-        if flag[0] then $
-           image_keywords.title = timestep_keywords.title[ip]
-        if flag[1] then $
-           image_keywords.position = timestep_keywords.position[*,ip]
-        img = image(imgData[*,*,ip],xData,yData, $
-                    current = (ip gt 0), $
-                    layout = [nc,nr,ip+1], $
-                    _EXTRA = image_keywords)
-     endfor
-  endif else begin
-     img = image(imgData,xData,yData,/buffer)
-  endelse
-  
-  ;;==Save image
-  if n_elements(imgName) eq 0 then imgName = "multi_image.pdf"
-  print, "Saving ",imgName,"..."
-  img.save, imgName,/landscape
-  img.close
-  print, "Finished"
+  if imgSize[0] eq 3 then begin
+     np = imgSize[3]
+     if keyword_set(image_keywords) then begin
+        nc = fix(sqrt(np))+((sqrt(np) mod 1) gt 0)
+        nr = nc
+        timestep_tags = ['title','position']
+        title = image_keywords.title
+        position = image_keywords.position
+        timestep_keywords = create_struct(timestep_tags,title,position)
+        flag = reduce_tag(image_keywords,timestep_tags)
+        for ip=0,np-1 do begin
+           if flag[0] then $
+              image_keywords.title = timestep_keywords.title[ip]
+           if flag[1] then $
+              image_keywords.position = timestep_keywords.position[*,ip]
+           img = image(imgData[*,*,ip],xData,yData, $
+                       current = (ip gt 0), $
+                       layout = [nc,nr,ip+1], $
+                       _EXTRA = image_keywords)
+                                ;-->PANEL-/ROW-SPECIFIC COLORBAR & TEXT
+        endfor
+                                ;-->GLOBAL COLORBAR & TEXT
+     endif else begin
+        for ip=0,np-1 do begin
+           remove_tag, ex,'buffer',/silent
+           if tag_exist(ex,'layout') then begin
+              img = image(imgData[*,*,ip],xData,yData, $
+                          /buffer, $
+                          current = (ip gt 0), $
+                          _EXTRA=ex)
+              if keyword_set(colorbar_on) then $
+                 clr = colorbar(target=img,orientation=1)
+           endif else begin
+              nc = fix(sqrt(np))+((sqrt(np) mod 1) gt 0)
+              nr = nc
+              img = image(imgData[*,*,ip],xData,yData, $
+                          /buffer, $
+                          current = (ip gt 0), $
+                          layout = [nc,nr,ip+1], $
+                          _EXTRA=ex)
+              if keyword_set(colorbar_on) then $
+                 clr = colorbar(target=img,orientation=1)
+           endelse
+        endfor
+     endelse
+     
+     ;;==Save image
+     if n_elements(name) eq 0 then name = "multi_image.pdf"
+     print, "Saving ",name,"..."
+     img.save, name,/landscape
+     img.close
+     print, "Finished"
 
-  ;;==Reset keyword structs
-  if keyword_set(image_keywords) then image_keywords = image_keywords_orig
-  if keyword_set(colorbar_keywords) then colorbar_keywords = colorbar_keywords_orig
-  if keyword_set(text_keywords) then text_keywords = text_keywords_orig
-  
+     ;;==Reset keyword structs
+     if keyword_set(image_keywords) then image_keywords = image_keywords_orig
+     if keyword_set(colorbar_keywords) then colorbar_keywords = colorbar_keywords_orig
+     if keyword_set(text_keywords) then text_keywords = text_keywords_orig
+  endif else begin
+     print, "MULTI_IMAGE: This prodecure expects data to have dimensions (nx,ny,np),"
+     print, "             where np = # of image panels."
+     print, "             To create a single-panel image, try img = image(data[,x,y])."
+     print, "             See the IDL image() online help for more info."
+     print, " "
+  endelse
+
 end
