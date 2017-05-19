@@ -23,6 +23,9 @@
 ;    The single-plot case can just be a standard function call,
 ;    such as img = image(imgData,xData,yData,_EXTRA=ex), but it
 ;    should probably make sure buffer = 1B.
+; -- Change names of <*>_keywords so that /colorbar_on can be
+;    abbreviated as /colorbar when calling this procedure? 
+;    Using /colorbar is more intuitive but this is a minor point.
 ;-
 
 pro multi_image, imgData,xData,yData, $
@@ -80,8 +83,15 @@ pro multi_image, imgData,xData,yData, $
                           /buffer, $
                           current = (ip gt 0), $
                           _EXTRA=ex)
-              if keyword_set(colorbar_on) then $
-                 clr = colorbar(target=img,orientation=1)
+              if keyword_set(colorbar_on) then begin
+                 img_pos = img.position
+                 clr_pos = [img_pos[2]+0.01, $
+                            img_pos[1], $
+                            img_pos[2]+0.04, $
+                            img_pos[3]]
+                 clr = colorbar(target=img,orientation=1,textpos=1)
+                 clr.scale, 0.50,0.75
+              endif
            endif else begin
               nc = fix(sqrt(np))+((sqrt(np) mod 1) gt 0)
               nr = nc
@@ -90,8 +100,19 @@ pro multi_image, imgData,xData,yData, $
                           current = (ip gt 0), $
                           layout = [nc,nr,ip+1], $
                           _EXTRA=ex)
-              if keyword_set(colorbar_on) then $
-                 clr = colorbar(target=img,orientation=1)
+              if keyword_set(colorbar_on) then begin
+                 img_pos = img.position
+                 clr_pos = [img_pos[2]+0.01, $
+                            img_pos[1], $
+                            img_pos[2]+0.04, $
+                            img_pos[3]]
+                 clr = colorbar(target = img, $
+                                orientation = 1, $
+                                textpos = 1, $
+                                font_size = 6.0, $
+                                position = clr_pos)
+                 clr.scale, 0.50,0.75
+              endif
            endelse
         endfor
      endelse
