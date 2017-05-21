@@ -7,6 +7,10 @@
 ; documentation doesn't mention this useful keyword!
 ; https://harrisgeospatial.com/docs/CREATE_STRUCT.html
 ;
+; SIDE EFFECTS:
+; -- Tag indices of the new struct will not match tag
+;    indices of the old struct.
+;
 ; SILENT: Suppress non-fatal warnings.
 ;-
 

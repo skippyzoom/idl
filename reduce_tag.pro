@@ -5,14 +5,17 @@
 ; The "zero" value for a string is a blank, non-null 
 ; string (i.e. ' ').
 ;
+; SIDE EFFECTS:
+; -- Tag indices of the new struct will not match tag
+;    indices of the old struct.
+;
 ; NOTES:
 ; -- This function was originally written to deal with 
-; image() keywords passed to multi_image.pro in for which
-; the value differs among panels.
-;
-; -- Recursively calling this function on the same tag N+1
-; times, where N is the dimension of the field data, will
-; result in zeroing the field.
+;    image() keywords passed to multi_image.pro in for
+;    which the value differs among panels.
+; -- Recursively calling this function on the same tag
+;    N+1 times, where N is the dimension of the field data,
+;    will result in zeroing the field.
 ;
 ; Example:
 ;   Suppose I pass a struct of keywords to multi_image.pro

@@ -3,6 +3,10 @@
 ; by copying the data into a new variable, then 
 ; removing the field from the struct.
 ;
+; SIDE EFFECTS:
+; -- Tag indices of the new struct will not match tag
+;    indices of the old struct.
+;
 ; SILENT: Suppress non-fatal warnings.
 ;-
 
