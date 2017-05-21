@@ -23,7 +23,7 @@ yminor = 7
 ytickvalues = imgSize[2]*indgen(ymajor)/(ymajor-1)
 ytickname = strcompress(ytickvalues,/remove_all)
 yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
-
+ct = get_custom_ct(1)
 kw_image = {axis_style: 2, $
             aspect_ratio: aspect_ratio, $
             position: position, $
@@ -54,21 +54,17 @@ kw_image = {axis_style: 2, $
             ytickdir: 1, $
             font_size: 10.0, $
             font_name: "Times", $
-            rgb_table: 5, $
+            rgb_table: [[ct.r],[ct.g],[ct.b]], $
             buffer: 1B}
 
 use_clr = 1B
 img_pos = kw_image.position
-;; position = [[img_pos[2,0]+0.01,img_pos[1,0],img_pos[2,0]+0.04,img_pos[3,0]], $ ;Top left
-;;             [img_pos[2,1]+0.01,img_pos[1,1],img_pos[2,1]+0.04,img_pos[3,1]], $ ;Top right
-;;             [img_pos[2,2]+0.01,img_pos[1,2],img_pos[2,2]+0.04,img_pos[3,2]], $ ;Bottom left
-;;             [img_pos[2,3]+0.01,img_pos[1,3],img_pos[2,3]+0.04,img_pos[3,3]]]   ;Bottom right
-position = [[img_pos[2,0],img_pos[1,0],img_pos[2,0]+0.04,img_pos[3,0]], $ ;Top left
-            [img_pos[2,1],img_pos[1,1],img_pos[2,1]+0.04,img_pos[3,1]], $ ;Top right
-            [img_pos[2,2],img_pos[1,2],img_pos[2,2]+0.04,img_pos[3,2]], $ ;Bottom left
-            [img_pos[2,3],img_pos[1,3],img_pos[2,3]+0.04,img_pos[3,3]]]   ;Bottom right
+position = [[img_pos[2,0]+0.01,img_pos[1,0],img_pos[2,0]+0.04,img_pos[3,0]], $ ;Top left
+            [img_pos[2,1]+0.01,img_pos[1,1],img_pos[2,1]+0.04,img_pos[3,1]], $ ;Top right
+            [img_pos[2,2]+0.01,img_pos[1,2],img_pos[2,2]+0.04,img_pos[3,2]], $ ;Bottom left
+            [img_pos[2,3]+0.01,img_pos[1,3],img_pos[2,3]+0.04,img_pos[3,3]]]   ;Bottom right
 kw_colorbar = {orientation: 1, $
-               title: "$\delta n/n_0$", $
+               title: "$\phi$ [V]", $
                position: position, $
                textpos: 1, $
                tickdir: 1, $

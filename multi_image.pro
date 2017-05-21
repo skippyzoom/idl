@@ -49,35 +49,55 @@ pro multi_image, imgData,xData,yData, $
   ;;==Make image
   if imgSize[0] eq 3 then begin
      np = imgSize[3]
-     timestep_tags = ['title','position']
+     timestep_tags = ['position','title']
      if keyword_set(kw_image) then begin
         nc = fix(sqrt(np))+((sqrt(np) mod 1) gt 0)
         nr = nc
-        for ip=0,np-1 do begin
-           ;Test for tag existence
-           ;Test tag for time steps
-           ;If true:
-           ;   replace field with value at current time step
-           ;If false:
-           ;   do nothing
-           if tag_exist(kw_image,'position') then begin
-              tmpSize = size(kw_image.position)
+        flag = make_array(n_elements(timestep_tags),value=0B)
+        if tag_exist(kw_image,timestep_tags[0]) then begin
+           ind = where(strcmp(tag_names(kw_image),timestep_tags[0],/fold_case),count)
+           if count ne 0 then begin
+              tmpSize = size(kw_image.(ind))
               case 1B of
                  (tmpSize[0] eq 0): $
                     message, "kw_image.position must have at least 4 elements"
+                 (tmpSize[0] eq 1): ;Do nothing
+                 (tmpSize[0] eq 2): begin
+                    position = kw_image.position
+                    flag[0] = reduce_tag(kw_image,'position')
+                 end
                  (tmpSize[0] gt 2): $
                     message, "kw_image.position must be 1D or 2D"
-                 else: 
               endcase
            endif
+        endif
+        if tag_exist(kw_image,timestep_tags[1]) then begin
+           ind = where(strcmp(tag_names(kw_image),timestep_tags[1],/fold_case),count)
+           if count ne 0 then begin
+              tmpSize = size(kw_image.(ind))
+              case 1B of
+                 (tmpSize[0] eq 0): ;Do nothing
+                 (tmpSize[0] eq 1): begin
+                    title = kw_image.title
+                    flag[1] = reduce_tag(kw_image,'title')
+                 end
+                 (tmpSize[0] gt 1): $
+                    message, "kw_image.title must be scalar or 1D"
+              endcase
+           endif
+        endif
+        for ip=0,np-1 do begin
+           if flag[0] then kw_image.position = position[*,ip]
+           if flag[1] then kw_image.title = title[ip]
            img = image(imgData[*,*,ip],xData,yData, $
                        current = (ip gt 0), $
                        layout = [nc,nr,ip+1], $
                        _EXTRA = kw_image)
            if keyword_set(kw_colorbar) then begin ;UNTESTED
-              
+              replace_tag, kw_colorbar,'position',kw_colorbar_orig.position[*,ip]
               clr = colorbar(target = img, $
                              _EXTRA = kw_colorbar)
+              clr.scale, 0.50,0.75
            endif
            if keyword_set(kw_text) then begin ;UNTESTED
               if n_elements(kw_text.x) eq 1 then begin
