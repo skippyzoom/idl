@@ -29,7 +29,7 @@ function load_eppic_data, dataName,dataType, $
   if n_elements(dataName) gt 0 then begin
      nData = n_elements(dataName)
      if n_elements(dataType) ne nData then $
-        dataType = make_array(nData,value=dataType)
+        dataType = make_array(nData,value=dataType[0])
      if n_elements(timestep) eq 0 then nt = ntMax $
      else nt = n_elements(timestep)
      data = create_struct(dataName[0],fltarr(grid.nx,grid.ny,grid.nz,nt))
