@@ -22,13 +22,14 @@
 ;-
 
 function load_eppic_data, dataName,dataType, $
-                          timestep=timestep
+                          timestep=timestep, $
+                          _EXTRA=ex
 @load_eppic_params
 
   if n_elements(dataName) gt 0 then begin
      nData = n_elements(dataName)
      if n_elements(dataType) ne nData then $
-        dataType = make_array(nData,value='ph5')
+        dataType = make_array(nData,value=dataType)
      if n_elements(timestep) eq 0 then nt = ntMax $
      else nt = n_elements(timestep)
      data = create_struct(dataName[0],fltarr(grid.nx,grid.ny,grid.nz,nt))
@@ -49,7 +50,9 @@ function load_eppic_data, dataName,dataType, $
                              sizepertime = grid.sizepertime, $
                              timestep = timestep, $
                              path = 'parallel', $
-                             /verbose)
+                             /verbose, $
+                             ;; /no_rotate)
+                             _EXTRA = ex)
         data.(id) = temp
      endfor
      return, data

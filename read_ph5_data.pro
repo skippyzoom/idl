@@ -35,7 +35,6 @@ function read_ph5_data, dataName, $
                         type=type,path=path, $
                         no_rotate=no_rotate
 
-
   if n_elements(ext) eq 0 then ext = 'h5'
   if n_elements(nx) eq 0 then nx = 1
   if n_elements(ny) eq 0 then ny = 1
