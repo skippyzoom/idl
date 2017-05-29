@@ -55,10 +55,14 @@ function analyze_moments, ntMax
   if n_elements(vzthd1) eq 0 then vzthd1 = 0.
   if n_elements(vz0d1) eq 0 then vz0d1 = 0.
   ;; if n_elements(Bz) eq 0 and n_elements(Bx) ne 0 then Bz = Bx
-  if hdf_output_arrays then Bz = Bx & Bx = 0.0
+  ;; if hdf_output_arrays then Bz = Bx & Bx = 0.0
   if (n_elements(kb) eq 0) then if (md0 lt 1e-8) then kb = 1.38e-23 else kb = 1
   if (n_elements(coll_rate0) eq 0) then coll_rate0 = 0.
   if (n_elements(coll_rate1) eq 0) then coll_rate1 = 0.
+  if (n_elements(Bx) eq 0) then Bx = 0.
+  if (n_elements(By) eq 0) then By = 0.
+  if (n_elements(Bz) eq 0) then Bz = 0.
+  B0 = sqrt(Bx^2 + By^2 + Bz^2)
   if (n_elements(Ex0_external) eq 0) then Ex0_external = 0.
   if (n_elements(Ey0_external) eq 0) then Ey0_external = 0.
   if (n_elements(Ez0_external) eq 0) then Ez0_external = 0.
@@ -84,8 +88,8 @@ function analyze_moments, ntMax
 
      ;;==Theoretical values
      ;;--cyclotron frequencies
-     wc0  = qd0*Bz/md0
-     wc1  = qd1*Bz/md1
+     wc0  = qd0*B0/md0
+     wc1  = qd1*B0/md1
      ;;--parallel mobilities
      if (coll_rate0 ne 0) then $
         mu0_start = qd0/coll_rate0/md0 $
@@ -109,14 +113,14 @@ function analyze_moments, ntMax
      Cs_start = sqrt(kb*(T0_start + T1_start)/md1)
      ;;--Psi
      Psi_start = abs(coll_rate0*coll_rate1/(wc0*wc1))
-     driver = (Ey0_external/Bz)/(1+Psi_start)
+     driver = (Ey0_external/B0)/(1+Psi_start)
 
      ;;==Simulated values
      ;;--Collision frequencies and Psi
      nu0 = moments1[5,*]*0.0 + coll_rate0       ;Input value
      nu1 = Ey0_external/(moments1[5,*])*(qd1/md1) ;Ped drift
      Psi = abs(nu0*nu1/(wc0*wc1))
-     driver = (Ey0_external/Bz)/(1+Psi)
+     driver = (Ey0_external/B0)/(1+Psi)
      ;;--parallel mobilities
      !NULL = where(nu0 ne 0.0,count)
      if (count ne 0) then $
@@ -148,8 +152,8 @@ function analyze_moments, ntMax
   else begin
      ;;==Theoretical values
      ;;--cyclotron frequencies
-     wc0  = qd0*Bz/md0
-     wc1  = qd1*Bz/md1
+     wc0  = qd0*B0/md0
+     wc1  = qd1*B0/md1
      ;;--parallel mobilities
      if (coll_rate0 ne 0) then $
         mu0_start = qd0/coll_rate0/md0 $
@@ -173,14 +177,14 @@ function analyze_moments, ntMax
      Cs_start = sqrt(kb*(T0_start + T1_start)/md1)
      ;;--Psi
      Psi_start = abs(coll_rate0*coll_rate1/(wc0*wc1))
-     driver = (Ey0_external/Bz)/(1+Psi_start)
+     driver = (Ey0_external/B0)/(1+Psi_start)
 
      ;;==Simulated values
      ;;--Collision frequencies and Psi
      nu0 = moments0[5,*]/moments0[1,*]*wc0      ;Hall drift
      nu1 = Ey0_external/(moments1[5,*])*(qd1/md1) ;Ped drift
      Psi = abs(nu0*nu1/(wc0*wc1))
-     driver = (Ey0_external/Bz)/(1+Psi)
+     driver = (Ey0_external/B0)/(1+Psi)
      ;;--parallel mobilities
      !NULL = where(nu0 ne 0.0,count)
      if (count ne 0) then $
