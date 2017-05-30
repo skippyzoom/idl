@@ -9,9 +9,13 @@ aspect_ratio = 1.0
 ;;             [0.10,0.10,0.40,0.40], $ ;Bottom left
 ;;             [0.50,0.10,0.80,0.40]]   ;Bottom right
 position = [[0.10,0.50,0.40,0.80], $ ;Top left
-            [0.60,0.50,0.90,0.80], $ ;Top right
+            [0.45,0.50,0.75,0.80], $ ;Top right
             [0.10,0.10,0.40,0.40], $ ;Bottom left
-            [0.60,0.10,0.90,0.40]]   ;Bottom right
+            [0.45,0.10,0.75,0.40]]   ;Bottom right
+;; position = [[0.10,0.50,0.40,0.80], $ ;Top left
+;;             [0.60,0.50,0.90,0.80], $ ;Top right
+;;             [0.10,0.10,0.40,0.40], $ ;Bottom left
+;;             [0.60,0.10,0.90,0.40]]   ;Bottom right
 max_abs = max(abs(imgData))
 min_value = -max_abs
 max_value = max_abs
@@ -67,15 +71,35 @@ img_pos = kw_image.position
 ;;             [img_pos[2,1]+0.01,img_pos[1,1],img_pos[2,1]+0.04,img_pos[3,1]], $ ;Top right
 ;;             [img_pos[2,2]+0.01,img_pos[1,2],img_pos[2,2]+0.04,img_pos[3,2]], $ ;Bottom left
 ;;             [img_pos[2,3]+0.01,img_pos[1,3],img_pos[2,3]+0.04,img_pos[3,3]]]   ;Bottom right
-position = [[img_pos[2,0],img_pos[1,0],img_pos[2,0]+0.02,img_pos[3,0]], $ ;Top left
-            [img_pos[2,1],img_pos[1,1],img_pos[2,1]+0.02,img_pos[3,1]], $ ;Top right
-            [img_pos[2,2],img_pos[1,2],img_pos[2,2]+0.02,img_pos[3,2]], $ ;Bottom left
-            [img_pos[2,3],img_pos[1,3],img_pos[2,3]+0.02,img_pos[3,3]]]   ;Bottom right
+;; position = [[img_pos[2,0],img_pos[1,0],img_pos[2,0]+0.02,img_pos[3,0]], $ ;Top left
+;;             [img_pos[2,1],img_pos[1,1],img_pos[2,1]+0.02,img_pos[3,1]], $ ;Top right
+;;             [img_pos[2,2],img_pos[1,2],img_pos[2,2]+0.02,img_pos[3,2]], $ ;Bottom left
+;;             [img_pos[2,3],img_pos[1,3],img_pos[2,3]+0.02,img_pos[3,3]]]   ;Bottom right
+cb_width = 0.03
+cb_height = 0.40
+cb_x0 = img_pos[2,1]+0.01
+cb_y0 = 0.50-0.50*cb_height
+cb_x1 = cb_x0 + cb_width
+cb_y1 = 0.50+0.50*cb_height
+position = [[cb_x0,cb_y0,cb_x1,cb_y1], $ ;Single colorbar (use with global min/max)
+            [-1,-1,-1,-1], $
+            [-1,-1,-1,-1], $
+            [-1,-1,-1,-1]]
+major = 7
+tickvalues = !NULL
+tickname = !NULL
+if n_elements(kw_image.max_value) ne 0 and n_elements(kw_image.min_value) ne 0 then $
+   tickvalues = (kw_image.max_value-kw_image.min_value)*findgen(major)/(major-1)+kw_image.min_value
+if n_elements(tickvalues) ne 0 then $
+   tickname = plusminus_labels(1e3*tickvalues,format='f5.1')
 kw_colorbar = {orientation: 1, $
-               title: "$\phi$ [V]", $
+               title: "$\phi$ [mV]", $
                position: position, $
                textpos: 1, $
                tickdir: 1, $
                ticklen: 0.2, $
+               major: 7, $
+               tickvalues: tickvalues, $
+               tickname: tickname, $
                font_name: "Times", $
                font_size: 10.0}

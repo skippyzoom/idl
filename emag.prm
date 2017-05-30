@@ -16,9 +16,8 @@ position = [[0.10,0.50,0.40,0.80], $ ;Top left
 ;;             [0.60,0.50,0.90,0.80], $ ;Top right
 ;;             [0.10,0.10,0.40,0.40], $ ;Bottom left
 ;;             [0.60,0.10,0.90,0.40]]   ;Bottom right
-max_abs = max(abs(imgData))
-min_value = -max_abs
-max_value = max_abs
+min_value = 0
+max_value = max(imgData)
 title = strcompress(string(dt*timestep*1e3,format='(f5.1)'),/remove_all)
 title = "t = "+title+" ms"
 xmajor = 5
@@ -31,7 +30,6 @@ yminor = 7
 ytickvalues = imgSize[2]*indgen(ymajor)/(ymajor-1)
 ytickname = strcompress(ytickvalues,/remove_all)
 yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
-
 kw_image = {axis_style: 2, $
             aspect_ratio: aspect_ratio, $
             position: position, $
@@ -62,7 +60,7 @@ kw_image = {axis_style: 2, $
             ytickdir: 1, $
             font_size: 10.0, $
             font_name: "Times", $
-            rgb_table: 5, $
+            rgb_table: 3, $
             buffer: 1B}
 
 use_clr = 1B
@@ -85,15 +83,17 @@ position = [[cb_x0,cb_y0,cb_x1,cb_y1], $ ;Single colorbar (use with global min/m
             [-1,-1,-1,-1], $
             [-1,-1,-1,-1], $
             [-1,-1,-1,-1]]
-major = 7
+major = 5
 tickvalues = !NULL
 tickname = !NULL
 if n_elements(kw_image.max_value) ne 0 and n_elements(kw_image.min_value) ne 0 then $
    tickvalues = (kw_image.max_value-kw_image.min_value)*findgen(major)/(major-1)+kw_image.min_value
+;; if n_elements(tickvalues) ne 0 then $
+;;    tickname = plusminus_labels(1e3*tickvalues,format='f5.1')
 if n_elements(tickvalues) ne 0 then $
-   tickname = plusminus_labels(100*tickvalues,format='f5.2')
+   tickname = string(1e3*tickvalues,format='(f5.2)')
 kw_colorbar = {orientation: 1, $
-               title: "$\delta n/n_0$ [%]", $
+               title: "$|E|$ [mV/m]", $
                position: position, $
                textpos: 1, $
                tickdir: 1, $

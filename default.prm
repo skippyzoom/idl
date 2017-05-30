@@ -7,6 +7,9 @@
 ; Graphics default structs will be passed to graphics routines, so
 ; they may only consist of valid keyword parameters for the 
 ; receiving routine.
+;
+; This script may be called multiple times during analysis routines,
+; so DO NOT PUT ANY RECURSIVE CALCULATIONS HERE!
 ;-
 
 ny = 1

@@ -20,8 +20,7 @@
 ; update it for a specific project by, e.g., 
 ; changing timestep and lWant.
 ;-
-
-@load_default_params
+@load_eppic_params
 ;; timestep = nout*(indgen(ntMax/2)+ntMax/2+1)
 timestep = nout*(lindgen(ntMax-1)+1)
 dataName = 'den1'

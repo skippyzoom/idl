@@ -1,4 +1,3 @@
-function plusminus_labels, values,type=type
 ;+
 ; Intended to be a way to prevent '+0.0' when
 ; using a 'f+...' format specifier, but in its
@@ -6,21 +5,35 @@ function plusminus_labels, values,type=type
 ; may be inconsistent with the rest of the 
 ; labels.
 ;
-; TYPE:
-;   If type = 'i' then output will be in integer format
-;   If type = 'f' then output will be in float format
-;   float is the default
-;
-; TO DO:
-; -- Just let the user specify the format so they can 
-;    also specify the width and number of decimals?
+; FORMAT: Optional user-specified FORTRAN-style
+;   format code. See 
+;   https://harrisgeospatial.com/docs/format_codes_fortran.html
+;   for details. If the user passes a string with 
+;   leading or training parentheses, this function
+;   will strip them to access the code and width.
 ;-
+function plusminus_labels, values,format=format
 
-  if keyword_set(type) eq 0 then type = 'f'
-  labels = string(values,format='('+type+'+18.1)')
+  ;;==Defaults and guards
+  if n_elements(format) eq 0 then format = 'f8.3'
+
+  ;;==Strip parentheses
+  length = strlen(format)
+  if strcmp(strmid(format,0,1),'(') then $
+     format = strmid(format,1,length-1)
+  length = strlen(format)
+  if strcmp(strmid(format,0,1,/reverse),')') then $
+     format = strmid(format,0,length-1)
+
+  ;;==Extract format code and width
+  length = strlen(format)
+  code = strmid(format,0,1)
+  width = strmid(format,1,length-1)
+
+  ;;==Create labels
+  labels = string(values,format='('+code+'+'+width+')')
   iEq0 = where(values eq 0.0)
-  if strcmp(type,'f') then labels[iEq0] = '0.0' $
-  else labels[iEq0] = '0'
+  labels[iEq0] = string(0,format='('+format+')')
   labels = strcompress(labels,/remove_all)
 
   return, labels
