@@ -3,23 +3,29 @@
 ; array of power as a function of k value (k),
 ; look angle (theta), frequency (omega), and, 
 ; optionally, aspect angle (alpha)
+;
+; TO DO:
+; -- Make this a function or procedure that 
+;    takes "data" array as input. It will be
+;    more flexible if it's ignorant of the
+;    actual physical quantity in "data".
 ;-
-@load_eppic_params
-if n_elements(dataName) eq 0 then dataName = 'den1'
-if n_elements(dataType) eq 0 then dataType = 'ph5'
-if n_elements(nTheta) eq 0 then nTheta = 360
-if n_elements(nAlpha) eq 0 then nAlpha = 1
-if n_elements(alpha) eq 0 then alpha = 0.0
-if n_elements(timestep) eq 0 then timestep = 0
+;; @load_eppic_params
+;; if n_elements(dataName) eq 0 then dataName = 'den1'
+;; if n_elements(dataType) eq 0 then dataType = 'ph5'
+;; if n_elements(nTheta) eq 0 then nTheta = 360
+;; if n_elements(nAlpha) eq 0 then nAlpha = 1
+;; if n_elements(alpha) eq 0 then alpha = 0.0
+;; if n_elements(timestep) eq 0 then timestep = 0
 
-data = read_xxx_data(dataName, $
-                     dataType, $
-                     nx = grid.nx, $
-                     ny = grid.ny, $
-                     nz = grid.nz, $
-                     timestep = timestep, $
-                     path = 'parallel', $
-                     /verbose)
+;; data = read_xxx_data(dataName, $
+;;                      dataType, $
+;;                      nx = grid.nx, $
+;;                      ny = grid.ny, $
+;;                      nz = grid.nz, $
+;;                      timestep = timestep, $
+;;                      path = 'parallel', $
+;;                      /verbose)
 
 data = fft_custom(data,/overwrite, $
                   /center, $

@@ -19,6 +19,10 @@
 ;    been read successfully.
 ; -- Allow user to specify names of IDL save files
 ;    from which to read data.
+; -- Add option to calculate E-field component(s) or 
+;    magnitude? May be more trouble than it's worth,
+;    but could also provide a more streamlined setup
+;    for kmag_interpolate-related routines.
 ;-
 
 function load_eppic_data, dataName,dataType, $
@@ -53,7 +57,6 @@ function load_eppic_data, dataName,dataType, $
                              timestep = timestep, $
                              path = 'parallel', $
                              /verbose, $
-                             ;; /no_rotate)
                              _EXTRA = ex)
         data.(id) = temp
      endfor

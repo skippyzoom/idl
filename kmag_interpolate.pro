@@ -3,31 +3,31 @@
 ; into an array of (|k|,theta) via IDL's interpolate.pro 
 ; Modeled after fixed_k_spectra2d/3d.pro.
 ;
-; This routine gets nx,ny,nz from the input array, not
+; This function gets nx,ny,nz from the input array, not
 ; from the simulation parameter file, and uses those
 ; values to determine whether to run 2-D or 3-D inter-
 ; polation. It assumes that the entire array is to be
 ; interpolated (i.e. that any looping happens outside).
+;
+; The kVals array goes from kMin (defined to be the smallest
+; of 2*!pi/<Lx,Ly,Lz>, where Lj is the simulation lenght in
+; the jth direction) to k_Nyquist/2, since that is the 
+; largest radius allowable by the Sampling Theorem when
+; interpolating from Cartesian to spherical coordinates.
 ;
 ; NOTES:
 ; -- 3D disk block may not be correct. 16Nov2016 (may)
 ;    Interpolating around a tilted disk may not yield
 ;    a physically interesting result, anyway,
 ;    since radars look at a fixed aspect angle. 04Apr2017 (may)
-; -- The aspect angle used here is actually the complement 
-;    to the aspect angle used in literature. Consider 
-;    renaming the parameter or adjusting the analysis to
-;    make this routine consistent with convention.
-;    FIXED. 04Apr2017 (may)
 ;
 ; TO DO:
-; -- Allow INFO keyword to return only informational
-;    parameters (e.g. nk) without calculating kmag.
-;    DONE. 29Apr2017 (may)
 ; -- Allow user to request one k value, to prevent
 ;    creating an unnecessarily large kmag array.
 ;    The default behavior can be to create the entire
 ;    kmag array.
+; -- Should k<x,y,z>Min be half the current value, to
+;    account for +/- symmetry in Fourier space?
 ;-
 
 function kmag_interpolate, fftArray, $
@@ -54,10 +54,6 @@ function kmag_interpolate, fftArray, $
   if ndim_space eq 3 then nz = fftSize[3]
 
   ;;==Defaults and guards
-  ;; if n_elements(dx) eq 0 then message, "Please supply dx > 0"
-  ;; if n_elements(dy) eq 0 then message, "Please supply dy > 0"
-  ;; if ndim_space eq 3 and n_elements(dz) eq 0 then $
-  ;;    message, "Please supply dz > 0"
   if n_elements(dx) eq 0 then dx = 2.0/nx
   if n_elements(dy) eq 0 then dy = 2.0/ny
   if ndim_space eq 3 and n_elements(dz) eq 0 then dz = 2.0/nz
@@ -73,13 +69,6 @@ function kmag_interpolate, fftArray, $
   endif
 
   ;;==Calculate # of k values and make array
-  ;; nx = fftSize[1]
-  ;; ny = fftSize[2]
-  ;; nk = min([nx/2,ny/2])
-  ;; if ndim_space eq 3 then begin
-  ;;    nz = fftSize[3]
-  ;;    nk = min([nk,nz/2])
-  ;; endif
   nk = min([nx/2,ny/2])
   if ndim_space eq 3 then nk = min([nk,nz/2])
   xLen = dx*nx
@@ -94,8 +83,7 @@ function kmag_interpolate, fftArray, $
   kVals = kMin*(1.0+dindgen(nk))
 
   if keyword_set(info) then $
-       return, {kmag: 0.0, $
-                kVals: kVals, $
+       return, {kVals: kVals, $
                 nTheta: nTheta, $
                 nAlpha: nAlpha, $
                 aspect: aspect, $
