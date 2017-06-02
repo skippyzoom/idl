@@ -30,7 +30,7 @@
 ;    account for +/- symmetry in Fourier space?
 ;-
 
-function kmag_interpolate, fftArray, $
+function kmag_interpolate, data, $
                            dx=dx,dy=dy,dz=dz, $
                            aspect=aspect, $
                            nTheta=nTheta,nAlpha=nAlpha, $
@@ -40,12 +40,12 @@ function kmag_interpolate, fftArray, $
                            info=info
 
   ;;==Ensure correct input
-  if n_elements(fftArray) eq 0 then $
+  if n_elements(data) eq 0 then $
      message, "Please supply FFT array"
 
   ;;==Remove singular dimensions and get sizes
-  fftArray = reform(fftArray)
-  fftSize = size(fftArray)
+  data = reform(data)
+  fftSize = size(data)
   ndim_space = fftSize[0]
   if ndim_space ne 2 and ndim_space ne 3 then $
      message, "Input must be 2D or 3D"
@@ -90,11 +90,11 @@ function kmag_interpolate, fftArray, $
                 shape: shape} $
   else begin
      ;;==Create output array
-     kmag = fltarr(nk,nTheta,nAlpha)
+     array = fltarr(nk,nTheta,nAlpha)
 
      ;;==Normalize input array
      if keyword_set(normalize) then $
-        fftArray /= max(fftArray)
+        data /= max(data)
 
      case ndim_space of
         2: begin
@@ -104,10 +104,10 @@ function kmag_interpolate, fftArray, $
               tVals = 2*!pi*dindgen(tSize)/tSize
               kxInterp = cos(tVals)*kVals[ik]/kxMin + nx/2
               kyInterp = sin(tVals)*kVals[ik]/kyMin + ny/2
-              kmagTmp = interpolate(fftArray, $
+              kmagTmp = interpolate(data, $
                                     kxInterp,kyInterp, $
                                     missing=0.)
-              kmag[ik,*,0] = congrid(kmagTmp,nTheta,/interp)
+              array[ik,*,0] = congrid(kmagTmp,nTheta,/interp)
            endfor
         end
         3: begin
@@ -137,10 +137,10 @@ function kmag_interpolate, fftArray, $
                                      cos(tVals)*kVals[ik]/kzMin + nz/2
                        end
                     endcase
-                    kmagTmp = interpolate(fftArray, $
+                    kmagTmp = interpolate(data, $
                                           kxInterp,kyInterp,kzInterp, $
                                           missing=0.)
-                    kmag[ik,*,0] = congrid(kmagTmp,nTheta,/interp)
+                    array[ik,*,0] = congrid(kmagTmp,nTheta,/interp)
                  endfor
               end
               strcmp(shape,'cone',/fold_case): begin
@@ -154,10 +154,10 @@ function kmag_interpolate, fftArray, $
                                sin(tVals)*kVals[ik]/kyMin + ny/2
                     kzInterp = double(sin(aspect))* $
                                (1.0+fltarr(tSize))*kVals[ik]/kzMin + nz/2
-                    kmagTmp = interpolate(fftArray, $
+                    kmagTmp = interpolate(data, $
                                           kxInterp,kyInterp,kzInterp, $
                                           missing=0.)
-                    kmag[ik,*,0] = congrid(kmagTmp,nTheta,/interp)
+                    array[ik,*,0] = congrid(kmagTmp,nTheta,/interp)
                  endfor
               end
               strcmp(shape,'sphere',/fold_case): begin
@@ -173,17 +173,17 @@ function kmag_interpolate, fftArray, $
                                double(cos(aVals)) + ny/2
                     kzInterp = ((dblarr(tSize)+1.0)*kVals[ik]/kzMin)# $
                                double(sin(aVals)) + nz/2
-                    kmagTmp = interpolate(fftArray, $
+                    kmagTmp = interpolate(data, $
                                           kxInterp,kyInterp,kzInterp, $
                                           missing=0.0)                       
-                    kmag[ik,*,*] = congrid(kmagTmp,nTheta,nAlpha,/interp)
+                    array[ik,*,*] = congrid(kmagTmp,nTheta,nAlpha,/interp)
                  endfor
               end
            endcase              ;3D: disk, cone, or sphere
         end
      endcase                    ;2D or 3D
 
-     return, {kmag: kmag, $
+     return, {array: array, $
               kVals: kVals, $
               nTheta: nTheta, $
               nAlpha: nAlpha, $
