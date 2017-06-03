@@ -38,19 +38,22 @@ function fft_custom, data, $
   n_dims = size(data,/n_dim)
   datadims = size(data,/dim)
   if n_elements(fftdims) eq 0 then $
-     fftdims = datadims
+     fftdims = datadims $
+  else begin
+     if tag_exist(ex,'overwrite') then begin
+        print, "FFT_CUSTOM: Cannot resize data when using /overwrite."
+        print, "            Using original dimensions instead."
+     endif
+  endelse
   if n_elements(alpha) eq 0 then alpha = 1.0
   do_time_fft = 1B
   if keyword_set(skip_time_fft) then do_time_fft = 0B
-  
-  ndx = 1
-  nkx = 1
-  ndy = 1
-  nky = 1
-  ndz = 1
-  nkz = 1
-  ndt = 1
-  nw = 1
+
+  ;;==Check dimensions
+  ndx = 1 & nkx = 1
+  ndy = 1 & nky = 1
+  ndz = 1 & nkz = 1
+  ndt = 1 & nw = 1
   switch n_dims of
      4: begin
         ndt = datadims[3]
@@ -78,9 +81,19 @@ function fft_custom, data, $
      end
   endswitch
 
-  fftdata = fltarr(nkx,nky,nkz,nw)*0.0
-  fftdata[0:ndx-1,0:ndy-1,0:ndz-1,0:ndt-1] = data
-  data = 0.0
+  ;;==Set up data
+  if tag_exist(ex, 'overwrite') then begin
+     if keyword_set(verbose) then $
+        print, "FFT: Overwriting input array..."
+  endif else begin
+     if keyword_set(verbose) then $
+        print, "FFT: Setting up FFT array..."
+     data_in = data
+     data = !NULL
+     data = fltarr(nkx,nky,nkz,nw)*0.0
+     data[0:ndx-1,0:ndy-1,0:ndz-1,0:ndt-1] = data_in
+     data_in = !NULL
+  endelse
 
   ;;==Add window
   if keyword_set(do_time_fft) then begin
@@ -92,7 +105,7 @@ function fft_custom, data, $
         Hsize = nw/2
         ;; Hsize = nw
         Hwin = Hanning(Hsize,alpha=alpha)
-        for iw=0,Hsize-1 do fftdata[*,*,*,iw] *= Hwin[iw]
+        for iw=0,Hsize-1 do data[*,*,*,iw] *= Hwin[iw]
      endif
   endif
 
@@ -100,10 +113,10 @@ function fft_custom, data, $
   if keyword_set(verbose) then $
      print, "FFT: Calculating..."
   if keyword_set(do_time_fft) then $
-     fftdata = abs(fft(fftdata,_EXTRA=ex)) $
+     data = abs(fft(data,_EXTRA=ex)) $
   else $
      for it=0,ndt-1 do $
-        fftdata[*,*,*,it] = abs(fft(fftdata[*,*,*,it],_EXTRA=ex))
+        data[*,*,*,it] = abs(fft(data[*,*,*,it],_EXTRA=ex))
 
   ;;==Swap time dimension
   if keyword_set(do_time_fft) then begin
@@ -111,9 +124,9 @@ function fft_custom, data, $
         if keyword_set(verbose) then $
            print, "FFT: Swapping time dimension..."
         for iw=0,nw/2-1 do begin
-           temp = fftdata[*,*,*,iw]
-           fftdata[*,*,*,iw] = fftdata[*,*,*,nw-iw-1]
-           fftdata[*,*,*,nw-iw-1] = temp
+           temp = data[*,*,*,iw]
+           data[*,*,*,iw] = data[*,*,*,nw-iw-1]
+           data[*,*,*,nw-iw-1] = temp
         endfor
      endif
   endif
@@ -122,16 +135,16 @@ function fft_custom, data, $
   if keyword_set(zero_dc) then begin
      if keyword_set(verbose) then $
         print, "FFT: zeroing DC component..."
-     fftdata[nkx/2,nky/2,nkz/2,nw/2] = 0.0
+     data[nkx/2,nky/2,nkz/2,nw/2] = 0.0
   endif
 
   ;;==Normalize
   if keyword_set(normalize) then begin
      if keyword_set(verbose) then $
         print, "FFT: Normalizing..."
-     fftdata /= max(fftdata)
+     data /= max(data)
   endif
 
-  return, fftdata
+  return, data
 
 end

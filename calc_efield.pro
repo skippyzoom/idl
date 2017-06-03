@@ -28,6 +28,9 @@
 ;    loop and thus takes longer. This may not be necessary
 ;    if, for instance, the user is only interested in the
 ;    relative structure of |E|.
+;
+; TO DO:
+; -- Make smoothWidths a keyword?
 ;-
 
 function calc_efield, phi,smoothWidths, $
