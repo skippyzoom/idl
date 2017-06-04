@@ -33,13 +33,12 @@ function calc_kmag, data, $
   if n_elements(alpha) eq 0 then alpha = 0.0
 
   if keyword_set(single_time) then begin
-     ;;==Calculate FFT
-     data = abs(fft(data, $     ;Temp until fft_custom can handle a single time step
-                    overwrite = overwrite, $
-                    /center))
-     if keyword_set(verbose) then $
-        print, "FFT: Normalizing..."
-     data /= max(data)
+     data = fft_custom(data, $
+                       overwrite = overwrite, $
+                       /center, $
+                       /normalize, $
+                       /single_time, $
+                       /verbose)
 
      ;;==Interpolate FFT from Cartesian to spherical
      kmag = kmag_interpolate(data, $
