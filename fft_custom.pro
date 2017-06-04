@@ -4,22 +4,23 @@
 ;
 ; FFTDIMS: Allows for zero-padding.
 ; ALPHA: Hanning window parameter.
+; SINGLE_TIME: Signals that data does not have a time dimension.
+;              This resolves the ambiguity between arrays with
+;              2 spatial + 1 temporal dimensions and arrays with
+;              3 spatial + 0 temporal dimsneions.
 ; SKIP_TIME_FFT: Do not compute the FFT in time.
 ;                The default is to compute the FFT in time.
 ;                This keyword is only used to turn off the
 ;                boolean do_time_fft, which is used in the
 ;                remainder of the code.
+; SWAP_TIME: Reverse the order of the time (frequency) dimension.
 ; ZERO_DC: Zero the DC component of the FFT.
 ; NORMALIZE: Normalize the FFT to its max value.
-; SWAP_TIME: Reverse the order of the time (frequency) dimension.
+; COMPLEX: Return the complex transform (amplitude and phase).
+;          Default is to return the real amplitude.
+; VERBOSE: Print informational messages.
 ;
 ; TO DO:
-; -- Check if the user has set ex.overwrite (i.e. has passed
-;    /overwrite to fft.pro). If so, this routine should act
-;    in a more memory efficient way.
-; -- Does this function need to return the real magnitude or
-;    can it return the complex FFT and let the user decide 
-;    if they want the magnitude?
 ;-
 function fft_custom, data, $
                      fftdims=fftdims, $
@@ -29,6 +30,7 @@ function fft_custom, data, $
                      swap_time=swap_time, $
                      zero_dc=zero_dc, $
                      normalize=normalize, $
+                     complex=complex, $
                      verbose=verbose, $
                      _EXTRA=ex
 
@@ -91,7 +93,7 @@ function fft_custom, data, $
      ;;==Calculate
      if keyword_set(verbose) then $
         print, "FFT: Calculating..."
-     data = abs(fft(data,_EXTRA=ex))
+     data = fft(data,_EXTRA=ex)
 
      ;;==Zero DC component
      if keyword_set(zero_dc) then begin
@@ -166,10 +168,10 @@ function fft_custom, data, $
      if keyword_set(verbose) then $
         print, "FFT: Calculating..."
      if keyword_set(do_time_fft) then $
-        data = abs(fft(data,_EXTRA=ex)) $
+        data = fft(data,_EXTRA=ex) $
      else $
         for it=0,ndt-1 do $
-           data[*,*,*,it] = abs(fft(data[*,*,*,it],_EXTRA=ex))
+           data[*,*,*,it] = fft(data[*,*,*,it],_EXTRA=ex)
 
      ;;==Swap time dimension
      if keyword_set(do_time_fft) then begin
@@ -198,6 +200,9 @@ function fft_custom, data, $
         print, "FFT: Normalizing..."
      data /= max(data)
   endif
+
+  ;;==Return real part if user didn't request complex
+  if ~keyword_set(complex) then data = abs(data)
 
   return, data
 
