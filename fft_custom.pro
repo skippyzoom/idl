@@ -27,6 +27,7 @@
 function fft_custom, data, $
                      fftdims=fftdims, $
                      alpha=alpha, $
+                     single_time=single_time, $
                      skip_time_fft=skip_time_fft, $
                      swap_time=swap_time, $
                      zero_dc=zero_dc, $
@@ -40,7 +41,7 @@ function fft_custom, data, $
   if n_elements(fftdims) eq 0 then $
      fftdims = datadims $
   else begin
-     if tag_exist(ex,'overwrite') then begin
+     if tag_exist(ex,'overwrite',/quiet) then begin
         print, "FFT_CUSTOM: Cannot resize data when using /overwrite."
         print, "            Using original dimensions instead."
      endif
@@ -49,94 +50,150 @@ function fft_custom, data, $
   do_time_fft = 1B
   if keyword_set(skip_time_fft) then do_time_fft = 0B
 
-  ;;==Check dimensions
-  ndx = 1 & nkx = 1
-  ndy = 1 & nky = 1
-  ndz = 1 & nkz = 1
-  ndt = 1 & nw = 1
-  switch n_dims of
-     4: begin
-        ndt = datadims[3]
-        nw = fftdims[3]
-        if nw lt ndt then $
-           message, "Must have nw >= nt"
-     end
-     3: begin
-        ndz = datadims[2]
-        nkz = fftdims[2]
-        if nkz lt ndz then $
-           message, "Must have nkz >= nz"
-     end
-     2: begin
-        ndy = datadims[1]
-        nky = fftdims[1]
-        if nky lt ndy then $
-           message, "Must have nky >= ny"
-     end
-     1: begin
-        ndx = datadims[0]
-        nkx = fftdims[0]
-        if nkx lt ndx then $
-           message, "Must have nkx >= nx"
-     end
-  endswitch
+  if keyword_set(single_time) then begin
 
-  ;;==Set up data
-  if tag_exist(ex, 'overwrite') then begin
+     ;;==Check dimensions
+     ndx = 1 & nkx = 1
+     ndy = 1 & nky = 1
+     ndz = 1 & nkz = 1
+     switch n_dims of
+        3: begin
+           ndz = datadims[2]
+           nkz = fftdims[2]
+           if nkz lt ndz then $
+              message, "Must have nkz >= nz"
+        end
+        2: begin
+           ndy = datadims[1]
+           nky = fftdims[1]
+           if nky lt ndy then $
+              message, "Must have nky >= ny"
+        end
+        1: begin
+           ndx = datadims[0]
+           nkx = fftdims[0]
+           if nkx lt ndx then $
+              message, "Must have nkx >= nx"
+        end
+     endswitch
+
+     ;;==Set up data
+     if tag_exist(ex, 'overwrite',/quiet) then begin
+        if keyword_set(verbose) then $
+           print, "FFT: Overwriting input array..."
+     endif else begin
+        if keyword_set(verbose) then $
+           print, "FFT: Setting up FFT array..."
+        data_in = data
+        data = !NULL
+        data = fltarr(nkx,nky,nkz)*0.0
+        data[0:ndx-1,0:ndy-1,0:ndz-1] = data_in
+        data_in = !NULL
+     endelse
+
+     ;;==Calculate
      if keyword_set(verbose) then $
-        print, "FFT: Overwriting input array..."
+        print, "FFT: Calculating..."
+     data = abs(fft(data,_EXTRA=ex))
+
+     ;;==Zero DC component
+     if keyword_set(zero_dc) then begin
+        if keyword_set(verbose) then $
+           print, "FFT: zeroing DC component..."
+        data[nkx/2,nky/2,nkz/2] = 0.0
+     endif
+
   endif else begin
+
+     ;;==Check dimensions
+     ndx = 1 & nkx = 1
+     ndy = 1 & nky = 1
+     ndz = 1 & nkz = 1
+     ndt = 1 & nw = 1
+     switch n_dims of
+        4: begin
+           ndt = datadims[3]
+           nw = fftdims[3]
+           if nw lt ndt then $
+              message, "Must have nw >= nt"
+        end
+        3: begin
+           ndz = datadims[2]
+           nkz = fftdims[2]
+           if nkz lt ndz then $
+              message, "Must have nkz >= nz"
+        end
+        2: begin
+           ndy = datadims[1]
+           nky = fftdims[1]
+           if nky lt ndy then $
+              message, "Must have nky >= ny"
+        end
+        1: begin
+           ndx = datadims[0]
+           nkx = fftdims[0]
+           if nkx lt ndx then $
+              message, "Must have nkx >= nx"
+        end
+     endswitch
+
+     ;;==Set up data
+     if tag_exist(ex, 'overwrite',/quiet) then begin
+        if keyword_set(verbose) then $
+           print, "FFT: Overwriting input array..."
+     endif else begin
+        if keyword_set(verbose) then $
+           print, "FFT: Setting up FFT array..."
+        data_in = data
+        data = !NULL
+        data = fltarr(nkx,nky,nkz,nw)*0.0
+        data[0:ndx-1,0:ndy-1,0:ndz-1,0:ndt-1] = data_in
+        data_in = !NULL
+     endelse
+
+     ;;==Add window
+     if keyword_set(do_time_fft) then begin
+        if alpha lt 1.0 then begin
+           if keyword_set(verbose) then $
+              print, "FFT: Adding window (alpha = ", $
+                     strcompress(string(alpha,format='(f4.2)'),/remove_all), $
+                     ")..."
+           Hsize = nw/2
+           ;; Hsize = nw
+           Hwin = Hanning(Hsize,alpha=alpha)
+           for iw=0,Hsize-1 do data[*,*,*,iw] *= Hwin[iw]
+        endif
+     endif
+
+     ;;==Calculate
      if keyword_set(verbose) then $
-        print, "FFT: Setting up FFT array..."
-     data_in = data
-     data = !NULL
-     data = fltarr(nkx,nky,nkz,nw)*0.0
-     data[0:ndx-1,0:ndy-1,0:ndz-1,0:ndt-1] = data_in
-     data_in = !NULL
+        print, "FFT: Calculating..."
+     if keyword_set(do_time_fft) then $
+        data = abs(fft(data,_EXTRA=ex)) $
+     else $
+        for it=0,ndt-1 do $
+           data[*,*,*,it] = abs(fft(data[*,*,*,it],_EXTRA=ex))
+
+     ;;==Swap time dimension
+     if keyword_set(do_time_fft) then begin
+        if keyword_set(swap_time) then begin
+           if keyword_set(verbose) then $
+              print, "FFT: Swapping time dimension..."
+           for iw=0,nw/2-1 do begin
+              temp = data[*,*,*,iw]
+              data[*,*,*,iw] = data[*,*,*,nw-iw-1]
+              data[*,*,*,nw-iw-1] = temp
+           endfor
+        endif
+     endif
+
+     ;;==Zero DC component
+     if keyword_set(zero_dc) then begin
+        if keyword_set(verbose) then $
+           print, "FFT: zeroing DC component..."
+        data[nkx/2,nky/2,nkz/2,nw/2] = 0.0
+     endif
   endelse
-
-  ;;==Add window
-  if keyword_set(do_time_fft) then begin
-     if alpha lt 1.0 then begin
-        if keyword_set(verbose) then $
-           print, "FFT: Adding window (alpha = ", $
-                  strcompress(string(alpha,format='(f4.2)'),/remove_all), $
-                  ")..."
-        Hsize = nw/2
-        ;; Hsize = nw
-        Hwin = Hanning(Hsize,alpha=alpha)
-        for iw=0,Hsize-1 do data[*,*,*,iw] *= Hwin[iw]
-     endif
-  endif
-
-  ;;==Calculate
-  if keyword_set(verbose) then $
-     print, "FFT: Calculating..."
-  if keyword_set(do_time_fft) then $
-     data = abs(fft(data,_EXTRA=ex)) $
-  else $
-     for it=0,ndt-1 do $
-        data[*,*,*,it] = abs(fft(data[*,*,*,it],_EXTRA=ex))
-
-  ;;==Swap time dimension
-  if keyword_set(do_time_fft) then begin
-     if keyword_set(swap_time) then begin
-        if keyword_set(verbose) then $
-           print, "FFT: Swapping time dimension..."
-        for iw=0,nw/2-1 do begin
-           temp = data[*,*,*,iw]
-           data[*,*,*,iw] = data[*,*,*,nw-iw-1]
-           data[*,*,*,nw-iw-1] = temp
-        endfor
-     endif
-  endif
-
-  ;;==Zero DC component
-  if keyword_set(zero_dc) then begin
-     if keyword_set(verbose) then $
-        print, "FFT: zeroing DC component..."
-     data[nkx/2,nky/2,nkz/2,nw/2] = 0.0
-  endif
 
   ;;==Normalize
   if keyword_set(normalize) then begin
