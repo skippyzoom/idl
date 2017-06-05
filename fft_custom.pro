@@ -152,7 +152,7 @@ function fft_custom, data, $
 
      ;;==Add window
      if keyword_set(do_time_fft) then begin
-        if alpha lt 1.0 then begin
+        if alpha gt 0.0 and alpha lt 1.0 then begin
            if keyword_set(verbose) then $
               print, "FFT: Adding window (alpha = ", $
                      strcompress(string(alpha,format='(f4.2)'),/remove_all), $

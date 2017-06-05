@@ -20,6 +20,7 @@ function calc_kmag, data, $
                     overwrite=overwrite, $
                     skip_time_fft=skip_time_fft, $
                     alpha=alpha, $
+                    aspect=aspect, $
                     nTheta=nTheta, $
                     nAlpha=nAlpha, $
                     shape=shape, $
@@ -31,6 +32,7 @@ function calc_kmag, data, $
   if n_elements(nTheta) eq 0 then nTheta = 360
   if n_elements(nAlpha) eq 0 then nAlpha = 1
   if n_elements(alpha) eq 0 then alpha = 0.0
+  if n_elements(aspect) eq 0 then aspect = 0.0
 
   if keyword_set(single_time) then begin
      data = fft_custom(data, $
@@ -45,7 +47,7 @@ function calc_kmag, data, $
                              dx = dx*nout_avg, $
                              dy = dy*nout_avg, $
                              dz = dz*nout_avg, $
-                             aspect = alpha, $
+                             aspect = aspect, $
                              shape = shape, $
                              nTheta = nTheta, $
                              nAlpha = nAlpha)
@@ -62,7 +64,7 @@ function calc_kmag, data, $
         data = fft_custom(data, $
                           overwrite = overwrite, $
                           /center, $
-                          alpha = alpha, $
+                          alpha = aspect, $
                           /normalize, $
                           /swap_time, $
                           /zero_dc, $
@@ -74,7 +76,7 @@ function calc_kmag, data, $
                                   dx = dx*nout_avg, $
                                   dy = dy*nout_avg, $
                                   dz = dz*nout_avg, $
-                                  aspect = alpha, $
+                                  aspect = aspect, $
                                   shape = shape, $
                                   nTheta = nTheta, $
                                   nAlpha = nAlpha)
