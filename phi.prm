@@ -4,21 +4,12 @@
 
 imgSize = size(imgData)
 aspect_ratio = 1.0
-;; position = [[0.10,0.50,0.40,0.80], $ ;Top left
-;;             [0.50,0.50,0.80,0.80], $ ;Top right
-;;             [0.10,0.10,0.40,0.40], $ ;Bottom left
-;;             [0.50,0.10,0.80,0.40]]   ;Bottom right
-position = [[0.10,0.50,0.40,0.80], $ ;Top left
-            [0.45,0.50,0.75,0.80], $ ;Top right
-            [0.10,0.10,0.40,0.40], $ ;Bottom left
-            [0.45,0.10,0.75,0.40]]   ;Bottom right
-;; position = [[0.10,0.50,0.40,0.80], $ ;Top left
-;;             [0.60,0.50,0.90,0.80], $ ;Top right
-;;             [0.10,0.10,0.40,0.40], $ ;Bottom left
-;;             [0.60,0.10,0.90,0.40]]   ;Bottom right
+position = multi_position(nSteps,edges=[0.10,0.10,0.80,0.80],buffers=[0.05,0.10])
 max_abs = max(abs(imgData))
-min_value = -max_abs
-max_value = max_abs
+min_value = !NULL
+max_value = !NULL
+min_value = -max_abs            ;Comment out for panel-wise autoscale
+max_value = max_abs             ;Comment out for panel-wise autoscale
 title = strcompress(string(dt*timestep*1e3,format='(f5.1)'),/remove_all)
 title = "t = "+title+" ms"
 xmajor = 5
@@ -35,8 +26,6 @@ ct = get_custom_ct(1)
 kw_image = {axis_style: 2, $
             aspect_ratio: aspect_ratio, $
             position: position, $
-            min_value: min_value, $
-            max_value: max_value, $
             title: title, $
             xrange: xrange, $
             yrange: yrange, $
@@ -64,42 +53,44 @@ kw_image = {axis_style: 2, $
             font_name: "Times", $
             rgb_table: [[ct.r],[ct.g],[ct.b]], $
             buffer: 1B}
+if n_elements(min_value) ne 0 then $
+   kw_image = create_struct(kw_image,'min_value',min_value)
+if n_elements(max_value) ne 0 then $
+   kw_image = create_struct(kw_image,'max_value',max_value)
 
 use_clr = 1B
 img_pos = kw_image.position
-;; position = [[img_pos[2,0]+0.01,img_pos[1,0],img_pos[2,0]+0.04,img_pos[3,0]], $ ;Top left
-;;             [img_pos[2,1]+0.01,img_pos[1,1],img_pos[2,1]+0.04,img_pos[3,1]], $ ;Top right
-;;             [img_pos[2,2]+0.01,img_pos[1,2],img_pos[2,2]+0.04,img_pos[3,2]], $ ;Bottom left
-;;             [img_pos[2,3]+0.01,img_pos[1,3],img_pos[2,3]+0.04,img_pos[3,3]]]   ;Bottom right
-;; position = [[img_pos[2,0],img_pos[1,0],img_pos[2,0]+0.02,img_pos[3,0]], $ ;Top left
-;;             [img_pos[2,1],img_pos[1,1],img_pos[2,1]+0.02,img_pos[3,1]], $ ;Top right
-;;             [img_pos[2,2],img_pos[1,2],img_pos[2,2]+0.02,img_pos[3,2]], $ ;Bottom left
-;;             [img_pos[2,3],img_pos[1,3],img_pos[2,3]+0.02,img_pos[3,3]]]   ;Bottom right
 cb_width = 0.03
 cb_height = 0.40
-cb_x0 = img_pos[2,1]+0.01
-cb_y0 = 0.50-0.50*cb_height
+cb_x0 = max(img_pos[2,*])+0.01
 cb_x1 = cb_x0 + cb_width
+cb_y0 = 0.50-0.50*cb_height
 cb_y1 = 0.50+0.50*cb_height
-position = [[cb_x0,cb_y0,cb_x1,cb_y1], $ ;Single colorbar (use with global min/max)
-            [-1,-1,-1,-1], $
-            [-1,-1,-1,-1], $
-            [-1,-1,-1,-1]]
+global_colorbar = (tag_exist(kw_image,'min_value') and $
+                   tag_exist(kw_image,'max_value'))
+position = make_array(4,nSteps,type=4,value=-1)
+if global_colorbar then position[*,0] = [cb_x0,cb_y0,cb_x1,cb_y1] $
+else position = multi_position(nSteps,edges=[[reform(img_pos[2,*])],[reform(img_pos[1,*])]], $
+                               width=0.02,height=img_pos[3,0]-img_pos[1,0])
 major = 7
-tickvalues = !NULL
+tickvalues = 0
+if global_colorbar then $
+   tickvalues = (kw_image.max_value-kw_image.min_value)*findgen(major)/(major-1)+ $
+                kw_image.min_value
 tickname = !NULL
-if n_elements(kw_image.max_value) ne 0 and n_elements(kw_image.min_value) ne 0 then $
-   tickvalues = (kw_image.max_value-kw_image.min_value)*findgen(major)/(major-1)+kw_image.min_value
-if n_elements(tickvalues) ne 0 then $
-   tickname = plusminus_labels(1e3*tickvalues,format='f5.1')
+if global_colorbar then $
+   tickname = plusminus_labels(tickvalues,format='f5.1')
+title = "$\phi$ [mV]"
 kw_colorbar = {orientation: 1, $
-               title: "$\phi$ [mV]", $
+               title: title, $
                position: position, $
                textpos: 1, $
                tickdir: 1, $
                ticklen: 0.2, $
                major: 7, $
-               tickvalues: tickvalues, $
-               tickname: tickname, $
                font_name: "Times", $
                font_size: 10.0}
+if global_colorbar then $
+   kw_colorbar = create_struct(kw_colorbar, $
+                               'tickvalues',tickvalues, $
+                               'tickname',tickname)
