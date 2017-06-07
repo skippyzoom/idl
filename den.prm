@@ -22,7 +22,7 @@ yminor = 7
 ytickvalues = imgSize[2]*indgen(ymajor)/(ymajor-1)
 ytickname = strcompress(ytickvalues,/remove_all)
 yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
-
+rgb_table = 5
 kw_image = {axis_style: 2, $
             aspect_ratio: aspect_ratio, $
             position: position, $
@@ -51,7 +51,7 @@ kw_image = {axis_style: 2, $
             ytickdir: 1, $
             font_size: 10.0, $
             font_name: "Times", $
-            rgb_table: 5, $
+            rgb_table: rgb_table, $
             buffer: 1B}
 if n_elements(min_value) ne 0 then $
    kw_image = create_struct(kw_image,'min_value',min_value)
