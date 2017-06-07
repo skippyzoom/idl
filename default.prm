@@ -47,6 +47,6 @@ if n_elements(timestep) eq 0 then timestep = 0
 ;-------------------;
 ; Graphics defaults ;
 ;-------------------;
-kw_image = {buffer: 1B}
-kw_plot = {buffer: 1B}
-use_clr = 0B
+if n_elements(kw_image) eq 0 then kw_image = {buffer: 1B}
+if n_elements(kw_plot) eq 0 then kw_plot = {buffer: 1B}
+if n_elements(use_clr) eq 0 then use_clr = 0B
