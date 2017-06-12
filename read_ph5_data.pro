@@ -63,7 +63,7 @@ function read_ph5_data, dataName, $
   nt = n_elements(h5File)
   data = make_array(nx,ny,nz,nt,type=type)
 
-  if keyword_set(verbose) then print,"Reading ",dataName,"..."
+  if keyword_set(verbose) then print,"READ_PH5_DATA: Reading ",dataName,"..."
   for it=0,nt-1 do begin
      fileID = h5f_open(h5File[it])
      dataID = h5d_open(fileID,dataName)
