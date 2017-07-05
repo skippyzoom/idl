@@ -52,8 +52,15 @@ function kmag_interpolate_loop, data, $
                               dy = dy, $
                               dz = dz, $
                               _EXTRA=ex)
-     array[*,*,it,*] = dummy.kmag
+     array[*,*,it,*] = dummy.array
   endfor
 
-  return, {array: array,info: info}
+  ;; return, {array: array,info: info}
+  return, {array: array, $
+           kVals: info.kVals, $
+           nTheta: info.nTheta, $
+           nAlpha: info.nAlpha, $
+           aspect: info.aspect, $
+           shape: info.shape}
+
 end

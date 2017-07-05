@@ -30,8 +30,14 @@ if ndim_space lt 3 then dz = 0.0
 if ndim_space lt 2 then ny = 1
 if ndim_space lt 2 then dy = 0.0
 if n_elements(nsubdomains) eq 0 then nsubdomains = 1
+if n_elements(subcycle0) eq 0 then subcycle0 = 1
 if n_elements(subcycle1) eq 0 then subcycle1 = 1
+if n_elements(subcycle2) eq 0 then subcycle2 = 1
+if n_elements(subcycle3) eq 0 then subcycle3 = 1
+if n_elements(den_out_subcycle0) eq 0 then den_out_subcycle0 = 1
 if n_elements(den_out_subcycle1) eq 0 then den_out_subcycle1 = 1
+if n_elements(den_out_subcycle2) eq 0 then den_out_subcycle2 = 1
+if n_elements(den_out_subcycle3) eq 0 then den_out_subcycle3 = 1
 if n_elements(iskip) eq 0 then iskip = 1
 if n_elements(istart) eq 0 then istart = 0
 if n_elements(iend) eq 0 then iend = -1
@@ -43,9 +49,11 @@ if n_elements(Ez0_external) eq 0 then Ez0_external = 0.0
 ;--------------;
 ; I/O defaults ;
 ;--------------;
-if n_elements(dataName) eq 0 then dataName = 'den1'
-if n_elements(dataType) eq 0 then dataType = 'ph5'
-if n_elements(timestep) eq 0 then timestep = 0
+;-->May be misleading. Better to handle defaults in 
+;   individual programs?
+;; if n_elements(dataName) eq 0 then dataName = 'den1'
+;; if n_elements(dataType) eq 0 then dataType = 'ph5'
+;; if n_elements(timestep) eq 0 then timestep = 0
 
 ;-------------------;
 ; Graphics defaults ;

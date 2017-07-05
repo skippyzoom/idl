@@ -1,9 +1,6 @@
 ;+
 ; Intended to be a way to prevent '+0.0' when
-; using a 'f+...' format specifier, but in its
-; current form, the resulting format of '0.0'
-; may be inconsistent with the rest of the 
-; labels.
+; using a 'f+...' format specifier.
 ;
 ; FORMAT: Optional user-specified FORTRAN-style
 ;   format code. See 
@@ -11,6 +8,9 @@
 ;   for details. If the user passes a string with 
 ;   leading or training parentheses, this function
 ;   will strip them to access the code and width.
+;   This function will also add 1 to the width to 
+;   account for the +/- symbol, so that the printed
+;   numbers have the user-specified width.
 ;-
 function plusminus_labels, values,format=format
 
@@ -29,6 +29,10 @@ function plusminus_labels, values,format=format
   length = strlen(format)
   code = strmid(format,0,1)
   width = strmid(format,1,length-1)
+  dot = strpos(width,'.')
+  width = strcompress(strmid(width,0,dot)+1,/remove_all)+ $
+          '.'+ $
+          strcompress(strmid(width,dot+1,strlen(width)),/remove_all)
 
   ;;==Create labels
   labels = string(values,format='('+code+'+'+width+')')

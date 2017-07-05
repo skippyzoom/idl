@@ -2,6 +2,10 @@
 ; Make a video of data.
 ; Assumes the final dimension of data
 ; is the time-step dimension.
+;
+; TO DO
+; -- Pass image, colorbar, and text keywords via
+;    structs, as in multi_image.pro
 ;-
 pro data_movie, data,xData,yData, $
                 filename=filename, $

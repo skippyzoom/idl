@@ -7,7 +7,7 @@
 pro replace_tag, str,tag,new,silent=silent
 
   if n_params() ne 3 then $
-     message, "Please provide struct and tag name." $
+     message, "Please provide struct, tag name, and new field." $
   else begin
      if size(str,/type) ne 8 then $
         message, "First argument must be a struct"

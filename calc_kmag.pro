@@ -13,10 +13,25 @@
 ;    be the length of the last dimension in data. At the moment,
 ;    this function doesn't need to know the number of time steps
 ;    anywhere else, so the /single_time keyword may be enough.
+;    Consider using a keyword DT that will multiply nOmega in the
+;    denominator of wMin and can also replace /single_time as 
+;    follows: 
+;       dt > 0 ==> do the time loop
+;       dt = 0 ==> set dt = 1 (and do the time loop)
+;       dt < 0 ==> same as setting /single_time
+;    If dt isn't set, treat it as the dt = 0 case.    
+;    **Problem: This function calls load_eppic_params.pro, thus
+;    overwriting the input value of DT. That's fine, since it
+;    then has access to dt and nout from the simulation, but this
+;    may make the DT-keyword approach impractical or, at least,
+;    awkward.
+; -- Clear up the ambiguity between use of alpha for FFT Hanning
+;    factor and for aspect angle.
 ;    
 ;-
 function calc_kmag, data, $
-                    single_time=single_time, $
+                    ;; single_time=single_time, $
+                    dt=dt, $
                     overwrite=overwrite, $
                     skip_time_fft=skip_time_fft, $
                     alpha=alpha, $
@@ -84,6 +99,14 @@ function calc_kmag, data, $
 
   ;;==Free memory
   data = !NULL
+
+  ;;==If transforming time, include frequency increment (wMin)
+  if ~keyword_set(skip_time_fft) then begin
+     kmagSize = size(kmag.array)
+     nOmega = kmagSize[kmagSize[0]]
+     wMin = 2*!pi/(dt*nout*nOmega)
+  endif
+  kmag = create_struct(kmag,'wMin',wMin)
 
   ;;==Return kmag struct
   return, kmag

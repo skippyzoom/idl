@@ -29,6 +29,7 @@ yminor = 4
 yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
 aspect_ratio = (xtickvalues[xmajor-1]-xtickvalues[0])/ $
                (ytickvalues[ymajor-1]-ytickvalues[0])
+if n_elements(lWant) eq 0 then lWant = 2*!pi/kWant
 title = string(lWant,format='(f4.1)')
 title = "$\lambda$ = "+strcompress(title,/remove_all)+" m"
 
