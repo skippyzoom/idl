@@ -31,6 +31,8 @@ function set_kw_kmag, imgData=imgData,frequency=frequency
      xminor = 5
      xrange = [xtickvalues[0],xtickvalues[xmajor-1]]
      ytickvalues = float([-500,-250,0,250,500])
+     ;; ytickvalues = float([-600,-300,0,300,600])
+     ;; ytickvalues = float([-1000,-500,0,500,1000])
      ytickname = plusminus_labels(ytickvalues,format='(f5.1)')
      ymajor = n_elements(ytickvalues)
      yminor = 4

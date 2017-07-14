@@ -4,7 +4,7 @@
 ; is wavenumber magnitude, Theta is flow angle,
 ; Omega is frequency, t is time, and Alpha is
 ; aspect angle. The use of "<Omega or t>" implies 
-; that thisfunction is ignorant of whether the 
+; that this function is ignorant of whether the 
 ; time dimension of data was transformed.
 ;
 ; TO DO:

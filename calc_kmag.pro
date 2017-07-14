@@ -105,7 +105,7 @@ function calc_kmag, data, $
      kmagSize = size(kmag.array)
      nOmega = kmagSize[kmagSize[0]]
      wMin = 2*!pi/(dt*nout*nOmega)
-  endif
+  endif else wMin = -1.0
   kmag = create_struct(kmag,'wMin',wMin)
 
   ;;==Return kmag struct

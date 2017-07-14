@@ -1,10 +1,6 @@
 ;+
 ; Create plots of spectral power as a function
 ; of |k|, angle, and frequency.
-;
-; TO DO
-; -- Allow user to restore kmag struct to 
-;    save time.
 ;-
 
 ;;==Load density data from simulation
@@ -14,8 +10,9 @@ if n_elements(dataType) eq 0 then dataType = 'ph5'
 if n_elements(timestep) eq 0 then timestep = nout*(lindgen(ntMax-1)+1)
 data = load_eppic_data(dataName,dataType,timestep=timestep)
 
-;; ;;==Calculate |k|,angle,freq.
-;; kmag = calc_kmag(data.den1, $
+;; kmag = load_kmag(data = data.den1, $
+;;                  filename = dataName[0]+'_kmag_freq.sav', $
+;;                  /restore, $
 ;;                  dt = dt*nout, $
 ;;                  alpha = 0.5, $
 ;;                  aspect = 0.0, $
@@ -23,21 +20,15 @@ data = load_eppic_data(dataName,dataType,timestep=timestep)
 ;;                  nAlpha = 1, $
 ;;                  shape = 'disk', $
 ;;                  /verbose)
-
-;; ;;==Save the interpolation struct
-;; save, kmag,filename='kmag_freq.sav'
-
-;; ;; ;;==Restore (TEMP)
-;; ;; restore, filename='kmag_freq.sav',/verbose
-
-kmag = load_kmag(data.den1, $
+kmag = load_kmag(data = (transpose(data.den1,[1,0,2,3]))[768-128:768+127,*,*,*], $
+                 filename = dataName[0]+'_kmag_freq.sav', $
+                 ;; /restore, $
                  dt = dt*nout, $
                  alpha = 0.5, $
                  aspect = 0.0, $
                  nTheta = 360, $
                  nAlpha = 1, $
                  shape = 'disk', $
-                 /restore, $
                  /verbose)
 
 ;;==Create images

@@ -2,6 +2,9 @@
 ; Calculate interpolated spectral data or
 ; restore an existing data struct.
 ;
+;
+; DATA:
+;   Data to be passed to calc_kmag, if applicable.
 ; FILENAME:
 ;   Name of existing file, which the function
 ;   will attempt to restore, or name of file to

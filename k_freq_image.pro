@@ -19,7 +19,8 @@ pro k_freq_image, kmag, $
   ;;==Defaults and guards
   if n_elements(name) eq 0 then name = 'k_freq_image.pdf'
   ext = get_ext(name)
-  if n_elements(kWant) eq 0 then kWant = 2*!pi/3.0
+  ;; if n_elements(kWant) eq 0 then kWant = 2*!pi/3.0
+  if n_elements(lambda) eq 0 then lambda = 3.0
 
   ;;==Set up data
   ikWant = find_closest(kmag.kVals,2*!pi/lambda)
