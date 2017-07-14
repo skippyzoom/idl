@@ -11,7 +11,7 @@
 ;-
 
 function set_grid
-@default.prm
+@eppic_defaults.pro
   if hdf_output_arrays eq 2 then begin
      case ndim_space of
         2: begin

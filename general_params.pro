@@ -43,4 +43,4 @@ make_plots = 1B
 ;-----------------------------;
 ; Default plotting parameters ;
 ;-----------------------------;
-@default.prm
+@eppic_defaults.pro

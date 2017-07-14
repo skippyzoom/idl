@@ -39,7 +39,7 @@
 
 function analyze_moments, ntMax
   ;;==Read sim parameters and moment files
-  @default.prm
+  @eppic_defaults.pro
   ;; @moments3d
   if file_test('domain000',/directory) then bp = 'domain000/' $
   else bp = './'
