@@ -13,34 +13,26 @@
 ;    min/max_value). Maybe the user should just
 ;    pass those things through _EXTRA.
 ;-
-function set_kw_den, imgData=imgData,timestep=timestep
-  nSteps = n_elements(timestep)
-  imgSize = size(imgData)
+function set_kw_den
+  @load_eppic_params
   aspect_ratio = 1.0
-  ;; position = multi_position(nSteps,edges=[0.10,0.10,0.80,0.80],buffers=[0.05,0.10])
-  position = multi_position([1,nSteps],edges=[0.10,0.10,0.80,0.80],buffers=[0.05,0.10])
-  title = strcompress(string(timestep,format='(f5.1)'),/remove_all)
-  title = "t = "+title+" ms"
-  max_abs = max(abs(imgData))
-  min_value = -max_abs
-  max_value = max_abs
+  position = multi_position(1,edges=[0.10,0.10,0.80,0.80],buffers=[0.0,0.0])
+  title = ' '
   xmajor = 5
   xminor = 7
-  xtickvalues = imgSize[1]*indgen(xmajor)/(xmajor-1)
+  xtickvalues = grid.nx*indgen(xmajor)/(xmajor-1)
   xtickname = strcompress(xtickvalues,/remove_all)
   xrange = [xtickvalues[0],xtickvalues[xmajor-1]]
   ymajor = 5
   yminor = 7
-  ytickvalues = imgSize[2]*indgen(ymajor)/(ymajor-1)
+  ytickvalues = grid.ny*indgen(ymajor)/(ymajor-1)
   ytickname = strcompress(ytickvalues,/remove_all)
   yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
   rgb_table = 5
   image = {axis_style: 2, $
            aspect_ratio: aspect_ratio, $
            position: position, $
-           ;; title: title, $
-           min_value: min_value, $
-           max_value: max_value, $
+           title: title, $
            xrange: xrange, $
            yrange: yrange, $
            xtickvalues: xtickvalues, $

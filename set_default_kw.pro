@@ -1,23 +1,34 @@
 ;+
 ; Set the default keywords for making graphics of <name>.
+; The user should call this function, then make project-specific
+; changes to the kw struct in a <name>.prm file that lives in
+; a subdirectory of ~/projects/
 ;
-; TO DO:
-; -- Repurpose the old set_kw_<name> functions for use here.
-; -- Consider implementing image, colorbar, and text keywords 
-;    to allow user to request only those defaults.
+; TO DO
+; -- Loop over case block to allow name to be a vector.
 ;-
+;; function set_default_kw, name, $
+;;                          image=image, $
+;;                          colorbar=colorbar, $
+;;                          text=text
 function set_default_kw, name, $
-                         image=image, $
-                         colorbar=colorbar, $
-                         text=text
+                         ;; prj=prj, $
+                         ;; image=image, $
+                         ;; colorbar=colorbar, $
+                         ;; text=text
+                         _EXTRA=ex
 
   case 1 of
-     strcmp(name,'den'): kw = set_kw_den()
-     strcmp(name,'phi'): kw = set_kw_phi()
-     strcmp(name,'emag'): kw = set_kw_emag()
-     strcmp(name,'kmag_freq'): kw = set_kw_kmag(/frequency)
-     strcmp(name,'kmag_time'): kw = set_kw_kmag()
-     ;; strcmp(name,'fft'): kw = set_kw_fft()
+     strcmp(name,'den',3): begin
+        if strlen(name) gt 3 then dist = fix(strmid(name,3,strlen(name))) $
+        else dist = 1
+        kw = default_kw_den(dist,_EXTRA=ex)
+     end
+     ;; strcmp(name,'phi'): kw = default_kw_phi(_EXTRA=ex)
+     ;; strcmp(name,'emag'): kw = default_kw_emag(_EXTRA=ex)
+     ;; strcmp(name,'kmag_freq'): kw = default_kw_kmag(_EXTRA=ex,/frequency)
+     ;; strcmp(name,'kmag_time'): kw = default_kw_kmag(_EXTRA=ex)
+     ;; strcmp(name,'fft'): kw = default_kw_fft()
      else: begin 
         print, "SET_DEFAULT_KW: Could not find a match for '"+name+"'."
         kw = !NULL

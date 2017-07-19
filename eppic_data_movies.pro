@@ -17,7 +17,7 @@ min_value = -max_abs
 max_value = max_abs
 data_movie, movData, $
             ;; /timestamps, $
-            rgb_table = 5, $
+            rgb_table = 4, $
             min_value = min_value, $
             max_value = max_value, $
             filename = 'den.mp4'

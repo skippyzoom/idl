@@ -51,7 +51,7 @@ function calc_emag, phi, $
   ;; Ex = 0.0
   if tag_exist(Efield,'x',/top_level) then begin
      ;; Ex = reform(Efield.x,gridReform)
-     if add_E0 and Ex0_external gt 0.0 then begin
+     if add_E0 and abs(Ex0_external) gt 0.0 then begin
         print, "EMAG_BUILD: Adding Ex0_external = ", $
                string(Ex0_external*1e3,format='(f6.1)'), $
                " mV/m"
@@ -63,7 +63,7 @@ function calc_emag, phi, $
   ;; Ey = 0.0
   if tag_exist(Efield,'y',/top_level) then begin
      ;; Ey = reform(Efield.y,gridReform)
-     if add_E0 and Ey0_external gt 0.0 then begin
+     if add_E0 and abs(Ey0_external) gt 0.0 then begin
         print, "EMAG_BUILD: Adding Ey0_external = ", $
                string(Ey0_external*1e3,format='(f6.1)'), $
                " mV/m"
@@ -75,12 +75,12 @@ function calc_emag, phi, $
   ;; Ez = 0.0
   if tag_exist(Efield,'z',/top_level) then begin
      ;; Ez = reform(Efield.z,gridReform)
-     if add_E0 and Ez0_external gt 0.0 then begin
+     if add_E0 and abs(Ez0_external) gt 0.0 then begin
         print, "EMAG_BUILD: Adding Ez0_external = ", $
                string(Ez0_external*1e3,format='(f6.1)'), $
                " mV/m"
         ;; Ez += Ez0_external
-        Efield.z = Ez0_external
+        Efield.z += Ez0_external
      endif
      Emag += Efield.z^2
   endif
