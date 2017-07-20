@@ -12,9 +12,9 @@ function set_current_prj, data,rngs,grid, $
 
   ;;==Defaults and guards
   if n_elements(data) eq 0 then $
-     message, "Must supply data struct" $
-  else if size(data,/type) ne 8 then $
-     message, "Parameter 'data' must be a struct"
+     message, "Must supply data hash" $
+  else if size(data,/type) ne 11 then $
+     message, "Parameter 'data' must be a hash"
   if n_elements(rngs) eq 0 then $
      message, "Must supply rngs struct" $
   else if size(rngs,/type) ne 8 then $
@@ -32,33 +32,26 @@ function set_current_prj, data,rngs,grid, $
           y: grid.y[rngs.y[0]:rngs.y[1]], $
           z: grid.z[rngs.z[0]:rngs.z[1]]}
 
-  ;;==Subset and transpose data
-  data_in = data
-  names = tag_names(data)
-  ;; for it=0,n_tags(data)-1 do $
-  ;;    replace_tag, data,names[it], $
-  ;;                 reform(transpose((data_in.(it))[rngs.x[0]:rngs.x[1], $
-  ;;                                                 rngs.y[0]:rngs.y[1], $
-  ;;                                                 rngs.z[0]:rngs.z[1], $
-  ;;                                                 *],xyzt))
-  for it=0,n_tags(data)-1 do $
-     data = replace_tag(data,names[it], $
-                        reform(transpose((data_in.(it))[rngs.x[0]:rngs.x[1], $
-                                                        rngs.y[0]:rngs.y[1], $
-                                                        rngs.z[0]:rngs.z[1], $
-                                                        *],xyzt)))
+  ;;==Create project hash
+  prj = hash('data', data[*], $  ;[*] makes a copy and preserves original
+             'np', np, $
+             'xyzt', xyzt, $
+             'title', title, $
+             'xrng', rngs.(xyzt[0]), $
+             'yrng', rngs.(xyzt[1]), $
+             'zrng', rngs.(xyzt[2]), $
+             'xvec', vecs.(xyzt[0]), $
+             'yvec', vecs.(xyzt[1]), $
+             'zvec', vecs.(xyzt[2]))
 
-  ;;==Create project struct
-  prj = {data: data, $
-         np: np, $
-         xyzt: xyzt, $
-         title: title, $
-         xrng: rngs.(xyzt[0]), $
-         yrng: rngs.(xyzt[1]), $
-         zrng: rngs.(xyzt[2]), $
-         xvec: vecs.(xyzt[0]), $
-         yvec: vecs.(xyzt[1]), $
-         zvec: vecs.(xyzt[2])}
+  keys = data.keys()
+  for ik=0,data.count()-1 do begin ;This could also be a foreach loop
+     (prj['data'])[keys[ik]] = $
+        reform(transpose((data[keys[ik]])[rngs.x[0]:rngs.x[1], $
+                                          rngs.y[0]:rngs.y[1], $
+                                          rngs.z[0]:rngs.z[1], $
+                                          *],xyzt))
+  endfor
 
   return, prj
 end

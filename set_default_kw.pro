@@ -7,10 +7,6 @@
 ; TO DO
 ; -- Loop over case block to allow name to be a vector.
 ;-
-;; function set_default_kw, name, $
-;;                          image=image, $
-;;                          colorbar=colorbar, $
-;;                          text=text
 function set_default_kw, name, $
                          ;; prj=prj, $
                          ;; image=image, $
