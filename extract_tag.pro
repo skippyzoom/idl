@@ -7,10 +7,9 @@
 ; -- Tag indices of the new struct will not match tag
 ;    indices of the old struct.
 ;
-; SILENT: Suppress non-fatal warnings.
+; QUIET: Suppress non-fatal warnings.
 ;-
-
-function extract_tag, str,tag,silent=silent
+function extract_tag, str,tag,quiet=quiet
 
   if n_params() ne 2 then $
      message, "Please provide struct and tag name." $
@@ -23,7 +22,7 @@ function extract_tag, str,tag,silent=silent
 
   ind = where(strcmp(tag_names(str),tag,/fold_case),count)
   if count eq 0 then begin
-     if not(keyword_set(silent)) then $
+     if not(keyword_set(quiet)) then $
         print, "tag '"+tag+"' is not a member of struct"
   endif else begin
      field = str.(ind)

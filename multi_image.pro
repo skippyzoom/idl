@@ -40,6 +40,7 @@ pro multi_image, imgData,xData,yData, $
   if keyword_set(kw_text) then kw_text_orig = kw_text[*]
 
   ;;==Defaults and guards
+  imgData = reform(imgData)
   imgSize = size(imgData)
   nx = imgSize[1]
   ny = imgSize[2]
@@ -80,17 +81,16 @@ pro multi_image, imgData,xData,yData, $
         for ip=0,np-1 do begin
            for it=0,nTags-1 do $
               if flag[it] then $
-                 kw_image[timestep_tag[it]] = (kw_image_orig[timestep_tag[it]])[ip,*]
+                 kw_image[timestep_tag[it]] = reform((kw_image_orig[timestep_tag[it]])[ip,*])
            img = image(imgData[*,*,ip],xData,yData, $
                        current = (ip gt 0), $
                        layout = [nc,nr,ip+1], $
                        _EXTRA = kw_image.tostruct())
-           if keyword_set(kw_colorbar) then begin ;UNTESTED
-              ;; replace_tag, kw_colorbar,'position',kw_colorbar_orig.position[*,ip]
-              kw_colorbar['position'] = (kw_colorbar_orig['position'])[*,ip]
+           if keyword_set(kw_colorbar) then begin
+              kw_colorbar['position'] = reform((kw_colorbar_orig['position'])[ip,*])
               clr = colorbar(target = img, $
                              _EXTRA = kw_colorbar.tostruct())
-              clr.scale, 0.50,0.75
+              clr.scale, 0.50,0.75              
            endif
            if keyword_set(kw_text) then begin ;UNTESTED
               ;Possible approaches: 1) include X, Y, string, and 
@@ -106,8 +106,9 @@ pro multi_image, imgData,xData,yData, $
                                 ;-->GLOBAL COLORBAR & TEXT
      endif else begin
         for ip=0,np-1 do begin
-           remove_tag, ex,'buffer',/silent
-           if tag_exist(ex,'layout') then begin
+           if n_elements(ex) ne 0 then $
+              ex = remove_tag(ex,'buffer',/quiet)
+           if tag_exist(ex,'layout',/quiet) then begin
               img = image(imgData[*,*,ip],xData,yData, $
                           /buffer, $
                           current = (ip gt 0), $
@@ -151,16 +152,12 @@ pro multi_image, imgData,xData,yData, $
      endelse
      
      ;;==Save image
-     if n_elements(name) eq 0 then name = "multi_image.pdf"
-     print, "Saving ",name,"..."
-     img.save, name,/landscape
-     img.close
-     print, "Finished"
+     image_save, img,name=name,/landscape
 
      ;;==Reset keyword structs
-     if keyword_set(kw_image) then kw_image = kw_image_orig
-     if keyword_set(kw_colorbar) then kw_colorbar = kw_colorbar_orig
-     if keyword_set(kw_text) then kw_text = kw_text_orig
+     if keyword_set(kw_image) then kw_image = kw_image_orig[*]
+     if keyword_set(kw_colorbar) then kw_colorbar = kw_colorbar_orig[*]
+     if keyword_set(kw_text) then kw_text = kw_text_orig[*]
   endif else begin
      print, "MULTI_IMAGE: This prodecure expects data to have dimensions (nx,ny,np),"
      print, "             where np = # of image panels."

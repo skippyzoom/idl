@@ -44,6 +44,11 @@ function set_current_prj, data,rngs,grid, $
              'yvec', vecs.(xyzt[1]), $
              'zvec', vecs.(xyzt[2]))
 
+  ;;==Calculate the aspect ratio (useful for images)
+  prj['aspect_ratio'] = (1 + float((prj['yrng'])[1]) - float((prj['yrng'])[0]))/ $
+                        (1 + float((prj['xrng'])[1]) - float((prj['xrng'])[0])) 
+
+  ;;==Transpose data
   keys = data.keys()
   for ik=0,data.count()-1 do begin ;This could also be a foreach loop
      (prj['data'])[keys[ik]] = $

@@ -1,16 +1,8 @@
 ;+
-; Set default keyword parameters for density images.
-;
-; The DIST parameter can be used to save different 
-; defaults for different EPPIC distributions. On the
-; other hand, maybe that runs counter to the idea of
-; defaults.
+; Set default keyword parameters for potential images.
 ;-
-function default_kw_den, dist,prj=prj, $
+function default_kw_phi, prj=prj, $
                          image=image,colorbar=colorbar,text=text
-
-  if n_elements(dist) eq 0 then dist = 1
-  sdist = strcompress(dist,/remove_all)
 
   ;----------------------;
   ; Keywords for image() ;
@@ -22,7 +14,8 @@ function default_kw_den, dist,prj=prj, $
                                   buffers=[0.00,0.05]) $
      else position = [0.0,0.0,1.0,1.0]
      position = transpose(position)
-     title = "Distribution "+sdist+" density"
+     title = "Electrostatic potential"
+     ct = get_custom_ct(1)
      image = hash('axis_style', 1, $
                   'aspect_ratio', 1.0, $
                   'position', position, $
@@ -45,12 +38,12 @@ function default_kw_den, dist,prj=prj, $
                   'ytickfont_size', 14.0, $
                   'font_size', 16.0, $
                   'font_name', "Times", $
-                  'rgb_table', 5, $
+                  'rgb_table', [[ct.r],[ct.g],[ct.b]], $
                   'buffer', 1B)
 
      if n_elements(prj) ne 0 then begin
-        if prj['data'].haskey('den'+sdist) then begin
-           max_abs = max(abs((prj['data'])['den'+sdist]))
+        if prj['data'].haskey('phi') then begin
+           max_abs = max(abs((prj['data'])['phi']))
            max_value = max_abs
            min_value = -max_abs
            add_keys = ['min_value','max_value']
@@ -104,7 +97,7 @@ function default_kw_den, dist,prj=prj, $
                                           width=0.02,height=pos[0,3]-pos[0,1])
         endif
      endif
-     title = "$\delta n/n_0 [%]$"
+     title = "$\phi [V]$"
      major = 7
      colorbar = hash('orientation', 1, $
                      'title', title, $
@@ -139,3 +132,4 @@ function default_kw_den, dist,prj=prj, $
 
   return, kw
 end
+
