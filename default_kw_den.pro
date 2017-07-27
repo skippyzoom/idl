@@ -2,7 +2,9 @@
 ; Set default keyword parameters for density images.
 ;
 ; The DIST parameter can be used to save different 
-; defaults for different EPPIC distributions.
+; defaults for different EPPIC distributions. On the
+; other hand, maybe that runs counter to the idea of
+; defaults.
 ;-
 function default_kw_den, dist,prj=prj, $
                          image=image,colorbar=colorbar,text=text
@@ -19,6 +21,7 @@ function default_kw_den, dist,prj=prj, $
                                   edges=[0.12,0.10,0.80,0.80], $
                                   buffers=[0.00,0.05]) $
      else position = [0.0,0.0,1.0,1.0]
+     position = transpose(position)
      title = "Distribution "+sdist+" density"
      image = hash('axis_style', 2, $
                   'aspect_ratio', 1.0, $
@@ -83,24 +86,22 @@ function default_kw_den, dist,prj=prj, $
   ;-------------------------;
   ;; if keyword_set(colorbar) then begin
   ;;    if n_elements(kw) ne 0 then begin
-  ;;       if tag_exist(kw,'image',/quiet) then begin
-  ;;          if tag_exist(kw.image,'position',/quiet) then begin
-  ;;             pos = image.position
-  ;;             width = 0.03
-  ;;             height = 0.40
-  ;;             buffer = 0.03
-  ;;             x0 = max(pos[2,*])+buffer
-  ;;             x1 = x0+width
-  ;;             y0 = 0.50*(1-height)
-  ;;             y1 = 0.50*(1+height)
-  ;;             global = (tag_exist(kw.image,'min_value',/quiet) and $
-  ;;                       tag_exist(kw.image,'max_value',/quiet))
-  ;;             position = make_array(4,prj.np,type=4,value=-1)
-  ;;             if global then position[*,0] = [x0,y0,x1,y1] $
-  ;;             else position = multi_position(prj.np, $
-  ;;                                            edges=[[reform(pos[2,*])],[reform(pos[1,*])]], $
-  ;;                                            width=0.02,height=pos[3,0]-pos[1,0])
-  ;;          endif
+  ;;       if kw['image'].haskey('position') then begin
+  ;;          pos = image['position']
+  ;;          width = 0.03
+  ;;          height = 0.40
+  ;;          buffer = 0.03
+  ;;          x0 = max(pos[2,*])+buffer
+  ;;          x1 = x0+width
+  ;;          y0 = 0.50*(1-height)
+  ;;          y1 = 0.50*(1+height)
+  ;;          global = (tag_exist(kw.image,'min_value',/quiet) and $
+  ;;                    tag_exist(kw.image,'max_value',/quiet))
+  ;;          position = make_array(4,prj.np,type=4,value=-1)
+  ;;          if global then position[*,0] = [x0,y0,x1,y1] $
+  ;;          else position = multi_position(prj.np, $
+  ;;                                         edges=[[reform(pos[2,*])],[reform(pos[1,*])]], $
+  ;;                                         width=0.02,height=pos[3,0]-pos[1,0])
   ;;       endif
   ;;    endif
   ;;    title = "$\delta n/n_0 [%]$"

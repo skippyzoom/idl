@@ -9,9 +9,9 @@
 ;
 ; This procedure places panels according to user-supplied
 ; position information or the layout keyword to image().
-; If the user did not pass position as a member of the
-; kw_image struct, this procedure will use the layout
-; keyword with best guesses for numbers of columns and rows.
+; If the user did not pass position as a member of kw_image, 
+; this procedure will use the layout keyword with best 
+; guesses for numbers of columns and rows.
 ; If the user passed position as a member of kw_image,
 ; that will override the hardcoded layout keyword.
 ;
@@ -35,9 +35,9 @@ pro multi_image, imgData,xData,yData, $
 
 
   ;;==Back-up keyword structs
-  if keyword_set(kw_image) then kw_image_orig = kw_image
-  if keyword_set(kw_colorbar) then kw_colorbar_orig = kw_colorbar
-  if keyword_set(kw_text) then kw_text_orig = kw_text
+  if keyword_set(kw_image) then kw_image_orig = kw_image[*]
+  if keyword_set(kw_colorbar) then kw_colorbar_orig = kw_colorbar[*]
+  if keyword_set(kw_text) then kw_text_orig = kw_text[*]
 
   ;;==Defaults and guards
   imgSize = size(imgData)
@@ -46,82 +46,61 @@ pro multi_image, imgData,xData,yData, $
   if n_elements(xData) eq 0 then xData = indgen(nx)
   if n_elements(yData) eq 0 then yData = indgen(ny)
 
-  ;;==Make image
+  ;;==Create image
   if imgSize[0] eq 3 then begin
      np = imgSize[3]
-     timestep_tags = ['position','title']
+     timestep_tag = ['position','title']
+     nTags = n_elements(timestep_tag)
      if keyword_set(kw_image) then begin
         nc = fix(sqrt(np))+((sqrt(np) mod 1) gt 0)
         nr = nc
-        flag = make_array(n_elements(timestep_tags),value=0B)
-        if tag_exist(kw_image,timestep_tags[0]) then begin
-           ind = where(strcmp(tag_names(kw_image),timestep_tags[0],/fold_case),count)
-           if count ne 0 then begin
-              tmpSize = size(kw_image.(ind))
-              case 1B of
-                 (tmpSize[0] eq 0): $
-                    message, "kw_image.position must have at least 4 elements"
-                 (tmpSize[0] eq 1): ;Do nothing
-                 (tmpSize[0] eq 2): begin
-                    position = kw_image.position
-                    flag[0] = reduce_tag(kw_image,'position')
-                 end
-                 (tmpSize[0] gt 2): $
-                    message, "kw_image.position must be 1D or 2D"
-              endcase
-           endif
+        flag = make_array(nTags,value=0B)
+        ;-->Can I make this a loop?
+        if kw_image.haskey('position') then begin
+           tmpSize = size(kw_image['position'])
+           case 1B of 
+              (tmpSize[0] eq 0): $
+                 message, "kw_image['position'] must have at least 4 elements"
+              (tmpSize[0] eq 1): ;Do nothing
+              (tmpSize[0] eq 2): flag[0] = 1B
+              (tmpSize[0] gt 2): $
+                 message, "kw_image['position'] may be 1D or 2D"
+           endcase
         endif
-        if tag_exist(kw_image,timestep_tags[1]) then begin
-           ind = where(strcmp(tag_names(kw_image),timestep_tags[1],/fold_case),count)
-           if count ne 0 then begin
-              tmpSize = size(kw_image.(ind))
-              case 1B of
-                 (tmpSize[0] eq 0): ;Do nothing
-                 (tmpSize[0] eq 1): begin
-                    title = kw_image.title
-                    flag[1] = reduce_tag(kw_image,'title')
-                 end
-                 (tmpSize[0] gt 1): $
-                    message, "kw_image.title must be scalar or 1D"
-              endcase
-           endif
+        if kw_image.haskey('title') then begin
+           tmpSize = size(kw_image['title'])
+           case 1B of 
+              (tmpSize[0] eq 0): ;Do nothing
+              (tmpSize[0] eq 1): flag[1] = 1B
+              (tmpSize[0] gt 1): $
+                 message, "kw_image['title'] may be scalar or 1D"
+           endcase
         endif
+        ;<--(loop?)
         for ip=0,np-1 do begin
-           if flag[0] then kw_image.position = position[*,ip]
-           if flag[1] then kw_image.title = title[ip]
+           for it=0,nTags-1 do $
+              if flag[it] then $
+                 kw_image[timestep_tag[it]] = (kw_image_orig[timestep_tag[it]])[ip,*]
            img = image(imgData[*,*,ip],xData,yData, $
                        current = (ip gt 0), $
                        layout = [nc,nr,ip+1], $
-                       _EXTRA = kw_image)
+                       _EXTRA = kw_image.tostruct())
            if keyword_set(kw_colorbar) then begin ;UNTESTED
-              replace_tag, kw_colorbar,'position',kw_colorbar_orig.position[*,ip]
+              ;; replace_tag, kw_colorbar,'position',kw_colorbar_orig.position[*,ip]
+              kw_colorbar['position'] = (kw_colorbar_orig['position'])[*,ip]
               clr = colorbar(target = img, $
-                             _EXTRA = kw_colorbar)
+                             _EXTRA = kw_colorbar.tostruct())
               clr.scale, 0.50,0.75
            endif
            if keyword_set(kw_text) then begin ;UNTESTED
-              if n_elements(kw_text.x) eq 1 then begin
-                 tmp = kw_text.x
-                 replace_tag, kw_text,'x',make_array(np,value=tmp)
-              endif
-              if n_elements(kw_text.y) eq 1 then begin
-                 tmp = kw_text.y
-                 replace_tag, kw_text,'y',make_array(np,value=tmp)
-              endif
-              if n_elements(kw_text.string) eq 1 then begin
-                 tmp = kw_text.string
-                 replace_tag, kw_text,'string',make_array(np,value=tmp)
-              endif
-              if tag_exist(kw_text.format) then begin
-                 if n_elements(kw_text.format) eq 1 then begin
-                    tmp = kw_text.format
-                    replace_tag, kw_text,'format',make_array(np,value=tmp)
-                 endif
-              endif else $
-                 kw_text = create_struct(kw_text,'format',make_array(np,value=''))
-              txt = text(kw_text.x[ip],kw_text.y[ip], $
-                         kw_text.string[ip],kw_text.format[ip], $
-                         _EXTRA = kw_text)
+              ;Possible approaches: 1) include X, Y, string, and 
+              ;format in kw_text and extract them here before
+              ;passing kw_text to text() via _EXTRA; 2) pass a
+              ;dedicated hash for X, Y, string, and format. I
+              ;think the first is better. Either way, we need
+              ;to check dimensions of those four to know if they
+              ;are panel-specific.
+              ;; txt = text(X, Y, string, format, _EXTRA=kw_text.tostruct())
            endif
         endfor
                                 ;-->GLOBAL COLORBAR & TEXT
