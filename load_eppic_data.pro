@@ -39,7 +39,7 @@ function load_eppic_data, dataName,dataType, $
      if nType gt 0 and nType ne nData then $
         dataType = make_array(nData,value=dataType[0]) $
      else dataType = make_array(nData,value='ph5')
-     if n_elements(timestep) eq 0 then nt = ntMax $
+     if n_elements(timestep) eq 0 then nt = nout*ntMax $
      else nt = n_elements(timestep)
 
      data = hash()

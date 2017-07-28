@@ -89,8 +89,8 @@ function default_kw_den, dist,prj=prj, $
      if n_elements(kw) ne 0 && kw.haskey('image') then begin
         if kw['image'].haskey('position') then begin
            pos = image['position']
-           width = 0.03
-           height = 0.40
+           width = 0.0225
+           height = 0.20
            buffer = 0.03
            x0 = max(pos[*,2])+buffer
            x1 = x0+width

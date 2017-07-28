@@ -16,13 +16,12 @@
 ; that will override the hardcoded layout keyword.
 ;
 ; TO DO:
-; -- Add colorbar options.
 ; -- Add text options.
 ; -- Add axes-manipulation options.
-; -- Allow for single-panel plots, for the sake of generality.
-;    The single-plot case can just be a standard function call,
-;    such as img = image(imgData,xData,yData,_EXTRA=ex), but it
-;    should probably make sure buffer = 1B.
+; -- Handle global colorbar and text separately?
+; -- Make the kw_colorbar block independent of the kw_image block?
+;    It should be rare to set the former without the latter but it
+;    would handle more cases.
 ;-
 
 pro multi_image, imgData,xData,yData, $
@@ -90,7 +89,7 @@ pro multi_image, imgData,xData,yData, $
               kw_colorbar['position'] = reform((kw_colorbar_orig['position'])[ip,*])
               clr = colorbar(target = img, $
                              _EXTRA = kw_colorbar.tostruct())
-              clr.scale, 0.50,0.75              
+              ;; clr.scale, 0.50,0.75              
            endif
            if keyword_set(kw_text) then begin ;UNTESTED
               ;Possible approaches: 1) include X, Y, string, and 
@@ -104,7 +103,7 @@ pro multi_image, imgData,xData,yData, $
            endif
         endfor
                                 ;-->GLOBAL COLORBAR & TEXT
-     endif else begin
+     endif else begin ;kw_image
         for ip=0,np-1 do begin
            if n_elements(ex) ne 0 then $
               ex = remove_tag(ex,'buffer',/quiet)
@@ -154,16 +153,41 @@ pro multi_image, imgData,xData,yData, $
      ;;==Save image
      image_save, img,name=name,/landscape
 
-     ;;==Reset keyword structs
-     if keyword_set(kw_image) then kw_image = kw_image_orig[*]
-     if keyword_set(kw_colorbar) then kw_colorbar = kw_colorbar_orig[*]
-     if keyword_set(kw_text) then kw_text = kw_text_orig[*]
   endif else begin
-     print, "MULTI_IMAGE: This prodecure expects data to have dimensions (nx,ny,np),"
-     print, "             where np = # of image panels."
-     print, "             To create a single-panel image, try img = image(data[,x,y])."
-     print, "             See the IDL image() online help for more info."
-     print, " "
+     ;; print, "MULTI_IMAGE: This prodecure expects data to have dimensions (nx,ny,np),"
+     ;; print, "             where np = # of image panels."
+     ;; print, "             To create a single-panel image, try img = image(data[,x,y])."
+     ;; print, "             See the IDL image() online help for more info."
+     ;; print, " "
+
+     ;;==Create single-panel image
+     if keyword_set(kw_image) then begin
+        img = image(imgData,xData,yData, $
+                    _EXTRA = kw_image.tostruct())
+        if keyword_set(kw_colorbar) then begin
+           clr = colorbar(target = img, $
+                          _EXTRA = kw_colorbar.tostruct())
+        endif
+        if keyword_set(kw_text) then begin ;UNTESTED
+           ;See note in FOR loop above.
+           ;; txt = text(X, Y, string, format, _EXTRA=kw_text.tostruct())
+        endif
+     endif else begin ;kw_image
+        if n_elements(ex) ne 0 then $
+           ex = remove_tag(ex,'buffer',/quiet)
+        img = image(imgData,xData,yData, $
+                    /buffer, $
+                    _EXTRA=ex)
+     endelse
+
+     ;;==Save image
+     image_save, img,name=name,/landscape
+
   endelse
+
+  ;;==Reset keyword structs
+  if keyword_set(kw_image) then kw_image = kw_image_orig[*]
+  if keyword_set(kw_colorbar) then kw_colorbar = kw_colorbar_orig[*]
+  if keyword_set(kw_text) then kw_text = kw_text_orig[*]
 
 end
