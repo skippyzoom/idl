@@ -97,7 +97,9 @@ function default_kw_phi, prj=prj, $
                                           width=0.02,height=pos[0,3]-pos[0,1])
         endif
      endif
-     title = "$\phi [V]$"
+     ;; title = "$\phi [V]$"
+     title = "$\phi$"
+     if prj.haskey('scale') && prj.scale eq 1e3 then title += " [V]"
      major = 7
      colorbar = dictionary('orientation', 1, $
                            'title', title, $

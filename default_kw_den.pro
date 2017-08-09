@@ -104,7 +104,9 @@ function default_kw_den, dist,prj=prj, $
                                           width=0.02,height=pos[0,3]-pos[0,1])
         endif
      endif
-     title = "$\delta n/n_0 [%]$"
+     ;; title = "$\delta n/n_0 [%]$"
+     title = "$\delta n/n_0$"
+     if prj.haskey('scale') && prj.scale eq 1e2 then title += " [%]"
      major = 7
      colorbar = dictionary('orientation', 1, $
                            'title', title, $
