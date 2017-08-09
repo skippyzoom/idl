@@ -14,7 +14,7 @@ function set_default_kw, name, $
                          _EXTRA=ex
 
   nData = n_elements(name)
-  kw = hash()
+  kw = dictionary()
   for id=0,nData-1 do begin
      case 1 of
         strcmp(name[id],'den',3): begin

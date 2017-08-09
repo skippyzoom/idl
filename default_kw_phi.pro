@@ -4,9 +4,9 @@
 function default_kw_phi, prj=prj, $
                          image=image,colorbar=colorbar,text=text
 
-  ;----------------------;
-  ; Keywords for image() ;
-  ;----------------------;
+                                ;----------------------;
+                                ; Keywords for image() ;
+                                ;----------------------;
   if keyword_set(image) then begin
      if n_elements(prj) ne 0 then $
         position = multi_position(prj['np'], $
@@ -16,34 +16,34 @@ function default_kw_phi, prj=prj, $
      position = transpose(position)
      title = "Electrostatic potential"
      ct = get_custom_ct(1)
-     image = hash('axis_style', 1, $
-                  'aspect_ratio', 1.0, $
-                  'position', position, $
-                  'title', title, $
-                  'xstyle', 1, $
-                  'ystyle', 1, $
-                  'xtitle', "X coord. [m]", $
-                  'ytitle', "Y coord. [m]", $
-                  'xmajor', 5, $
-                  'xminor', 1, $
-                  'ymajor', 5, $
-                  'yminor', 1, $
-                  'xticklen', 0.02, $
-                  'yticklen', 0.02*prj['aspect_ratio'], $
-                  'xsubticklen', 0.5, $
-                  'ysubticklen', 0.5, $
-                  'xtickdir', 1, $
-                  'ytickdir', 1, $
-                  'xtickfont_size', 14.0, $
-                  'ytickfont_size', 14.0, $
-                  'font_size', 16.0, $
-                  'font_name', "Times", $
-                  'rgb_table', [[ct.r],[ct.g],[ct.b]], $
-                  'buffer', 1B)
+     image = dictionary('axis_style', 1, $
+                        'aspect_ratio', 1.0, $
+                        'position', position, $
+                        'title', title, $
+                        'xstyle', 1, $
+                        'ystyle', 1, $
+                        'xtitle', "X coord. [m]", $
+                        'ytitle', "Y coord. [m]", $
+                        'xmajor', 5, $
+                        'xminor', 1, $
+                        'ymajor', 5, $
+                        'yminor', 1, $
+                        'xticklen', 0.02, $
+                        'yticklen', 0.02*prj['aspect_ratio'], $
+                        'xsubticklen', 0.5, $
+                        'ysubticklen', 0.5, $
+                        'xtickdir', 1, $
+                        'ytickdir', 1, $
+                        'xtickfont_size', 14.0, $
+                        'ytickfont_size', 14.0, $
+                        'font_size', 16.0, $
+                        'font_name', "Times", $
+                        'rgb_table', [[ct.r],[ct.g],[ct.b]], $
+                        'buffer', 1B)
 
      if n_elements(prj) ne 0 then begin
         if prj['data'].haskey('phi') then begin
-           max_abs = max(abs((prj['data'])['phi']))
+           max_abs = max(abs(prj.data['phi']))
            max_value = max_abs
            min_value = -max_abs
            add_keys = ['min_value','max_value']
@@ -71,13 +71,13 @@ function default_kw_phi, prj=prj, $
            image[add_keys] = add_vals
         endif
      endif
-     if n_elements(kw) eq 0 then kw = hash('image',image) $
+     if n_elements(kw) eq 0 then kw = dictionary('image',image) $
      else kw['image'] = image
   endif
 
-  ;-------------------------;
-  ; Keywords for colorbar() ;
-  ;-------------------------;
+                                ;-------------------------;
+                                ; Keywords for colorbar() ;
+                                ;-------------------------;
   if keyword_set(colorbar) then begin
      if n_elements(kw) ne 0 && kw.haskey('image') then begin
         if kw['image'].haskey('position') then begin
@@ -99,31 +99,31 @@ function default_kw_phi, prj=prj, $
      endif
      title = "$\phi [V]$"
      major = 7
-     colorbar = hash('orientation', 1, $
-                     'title', title, $
-                     'position', position, $
-                     'textpos', 1, $
-                     'tickdir', 1, $
-                     'ticklen', 0.2, $
-                     'major', major, $
-                     'font_name', "Times", $
-                     'font_size', 14.0)
+     colorbar = dictionary('orientation', 1, $
+                           'title', title, $
+                           'position', position, $
+                           'textpos', 1, $
+                           'tickdir', 1, $
+                           'ticklen', 0.2, $
+                           'major', major, $
+                           'font_name', "Times", $
+                           'font_size', 14.0)
      if global then begin
-        tickvalues = (kw['image'])['min_value'] + $
-                     ((kw['image'])['max_value'] - (kw['image'])['min_value'])* $
+        tickvalues = kw.image.min_value + $
+                     (kw.image.max_value - kw.image.min_value)* $
                      findgen(major)/(major-1)
         tickname = plusminus_labels(tickvalues,format='f5.2')
         add_keys = ['tickvalues','tickname']
         add_vals = list(tickvalues,tickname)
         colorbar[add_keys] = add_vals
      endif
-     if n_elements(kw) eq 0 then kw = hash('colorbar',colorbar) $
+     if n_elements(kw) eq 0 then kw = dictionary('colorbar',colorbar) $
      else kw['colorbar'] = colorbar
   endif
 
-  ;---------------------;
-  ; Keywords for text() ;
-  ;---------------------;
+                                ;---------------------;
+                                ; Keywords for text() ;
+                                ;---------------------;
   if keyword_set(text) then begin
 
      if n_elements(kw) eq 0 then kw = create_struct('text',text) $

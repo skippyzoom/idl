@@ -21,7 +21,9 @@
 ; -- Handle global colorbar and text separately?
 ; -- Make the kw_colorbar block independent of the kw_image block?
 ;    It should be rare to set the former without the latter but it
-;    would handle more cases.
+;    would handle more cases. On the other hand, this routine would
+;    need to distinguish between panel-specific colorbars and a 
+;    global colorbar.
 ;-
 
 pro multi_image, imgData,xData,yData, $
@@ -32,6 +34,19 @@ pro multi_image, imgData,xData,yData, $
                  colorbar_on=colorbar_on, $
                  _EXTRA=ex
 
+  ;;==Check for global colorbar
+  global_colorbar = 0B
+  if n_elements(kw_colorbar) ne 0 && kw_colorbar.haskey('global') then begin
+     global_colorbar = 1B
+     kw_colorbar.remove, 'global'
+  endif
+
+  ;;==Check for global text
+  global_text = 0B
+  if n_elements(kw_text) ne 0 && kw_text.haskey('global') then begin
+     global_text = 1B
+     kw_text.remove, 'global'
+  endif
 
   ;;==Back-up keyword structs
   if keyword_set(kw_image) then kw_image_orig = kw_image[*]
@@ -85,13 +100,12 @@ pro multi_image, imgData,xData,yData, $
                        current = (ip gt 0), $
                        layout = [nc,nr,ip+1], $
                        _EXTRA = kw_image.tostruct())
-           if keyword_set(kw_colorbar) then begin
+           if keyword_set(kw_colorbar) && ~global_colorbar then begin
               kw_colorbar['position'] = reform((kw_colorbar_orig['position'])[ip,*])
               clr = colorbar(target = img, $
                              _EXTRA = kw_colorbar.tostruct())
-              ;; clr.scale, 0.50,0.75              
            endif
-           if keyword_set(kw_text) then begin ;UNTESTED
+           if keyword_set(kw_text) && ~global_text then begin ;UNTESTED
               ;Possible approaches: 1) include X, Y, string, and 
               ;format in kw_text and extract them here before
               ;passing kw_text to text() via _EXTRA; 2) pass a
@@ -102,7 +116,12 @@ pro multi_image, imgData,xData,yData, $
               ;; txt = text(X, Y, string, format, _EXTRA=kw_text.tostruct())
            endif
         endfor
-                                ;-->GLOBAL COLORBAR & TEXT
+        if global_colorbar then begin
+           print, "MULTI_IMAGE: global colorbar not implemented yet."
+        endif
+        if global_text then begin
+           print, "MULTI_IMAGE: global text not implemented yet."
+        endif
      endif else begin ;kw_image
         for ip=0,np-1 do begin
            if n_elements(ex) ne 0 then $

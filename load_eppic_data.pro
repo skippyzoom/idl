@@ -14,11 +14,11 @@
 ; type is ph5, since IDL's h5d_open() will abort if
 ; it can't find an object with the given name.
 ; 
-; As of 19Jul2017, this function returns a hash.
-; The previous return value was a struct.
+; As of 08Aug2017, this function returns a dictionary.
+; The previous return value was a hash.
 ;
 ; TO DO:
-; -- Only create hash entries for data that has
+; -- Only create dictionary entries for data that has
 ;    been read successfully.
 ; -- Allow user to specify names of IDL save files
 ;    from which to read data.
@@ -42,7 +42,7 @@ function load_eppic_data, dataName,dataType, $
      if n_elements(timestep) eq 0 then nt = nout*ntMax $
      else nt = n_elements(timestep)
 
-     data = hash()
+     data = dictionary()
      for id=0,nData-1 do begin
         print, "LOAD_EPPIC_DATA: Loading ",dataName[id],"..."
         data[dataName[id]] = read_xxx_data(dataName[id], $
