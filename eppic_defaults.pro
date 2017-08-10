@@ -58,6 +58,39 @@ if n_elements(Ez0_external) eq 0 then Ez0_external = 0.0
 ;-------------------;
 ; Graphics defaults ;
 ;-------------------;
-if n_elements(kw_image) eq 0 then kw_image = {buffer: 1B}
-if n_elements(kw_plot) eq 0 then kw_plot = {buffer: 1B}
-if n_elements(use_clr) eq 0 then use_clr = 0B
+;-->Update these for consistency with the dictionary-based
+;   kw approach.
+;; if n_elements(kw_image) eq 0 then kw_image = {buffer: 1B}
+;; if n_elements(kw_plot) eq 0 then kw_plot = {buffer: 1B}
+;; if n_elements(use_clr) eq 0 then use_clr = 0B
+
+;--------------;
+; Dictionaries ;
+;--------------;
+units = dictionary()
+units['prefixes'] = hash('Y', 24, $           ;yotta
+                         'Z', 21, $           ;zetta
+                         'E', 18, $           ;exa
+                         'P', 15, $           ;peta
+                         'T', 12, $           ;tera
+                         'G', 9, $            ;giga
+                         'M', 6, $            ;mega
+                         'k', 3, $            ;kilo
+                         'h', 2, $            ;hecto
+                         'da', 1, $           ;deca
+                         '', 0, $             ;(unit)
+                         'd', -1, $           ;deci
+                         'c', -2, $           ;centi
+                         'm', -3, $           ;milli
+                         '$\mu$', -6, $       ;micro
+                         'n', -9, $           ;nano
+                         'p', -12, $          ;pico
+                         'f', -15, $          ;femto
+                         'a', -18, $          ;atto
+                         'z', -21, $          ;zepto
+                         'y', -24)            ;yocto
+units['data'] = hash('abs_den', '$m^{-3}$', $ ;Absolute density
+                     'rel_den', '', $         ;Relative density
+                     'den', '', $             ;Relative density (shorthand)
+                     'phi', 'V', $            ;Electrostatic potential
+                     'E', 'V/m')              ;Electric field

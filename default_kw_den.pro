@@ -8,9 +8,11 @@
 ;-
 function default_kw_den, dist,prj=prj, $
                          image=image,colorbar=colorbar,text=text
+@eppic_defaults.pro
 
   if n_elements(dist) eq 0 then dist = 1
   sdist = strcompress(dist,/remove_all)
+  curDen = 'den'+sdist
 
                                 ;----------------------;
                                 ; Keywords for image() ;
@@ -49,8 +51,8 @@ function default_kw_den, dist,prj=prj, $
                         'buffer', 1B)
 
      if n_elements(prj) ne 0 then begin
-        if prj['data'].haskey('den'+sdist) then begin
-           max_abs = max(abs(prj.data['den'+sdist]))
+        if prj['data'].haskey(curDen) then begin
+           max_abs = max(abs(prj.data[curDen]))
            max_value = max_abs
            min_value = -max_abs
            add_keys = ['min_value','max_value']
@@ -104,9 +106,15 @@ function default_kw_den, dist,prj=prj, $
                                           width=0.02,height=pos[0,3]-pos[0,1])
         endif
      endif
-     ;; title = "$\delta n/n_0 [%]$"
      title = "$\delta n/n_0$"
-     if prj.haskey('scale') && prj.scale eq 1e2 then title += " [%]"
+     if prj.haskey('scale') then begin
+        data_oom = fix(alog10(1./prj.scale[curDen]))
+        case data_oom of
+           0: ;Do nothing
+           -2: title += " [%]"
+           else: title += " $\times$"+strcompress(string(prj.scale.den1),/remove_all)
+        endcase
+     endif     
      major = 7
      colorbar = dictionary('orientation', 1, $
                            'title', title, $
