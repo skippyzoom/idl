@@ -7,6 +7,7 @@
 ; defaults.
 ;-
 function default_kw_den, dist,prj=prj, $
+                         global=global, $
                          image=image,colorbar=colorbar,text=text
 @eppic_defaults.pro
 
@@ -51,7 +52,7 @@ function default_kw_den, dist,prj=prj, $
                         'buffer', 1B)
 
      if n_elements(prj) ne 0 then begin
-        if prj['data'].haskey(curDen) then begin
+        if prj['data'].haskey(curDen) && keyword_set(global) then begin
            max_abs = max(abs(prj.data[curDen]))
            max_value = max_abs
            min_value = -max_abs
@@ -92,15 +93,14 @@ function default_kw_den, dist,prj=prj, $
         if kw['image'].haskey('position') then begin
            pos = image['position']
            width = 0.0225
-           height = 0.20
+           height = 0.40
            buffer = 0.03
            x0 = max(pos[*,2])+buffer
            x1 = x0+width
            y0 = 0.50*(1-height)
            y1 = 0.50*(1+height)
-           global = (kw['image'].haskey('min_value') and kw['image'].haskey('max_value')) 
            position = make_array(n_elements(prj['np']),4,type=4,value=-1)
-           if global then position[0,*] = [x0,y0,x1,y1] $
+           if keyword_set(global) then position[0,*] = [x0,y0,x1,y1] $
            else position = multi_position([1,prj['np']], $
                                           edges=[[reform(pos[*,2])],[reform(pos[*,1])]], $
                                           width=0.02,height=pos[0,3]-pos[0,1])
@@ -124,8 +124,9 @@ function default_kw_den, dist,prj=prj, $
                            'ticklen', 0.2, $
                            'major', major, $
                            'font_name', "Times", $
-                           'font_size', 14.0)
-     if global then begin
+                           'font_size', 10.0, $
+                           'global', keyword_set(global))
+     if keyword_set(global) then begin
         tickvalues = kw.image.min_value + $
                      (kw.image.max_value - kw.image.min_value)* $
                      findgen(major)/(major-1)

@@ -2,59 +2,45 @@
 ; Create images of EPPIC simulation output.
 ;-
 
+;;==Declare the project name
+;-->In a batch file?
+prjDir = 'parametric_wave/run000/'
+paths = source_project(prjDir)
+!PATH = paths.proj
+
+;;==Move to the project data directory
+cd, '/projectnb/eregion/may/Stampede_runs/'+prjDir
+
 ;;==Load density and potential for limited time steps
 @load_eppic_params
-;; timestep = nout*[1,ntMax-1] ;Make this a default?
-nSteps = n_elements(timestep)
+plotStep = nout*[1,ntMax-1]
 dataName = ['den1','phi']
 dataType = ['ph5','ph5']
-data = load_eppic_data(dataName,dataType,timestep=timestep)
+nData = n_elements(dataName)
+data = load_eppic_data(dataName,dataType,timestep=plotStep)
+
+;;==Load the project graphics parameters
+@project.pro
+
+;;==Create graphics
+for id=0,nData-1 do $
+   multi_image, prj.data[dataName[id]],prj.xvec,prj.yvec, $
+                kw_image = (kw[dataName[id]]).image[*], $
+                kw_colorbar = (kw[dataName[id]]).colorbar[*], $
+                name = dataName[id]+'_test.png'
 
 ;;==Density
-;; imgData = reform(data.den1[*,grid.ny/2-grid.ny/4:grid.ny/2+grid.ny/4-1,0,*])
-imgData = reform(data.den1[gfxInds.x0:gfxInds.xf, $
-                           gfxInds.y0:gfxInds.yf, $
-                           gfxInds.z0:gfxInds.zf, $
-                           gfxInds.t0:gfxInds.tf])
-imgData *= 100                  ;Rescale units to [%]
-kw = set_kw('den',imgData=imgData,timestep=dt*timestep*1e3)
-multi_image, imgData,kw_image=kw.image,kw_colorbar=kw.colorbar,name='den-P.pdf'
-
 
 ;;==Potential
-;; imgData = reform(data.phi[*,grid.ny/2-grid.ny/4:grid.ny/2+grid.ny/4-1,0,*])
-imgData = reform(data.phi[gfxInds.x0:gfxInds.xf, $
-                           gfxInds.y0:gfxInds.yf, $
-                           gfxInds.z0:gfxInds.zf, $
-                           gfxInds.t0:gfxInds.tf])
-imgData *= 1000                 ;Rescale units to [mV]
-kw = set_kw('phi',imgData=imgData,timestep=dt*timestep*1e3)
-multi_image, imgData,kw_image=kw.image,kw_colorbar=kw.colorbar,name='phi-P.pdf'
 
 ;;==Total electric-field magnitude
-emag = calc_emag(data.phi,phiSW=5.0,/add_E0,/verbose)
-;; imgData = reform(emag[*,grid.ny/2-grid.ny/4:grid.ny/2+grid.ny/4-1,0,*])
-imgData = reform(emag[gfxInds.x0:gfxInds.xf, $
-                      gfxInds.y0:gfxInds.yf, $
-                      gfxInds.z0:gfxInds.zf, $
-                      gfxInds.t0:gfxInds.tf])
-imgData *= 1000                 ;Rescale units to [mV/m]
-kw = set_kw('emag',imgData=imgData,timestep=dt*timestep*1e3)
-multi_image, imgData,kw_image=kw.image,kw_colorbar=kw.colorbar,name='emag_full-P.pdf'
+;; emag = calc_emag(prj.data.phi,phiSW=5.0,/add_E0,/verbose)
 
 ;;==Perturbed electric-field magnitude
-emag = calc_emag(data.phi,phiSW=5.0,/verbose)
-;; imgData = reform(emag[*,grid.ny/2-grid.ny/4:grid.ny/2+grid.ny/4-1,0,*])
-imgData = reform(emag[gfxInds.x0:gfxInds.xf, $
-                      gfxInds.y0:gfxInds.yf, $
-                      gfxInds.z0:gfxInds.zf, $
-                      gfxInds.t0:gfxInds.tf])
-imgData *= 1000                 ;Rescale units to [mV/m]
-kw = set_kw('emag',imgData=imgData,timestep=dt*timestep*1e3)
-multi_image, imgData,kw_image=kw.image,kw_colorbar=kw.colorbar,name='emag_pert-P.pdf'
+;; emag = calc_emag(prj.data.phi,phiSW=5.0,/verbose)
 
 ;;==Spatial RMS of perturbed electric field
-pltName = "emag_rms-P.pdf"
-timestep = nout*lindgen(timestep[nSteps-1]/nout-1)
-@plot_emag_rms
+;; pltName = "emag_rms-test.pdf"
+;; timestep = nout*lindgen(timestep[nSteps-1]/nout-1)
+;; @plot_emag_rms
 

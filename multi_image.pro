@@ -37,14 +37,14 @@ pro multi_image, imgData,xData,yData, $
   ;;==Check for global colorbar
   global_colorbar = 0B
   if n_elements(kw_colorbar) ne 0 && kw_colorbar.haskey('global') then begin
-     global_colorbar = 1B
+     global_colorbar = kw_colorbar['global']
      kw_colorbar.remove, 'global'
   endif
 
   ;;==Check for global text
   global_text = 0B
   if n_elements(kw_text) ne 0 && kw_text.haskey('global') then begin
-     global_text = 1B
+     global_text = kw_text['global']
      kw_text.remove, 'global'
   endif
 
@@ -101,7 +101,7 @@ pro multi_image, imgData,xData,yData, $
                        layout = [nc,nr,ip+1], $
                        _EXTRA = kw_image.tostruct())
            if keyword_set(kw_colorbar) && ~global_colorbar then begin
-              kw_colorbar['position'] = reform((kw_colorbar_orig['position'])[ip,*])
+              kw_colorbar['position'] = reform(kw_colorbar_orig.position[ip,*])
               clr = colorbar(target = img, $
                              _EXTRA = kw_colorbar.tostruct())
            endif
@@ -117,7 +117,9 @@ pro multi_image, imgData,xData,yData, $
            endif
         endfor
         if global_colorbar then begin
-           print, "MULTI_IMAGE: global colorbar not implemented yet."
+           kw_colorbar['position'] = reform(kw_colorbar_orig.position[0,*])
+           clr = colorbar(target = img, $
+                          _EXTRA = kw_colorbar.tostruct())
         endif
         if global_text then begin
            print, "MULTI_IMAGE: global text not implemented yet."

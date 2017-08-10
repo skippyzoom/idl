@@ -2,6 +2,7 @@
 ; Set default keyword parameters for potential images.
 ;-
 function default_kw_phi, prj=prj, $
+                         ;; global=global, $
                          image=image,colorbar=colorbar,text=text
 @eppic_defaults.pro
 
@@ -118,7 +119,7 @@ function default_kw_phi, prj=prj, $
         tickvalues = kw.image.min_value + $
                      (kw.image.max_value - kw.image.min_value)* $
                      findgen(major)/(major-1)
-        tickname = plusminus_labels(tickvalues,format='f5.2')
+        tickname = plusminus_labels(tickvalues,format='f8.2')
         add_keys = ['tickvalues','tickname']
         add_vals = list(tickvalues,tickname)
         colorbar[add_keys] = add_vals
