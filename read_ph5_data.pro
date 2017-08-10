@@ -64,17 +64,23 @@ function read_ph5_data, dataName, $
   data = make_array(nx,ny,nz,nt,type=type)
 
   if keyword_set(verbose) then print,"READ_PH5_DATA: Reading ",dataName,"..."
+  nullCount = 0L
   for it=0,nt-1 do begin
-     fileID = h5f_open(h5File[it])
-     dataID = h5d_open(fileID,dataName)
-     temp = h5d_read(dataID)
-     if rotate_data then begin
-        if nz eq 1 then temp = rotate(temp,4) $
-        else for iz=0,nz-1 do $
+     temp = get_h5_data(h5File[it],dataName)
+     if n_elements(temp) ne 0 then begin
+        if rotate_data then begin
+           if nz eq 1 then temp = rotate(temp,4) $
+           else for iz=0,nz-1 do $
               temp[*,*,iz] = rotate(temp[*,*,iz],5)
-     endif
-     data[*,*,*,it] = temp
+        endif
+        data[*,*,*,it] = temp
+     endif else nullCount++
   endfor
+  if nullCount gt 0 then $
+     print, "READ_PH5_DATA: Warning: Did not find '", $
+            dataName+"' in ", $
+            strcompress(nullCount,/remove_all),"/", $
+            strcompress(nt,/remove_all)," files."
 
   return, data
 end

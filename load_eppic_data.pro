@@ -6,17 +6,6 @@
 ;
 ; The default for timestep is all time steps.
 ;
-; This function can deal gracefully with misspelled
-; data types, because read_xxx_data will simply skip
-; that entry, and with misspelled data names when
-; the data type is binary. However, it CAN NOT deal 
-; gracefully with misspelled data names when the data
-; type is ph5, since IDL's h5d_open() will abort if
-; it can't find an object with the given name.
-; 
-; As of 08Aug2017, this function returns a dictionary.
-; The previous return value was a hash.
-;
 ; TO DO:
 ; -- Only create dictionary entries for data that has
 ;    been read successfully.
