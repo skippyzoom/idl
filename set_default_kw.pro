@@ -7,10 +7,6 @@
 ; TO DO
 ;-
 function set_default_kw, name, $
-                         ;; prj=prj, $
-                         ;; image=image, $
-                         ;; colorbar=colorbar, $
-                         ;; text=text
                          _EXTRA=ex
 
   nData = n_elements(name)

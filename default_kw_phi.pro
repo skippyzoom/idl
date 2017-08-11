@@ -2,7 +2,7 @@
 ; Set default keyword parameters for potential images.
 ;-
 function default_kw_phi, prj=prj, $
-                         ;; global=global, $
+                         global=global, $
                          image=image,colorbar=colorbar,text=text
 @eppic_defaults.pro
 
