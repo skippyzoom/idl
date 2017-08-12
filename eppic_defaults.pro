@@ -89,8 +89,7 @@ units['prefixes'] = hash('Y', 24, $           ;yotta
                          'a', -18, $          ;atto
                          'z', -21, $          ;zepto
                          'y', -24)            ;yocto
-units['data'] = hash('abs_den', '$m^{-3}$', $ ;Absolute density
-                     'rel_den', '', $         ;Relative density
-                     'den', '', $             ;Relative density (shorthand)
-                     'phi', 'V', $            ;Electrostatic potential
-                     'E', 'V/m')              ;Electric field
+units['bases'] = hash('abs_den', '$m^{-3}$', $ ;Absolute density
+                      'rel_den', '', $         ;Relative density
+                      'phi', 'V', $            ;Electrostatic potential
+                      'E', 'V/m')              ;Electric field

@@ -24,6 +24,8 @@
 ;    would handle more cases. On the other hand, this routine would
 ;    need to distinguish between panel-specific colorbars and a 
 ;    global colorbar.
+; -- Consider passing in only kw struct/dictionary and extracting 
+;    individual dictionaries here.
 ;-
 
 pro multi_image, imgData,xData,yData, $
