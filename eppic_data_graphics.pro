@@ -34,3 +34,4 @@ for id=0,nData-1 do $
                kw_colorbar = prj.kw[dataName[id]].colorbar[*], $
                filename = dataName[id]+'_test.png'
 
+!PATH = paths.orig

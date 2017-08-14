@@ -1,7 +1,15 @@
 ;+
 ; Make a video of data.
-; Assumes the final dimension of data
-; is the time-step dimension.
+; This routine assumes the final dimension of data
+; is the time-step dimension. This routine automatically
+; sets the buffer keyword to 1B to ensure that the current 
+; frame goes to a buffer instead of printing to the screen.
+; The latter would slow the process considerably and clutter 
+; the screen. This routine requires that the image dimensions
+; match the dimensions of the initialized video stream. If 
+; the user does not pass in the dimensions keyword, this 
+; routine sets it to [nx,ny], where nx and ny are derived from 
+; the input data array.
 ;-
 pro data_movie, movData,xData,yData, $
                 filename=filename, $
@@ -27,7 +35,7 @@ pro data_movie, movData,xData,yData, $
   movData = reform(movData)
   movSize = size(movData)
   if movSize[0] ne 3 then $
-     message, "DATA_MOVIE: movData must be 3D (two in space, one in time)."
+     message, "Movie data must be 3D (two in space, one in time)."
   nx = movSize[1]
   ny = movSize[2]
   nt = movSize[3]
@@ -39,16 +47,20 @@ pro data_movie, movData,xData,yData, $
   if n_elements(framerate) eq 0 then framerate = 20
   if keyword_set(kw_image) then begin
      kw_image['buffer'] = 1B
-     kw_image['dimensions'] = [nx,ny]
+     if ~kw_image.haskey('dimensions') then $
+        kw_image['dimensions'] = [nx,ny]
+     framesize = kw_image['dimensions']
   endif $
   else begin
      replace_tag, ex,'buffer',1B,/quiet
-     replace_tag, ex,'dimensions',[nx,ny],/quiet
+     if ~tag_exist(ex,'dimensions') then $
+        ex = create_struct(ex,'dimensions',[nx,ny])
+     framesize = ex.dimensions
   endelse
 
   ;;==Open video stream
   video = idlffvideowrite(filename)
-  stream = video.addvideostream(nx,ny,framerate)
+  stream = video.addvideostream(framesize[0],framesize[1],framerate)
 
   ;;==Write data to video stream
   for it=0,nt-1 do begin

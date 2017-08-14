@@ -9,22 +9,6 @@
 ;    
 ; QUIET: Suppress non-fatal warnings.
 ;-
-;; function replace_tag, str,tag,new,quiet=quiet
-
-;;   if n_params() ne 3 then $
-;;      message, "Please provide struct, tag name, and new field." $
-;;   else begin
-;;      if size(str,/type) ne 8 then $
-;;         message, "First argument must be a struct"
-;;      if size(tag,/type) ne 7 then $
-;;         message, "Second argument must be a string"
-;;   endelse
-
-;;   str = remove_tag(str,tag,quiet=quiet)
-;;   str = create_struct(str,tag,new)
-
-;;   return, str
-;; end
 pro replace_tag, str,tag,new,quiet=quiet
 
   if n_params() ne 3 then $

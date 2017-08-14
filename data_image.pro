@@ -70,38 +70,17 @@ pro data_image, imgData,xData,yData, $
   ;;==Create image
   if imgSize[0] eq 3 then begin
      np = imgSize[3]
-     timestep_tag = ['position','title']
-     nTags = n_elements(timestep_tag)
+     timestep_key = ['position','title']
+     nKeys = n_elements(timestep_key)
+     expect = [1,0]
      if keyword_set(kw_image) then begin
         nc = fix(sqrt(np))+((sqrt(np) mod 1) gt 0)
         nr = nc
-        flag = make_array(nTags,value=0B)
-        ;-->Can I make this a loop?
-        if kw_image.haskey('position') then begin
-           tmpSize = size(kw_image['position'])
-           case 1B of 
-              (tmpSize[0] eq 0): $
-                 message, "kw_image['position'] must have at least 4 elements"
-              (tmpSize[0] eq 1): ;Do nothing
-              (tmpSize[0] eq 2): flag[0] = 1B
-              (tmpSize[0] gt 2): $
-                 message, "kw_image['position'] may be 1D or 2D"
-           endcase
-        endif
-        if kw_image.haskey('title') then begin
-           tmpSize = size(kw_image['title'])
-           case 1B of 
-              (tmpSize[0] eq 0): ;Do nothing
-              (tmpSize[0] eq 1): flag[1] = 1B
-              (tmpSize[0] gt 1): $
-                 message, "kw_image['title'] may be scalar or 1D"
-           endcase
-        endif
-        ;<--(loop?)
+        flag = get_timestep_kw(kw_image[*],timestep_key,expect)
         for ip=0,np-1 do begin
-           for it=0,nTags-1 do $
-              if flag[it] then $
-                 kw_image[timestep_tag[it]] = reform((kw_image_orig[timestep_tag[it]])[ip,*])
+           for ik=0,nKeys-1 do $
+              if flag[ik] then $
+                 kw_image[timestep_key[ik]] = reform((kw_image_orig[timestep_key[ik]])[ip,*])
            img = image(imgData[*,*,ip],xData,yData, $
                        current = (ip gt 0), $
                        layout = [nc,nr,ip+1], $
@@ -181,12 +160,6 @@ pro data_image, imgData,xData,yData, $
      image_save, img,filename=filename,/landscape
 
   endif else begin
-     ;; print, "MULTI_IMAGE: This prodecure expects data to have dimensions (nx,ny,np),"
-     ;; print, "             where np = # of image panels."
-     ;; print, "             To create a single-panel image, try img = image(data[,x,y])."
-     ;; print, "             See the IDL image() online help for more info."
-     ;; print, " "
-
      ;;==Create single-panel image
      if keyword_set(kw_image) then begin
         img = image(imgData,xData,yData, $

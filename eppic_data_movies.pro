@@ -24,7 +24,7 @@ dataName.add, addName
 data[addName] = calc_emag(data.phi,phiSW=5.0,/add_E0,/verbose)
 
 ;;==Load the project graphics parameters
-@project
+@project.pro
 
 ;;==Create movies
 nData = n_elements(dataName)
@@ -33,3 +33,5 @@ for id=0,nData-1 do $
                kw_image = prj.kw[dataName[id]].image[*], $
                kw_colorbar = prj.kw[dataName[id]].colorbar[*], $
                filename = dataName[id]+'_test.mp4'
+
+!PATH = paths.orig
