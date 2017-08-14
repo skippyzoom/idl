@@ -30,7 +30,7 @@ function remove_tag, str,tag,quiet=quiet
 
   ind = where(strcmp(tag_names(str),tag,/fold_case),count)
   if count eq 0 then begin
-     if not(keyword_set(quiet)) then $
+     if ~keyword_set(quiet) then $
         print, "tag '"+tag+"' is not a member of struct"
   endif else str = create_struct(str,remove=ind)
 

@@ -11,7 +11,7 @@ pro data_kw_colorbar, name,kw,prj=prj,global=global
                         'ticklen', 0.2, $
                         'major', 7, $
                         'font_name', "Times", $
-                        'font_size', 14.0)
+                        'font_size', 10.0)
 
   nNames = n_elements(name)
   for id=0,nNames-1 do begin

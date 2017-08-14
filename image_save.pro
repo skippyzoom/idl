@@ -5,13 +5,13 @@
 ; If this function doesn't recognize the file extension,
 ; it will issue a warning and use '.png' as the extension.
 ;-
-pro image_save, image,name=name,_EXTRA=ex
+pro image_save, image,filename=filename,_EXTRA=ex
   
   ;;==Defaults and guards
-  if n_elements(name) eq 0 then name = "new_image.png"
+  if n_elements(filename) eq 0 then filename = "new_image.png"
 
-  ;;==Get file extension from name
-  ext = get_extension(name)
+  ;;==Get file extension from filename
+  ext = get_extension(filename)
 
   ;;==Check for file support
   types = ['bmp', $             ;Windows bitmap
@@ -30,12 +30,12 @@ pro image_save, image,name=name,_EXTRA=ex
   supported = string_exists(types,ext,/fold_case)
   if ~supported then begin
      print, "IMAGE_SAVE: File type not recognized or not supported. Using PNG."
-     name = strip_extension(name)+'.png'
+     filename = strip_extension(filename)+'.png'
   endif
 
   ;;==Save image
-  print, "IMAGE_SAVE: Saving ",name,"..."
-  image.save, name,_EXTRA=ex
+  print, "IMAGE_SAVE: Saving ",filename,"..."
+  image.save, filename,_EXTRA=ex
   if strcmp(ext,'pdf') or strcmp(ext,'gif') then image.close
   print, "IMAGE_SAVE: Finished"
 

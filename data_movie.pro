@@ -2,51 +2,77 @@
 ; Make a video of data.
 ; Assumes the final dimension of data
 ; is the time-step dimension.
-;
-; TO DO
-; -- Pass image, colorbar, and text keywords via
-;    structs, as in multi_image.pro
 ;-
-pro data_movie, data,xData,yData, $
+pro data_movie, movData,xData,yData, $
                 filename=filename, $
                 framerate=framerate, $
                 timestamps=timestamps, $
+                kw_image=kw_image, $
+                kw_colorbar=kw_colorbar, $
+                kw_text=kw_text, $
                 _EXTRA=ex
+
+  ;;==Back-up keyword structs
+  if keyword_set(kw_image) then kw_image_orig = kw_image[*]
+  if keyword_set(kw_colorbar) then kw_colorbar_orig = kw_colorbar[*]
+  if keyword_set(kw_text) then kw_text_orig = kw_text[*]
+
+  ;;==Handle dictionary entries that are not image keywords
+  if n_elements(kw_colorbar) ne 0 && kw_colorbar.haskey('global') then $
+     kw_colorbar.remove, 'global'
+  if n_elements(kw_text) ne 0 && kw_text.haskey('global') then $
+     kw_text.remove, 'global'
+
+  ;;==Get data dimensions
+  movData = reform(movData)
+  movSize = size(movData)
+  if movSize[0] ne 3 then $
+     message, "DATA_MOVIE: movData must be 3D (two in space, one in time)."
+  nx = movSize[1]
+  ny = movSize[2]
+  nt = movSize[3]
+  if n_elements(xData) eq 0 then xData = indgen(nx)
+  if n_elements(yData) eq 0 then yData = indgen(ny)
 
   ;;==Defaults and guards
   if n_elements(filename) eq 0 then filename = 'data_movie.mp4'
   if n_elements(framerate) eq 0 then framerate = 20
-
-  ;;==Get data dimensions
-  data = reform(data)
-  if size(data,/n_dim) ne 3 then $
-     message, "data must be 3D (two in space, one in time)."
-  dataDims = size(data,/dim)
+  if keyword_set(kw_image) then begin
+     kw_image['buffer'] = 1B
+     kw_image['dimensions'] = [nx,ny]
+  endif $
+  else begin
+     replace_tag, ex,'buffer',1B,/quiet
+     replace_tag, ex,'dimensions',[nx,ny],/quiet
+  endelse
 
   ;;==Open video stream
-  video = idlffvideowrite(fileName)
-  stream = video.addvideostream(dataDims[0],dataDims[1],framerate)
-
-  if n_elements(xData) eq dataDims[0] and n_elements(yData) eq dataDims[1] $
-  then include_xy = 1B $
-  else include_xy = 0B
+  video = idlffvideowrite(filename)
+  stream = video.addvideostream(nx,ny,framerate)
 
   ;;==Write data to video stream
-  for it=0,dataDims[2]-1 do begin
-     if include_xy then $
-        img = image(data[*,*,it], $
+  for it=0,nt-1 do begin
+     if keyword_set(kw_image) then begin
+        img = image(movData[*,*,it], $
                     xData,yData, $
-                    /buffer, $
-                    dimensions=[dataDims[0],dataDims[1]], $
-                    _EXTRA=ex) $
-     else $
-        img = image(data[*,*,it], $
-                    /buffer, $
-                    dimensions=[dataDims[0],dataDims[1]], $
-                    _EXTRA=ex)
-     clr = colorbar(target=img, $
-                    orientation=1, $
-                    textpos=1)
+                    _EXTRA = kw_image.tostruct())
+     endif $
+     else begin
+        img = image(movData[*,*,it], $
+                    xData,yData, $
+                    _EXTRA = ex)
+     endelse
+
+     if keyword_set(kw_colorbar) then begin
+        clr = colorbar(target = img, $
+                       _EXTRA = kw_colorbar.tostruct())
+     endif $
+     else begin
+        clr = colorbar(target = img, $
+                       orientation = 1, $
+                       textpos = 1)
+     endelse
+
      if keyword_set(timestamps) then begin
         ;-->This may be possible with fill_background and
         ;   fill_color properties in text().
@@ -57,19 +83,19 @@ pro data_movie, data,xData,yData, $
         ply = polygon([ply_x0,ply_x0+ply_dx,ply_x0+ply_dx,ply_x0], $
                       [ply_y0,ply_y0,ply_y0+ply_dy,ply_y0+ply_dy], $
                       /normal, $
-                      fill_color='white', $
-                      linestyle=0, $
-                      thick=2)
+                      fill_color = 'white', $
+                      linestyle = 0, $
+                      thick = 2)
         timeText = "it = "+strcompress(it,/remove_all)
         txt = text(ply_x0+0.01, $
                    ply_y0+0.02, $
                    timeText, $
                    /normal, $
-                   color='black', $
-                   alignment=0.0, $
-                   vertical_alignment=0.0, $
-                   font_name='Times', $
-                   font_size=12)
+                   color = 'black', $
+                   alignment = 0.0, $
+                   vertical_alignment = 0.0, $
+                   font_name = 'Times', $
+                   font_size = 12)
      endif
      frame = img.copywindow()
      !NULL = video.put(stream,frame)
@@ -79,4 +105,9 @@ pro data_movie, data,xData,yData, $
   ;;==Close video stream
   video.cleanup
   print, "DATA_MOVIE: Created ",filename
+
+  ;;==Reset keyword structs
+  if keyword_set(kw_image) then kw_image = kw_image_orig[*]
+  if keyword_set(kw_colorbar) then kw_colorbar = kw_colorbar_orig[*]
+  if keyword_set(kw_text) then kw_text = kw_text_orig[*]
 end

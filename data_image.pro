@@ -25,16 +25,20 @@
 ;    need to distinguish between panel-specific colorbars and a 
 ;    global colorbar.
 ; -- Consider passing in only kw struct/dictionary and extracting 
-;    individual dictionaries here.
+;    individual dictionaries here. Update: This may be impractical,
+;    given the current project.pro paradigm, since the prj dictionary
+;    is organized as prj.kw.<dataName>.<image,colorbar,etc.>. That 
+;    means this routine would need to explicitly know the dataName
+;    in order to extract the correct image, colorbar, etc. info.
 ;-
 
-pro multi_image, imgData,xData,yData, $
-                 name=name, $
-                 kw_image=kw_image, $
-                 kw_colorbar=kw_colorbar, $
-                 kw_text=kw_text, $
-                 colorbar_on=colorbar_on, $
-                 _EXTRA=ex
+pro data_image, imgData,xData,yData, $
+                filename=filename, $
+                kw_image=kw_image, $
+                kw_colorbar=kw_colorbar, $
+                kw_text=kw_text, $
+                colorbar_on=colorbar_on, $
+                _EXTRA=ex
 
   ;;==Check for global colorbar
   global_colorbar = 0B
@@ -55,7 +59,7 @@ pro multi_image, imgData,xData,yData, $
   if keyword_set(kw_colorbar) then kw_colorbar_orig = kw_colorbar[*]
   if keyword_set(kw_text) then kw_text_orig = kw_text[*]
 
-  ;;==Defaults and guards
+  ;;==Get data dimensions
   imgData = reform(imgData)
   imgSize = size(imgData)
   nx = imgSize[1]
@@ -174,7 +178,7 @@ pro multi_image, imgData,xData,yData, $
      endelse
      
      ;;==Save image
-     image_save, img,name=name,/landscape
+     image_save, img,filename=filename,/landscape
 
   endif else begin
      ;; print, "MULTI_IMAGE: This prodecure expects data to have dimensions (nx,ny,np),"
@@ -200,11 +204,11 @@ pro multi_image, imgData,xData,yData, $
            ex = remove_tag(ex,'buffer',/quiet)
         img = image(imgData,xData,yData, $
                     /buffer, $
-                    _EXTRA=ex)
+                    _EXTRA = ex)
      endelse
 
      ;;==Save image
-     image_save, img,name=name,/landscape
+     image_save, img,filename=filename,/landscape
 
   endelse
 

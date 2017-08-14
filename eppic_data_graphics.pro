@@ -29,8 +29,8 @@ data[addName] = calc_emag(data.phi,phiSW=5.0,/add_E0,/verbose)
 ;;==Create graphics
 nData = n_elements(dataName)
 for id=0,nData-1 do $
-   multi_image, prj.data[dataName[id]],prj.xvec,prj.yvec, $
-                kw_image = prj.kw[dataName[id]].image[*], $
-                kw_colorbar = prj.kw[dataName[id]].colorbar[*], $
-                name = dataName[id]+'_test.png'
+   data_image, prj.data[dataName[id]],prj.xvec,prj.yvec, $
+               kw_image = prj.kw[dataName[id]].image[*], $
+               kw_colorbar = prj.kw[dataName[id]].colorbar[*], $
+               filename = dataName[id]+'_test.png'
 
