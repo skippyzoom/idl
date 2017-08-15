@@ -10,6 +10,12 @@
 ; the user does not pass in the dimensions keyword, this 
 ; routine sets it to [nx,ny], where nx and ny are derived from 
 ; the input data array.
+;
+; TO DO
+; -- Develop routine that "cleans up" kw dictionaries based on
+;    allowed IDL keywords? This may become more useful as 
+;    data_image.pro and data_movie.pro develop concurrently but
+;    not necessarily consistently.
 ;-
 pro data_movie, movData,xData,yData, $
                 filename=filename, $

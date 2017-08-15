@@ -46,27 +46,9 @@ if n_elements(Ex0_external) eq 0 then Ex0_external = 0.0
 if n_elements(Ey0_external) eq 0 then Ey0_external = 0.0
 if n_elements(Ez0_external) eq 0 then Ez0_external = 0.0
 
-;--------------;
-; I/O defaults ;
-;--------------;
-;-->May be misleading. Better to handle defaults in 
-;   individual programs?
-;; if n_elements(dataName) eq 0 then dataName = 'den1'
-;; if n_elements(dataType) eq 0 then dataType = 'ph5'
-;; if n_elements(timestep) eq 0 then timestep = 0
-
-;-------------------;
-; Graphics defaults ;
-;-------------------;
-;-->Update these for consistency with the dictionary-based
-;   kw approach.
-;; if n_elements(kw_image) eq 0 then kw_image = {buffer: 1B}
-;; if n_elements(kw_plot) eq 0 then kw_plot = {buffer: 1B}
-;; if n_elements(use_clr) eq 0 then use_clr = 0B
-
-;--------------;
-; Dictionaries ;
-;--------------;
+;-------;
+; Units ;
+;-------;
 units = dictionary()
 units['prefixes'] = hash('Y', 24, $           ;yotta
                          'Z', 21, $           ;zetta
@@ -93,3 +75,4 @@ units['bases'] = hash('abs_den', '$m^{-3}$', $ ;Absolute density
                       'rel_den', '', $         ;Relative density
                       'phi', 'V', $            ;Electrostatic potential
                       'E', 'V/m')              ;Electric field
+
