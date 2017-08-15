@@ -11,11 +11,6 @@
 ; routine sets it to [nx,ny], where nx and ny are derived from 
 ; the input data array.
 ;
-; TO DO
-; -- Develop routine that "cleans up" kw dictionaries based on
-;    allowed IDL keywords? This may become more useful as 
-;    data_image.pro and data_movie.pro develop concurrently but
-;    not necessarily consistently.
 ;-
 pro data_movie, movData,xData,yData, $
                 filename=filename, $
@@ -32,10 +27,16 @@ pro data_movie, movData,xData,yData, $
   if keyword_set(kw_text) then kw_text_orig = kw_text[*]
 
   ;;==Handle dictionary entries that are not image keywords
-  if n_elements(kw_colorbar) ne 0 && kw_colorbar.haskey('global') then $
-     kw_colorbar.remove, 'global'
-  if n_elements(kw_text) ne 0 && kw_text.haskey('global') then $
-     kw_text.remove, 'global'
+  ;; if n_elements(kw_colorbar) ne 0 && kw_colorbar.haskey('global') then $
+  ;;    kw_colorbar.remove, 'global'
+  ;; if n_elements(kw_text) ne 0 && kw_text.haskey('global') then $
+  ;;    kw_text.remove, 'global'
+  if n_elements(kw_image) ne 0 then clean_kw, kw_image,/image, $
+     removed=image_removed
+  if n_elements(kw_colorbar) ne 0 then clean_kw, kw_colorbar,/colorbar, $
+     removed=colorbar_removed
+  if n_elements(kw_text) ne 0 then clean_kw, kw_text, /text, $
+     removed=text_removed
 
   ;;==Get data dimensions
   movData = reform(movData)
