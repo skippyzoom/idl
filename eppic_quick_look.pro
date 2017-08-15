@@ -5,9 +5,6 @@
 ; so the user can know if the run is worth analyzing further.
 ;-
 
-;;==Change to project directory
-cd, '/projectnb/eregion/may/Stampede_runs/parametric_wave/run000'
-
 ;;==Load simulation data
 @load_eppic_params
 data = load_eppic_data(['den1','phi'],timestep=nout*lindgen(ntMax))
