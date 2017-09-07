@@ -3,13 +3,13 @@
 ;-
 
 ;;==Declare the project name
-;-->In a batch file?
-prjDir = 'parametric_wave/run000/'
-paths = source_project(prjDir)
+if n_elements(projDir) eq 0 then projDir = './'
+paths = source_project(projDir)
 !PATH = paths.proj
 
 ;;==Move to the project data directory
-cd, '/projectnb/eregion/may/Stampede_runs/'+prjDir
+if n_elements(projPath) eq 0 then projPath = './'
+cd, projPath
 
 ;;==Load density and potential for limited time steps
 @load_eppic_params
@@ -32,6 +32,6 @@ for id=0,nData-1 do $
    data_image, prj.data[dataName[id]],prj.xvec,prj.yvec, $
                kw_image = prj.kw[dataName[id]].image[*], $
                kw_colorbar = prj.kw[dataName[id]].colorbar[*], $
-               filename = dataName[id]+'_test.png'
+               filename = dataName[id]+'.png'
 
 !PATH = paths.orig
