@@ -26,7 +26,7 @@
 ;    global colorbar.
 ; -- Consider passing in only kw struct/dictionary and extracting 
 ;    individual dictionaries here. Update: This may be impractical,
-;    given the current project.pro paradigm, since the prj dictionary
+;    given the current project paradigm, since the prj dictionary
 ;    is organized as prj.kw.<dataName>.<image,colorbar,etc.>. That 
 ;    means this routine would need to explicitly know the dataName
 ;    in order to extract the correct image, colorbar, etc. info.
