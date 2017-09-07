@@ -4,7 +4,7 @@
 
 ;;==Declare the project name
 if n_elements(projDir) eq 0 then projDir = './'
-paths = source_project(prjDir)
+paths = source_project(projDir)
 !PATH = paths.proj
 
 ;;==Move to the project data directory

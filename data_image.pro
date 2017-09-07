@@ -70,17 +70,14 @@ pro data_image, imgData,xData,yData, $
   ;;==Create image
   if imgSize[0] eq 3 then begin
      np = imgSize[3]
-     timestep_key = ['position','title']
-     nKeys = n_elements(timestep_key)
-     expect = [1,0]
      if keyword_set(kw_image) then begin
         nc = fix(sqrt(np))+((sqrt(np) mod 1) gt 0)
         nr = nc
-        flag = get_timestep_kw(kw_image[*],timestep_key,expect)
+        flag = get_timestep_kw(kw_image[*],'image')
         for ip=0,np-1 do begin
+           nKeys = flag.count()
            for ik=0,nKeys-1 do $
-              if flag[ik] then $
-                 kw_image[timestep_key[ik]] = reform((kw_image_orig[timestep_key[ik]])[ip,*])
+              kw_image[flag[ik]] = reform((kw_image_orig[flag[ik]])[ip,*])
            img = image(imgData[*,*,ip],xData,yData, $
                        current = (ip gt 0), $
                        layout = [nc,nr,ip+1], $

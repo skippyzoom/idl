@@ -1,171 +1,176 @@
 ;+
-; A list of allowed graphics keywords.
+; A list of allowed graphics keywords and expected number of dimensions.
+;
+; NB: This will assume the following dimensions, even though IDL
+; allows additional options, until I figure out how to handle all
+; the options:
+; -- margin is a scalar (IDL also allows a [left,bottom,right,top] array).
+; -- [xyz]subgridstyle is a scalar (IDL also allows a 2-element vector).
+; -- [xyz]tickformat is a scalar (IDL also allows a string array).
+;
 ;-
 keys = list('image','plot','colorbar','text')
 idl_keywords = dictionary(keys.toarray())
-keys = list('axis_style', $
-            'buffer', $
-            'current', $
-            'device', $
-            'dimensions', $
-            'layout', $
-            'location', $
-            'margin', $
-            'no_toolbar', $
-            'nodata', $
-            'overplot', $
-            'widgets', $
-            'geotiff', $
-            'image_dimensions', $
-            'image_location', $
-            'irregular', $
-            'order', $
-            'aspect_ratio', $
-            'axes', $
-            'background_color', $
-            'background_transparency', $
-            'clip', $
-            'crosshair', $
-            'font_color', $
-            'font_name', $
-            'font_size', $
-            'font_style', $
-            'grid_units', $
-            'hide', $
-            'interpolate', $
-            'mapgrid', $
-            'mapprojection', $
-            'map_projection', $
-            'max_value', $
-            'min_value', $
-            'name', $
-            'position', $
-            'rgb_table', $
-            'scale_center', $
-            'scale_factor', $
-            'title', $
-            'transparency', $
-            'uvalue', $
-            'window', $
-            'window_title', $
-            'xrange', $
-            'xcolor', $
-            'xgridstyle', $
-            'xlog', $
-            'xmajor', $
-            'xminor', $
-            'xsubgridstyle', $
-            'xshowtext', $
-            'xstyle', $
-            'xsubticklen', $
-            'xtext_color', $
-            'xtext_orientation', $
-            'xtextpos', $
-            'xthick', $
-            'xtickdir', $
-            'xtickfont_name', $
-            'xtickfont_size', $
-            'xtickfont_style', $
-            'xtickformat', $
-            'xtickinterval', $
-            'xticklayout', $
-            'xticklen', $
-            'xtickname', $
-            'xtickunits', $
-            'xtickvalues', $
-            'xtitle', $
-            'xtransparency', $
-            'yrange', $
-            'ycolor', $
-            'ygridstyle', $
-            'ylog', $
-            'ymajor', $
-            'yminor', $
-            'ysubgridstyle', $
-            'yshowtext', $
-            'ystyle', $
-            'ysubticklen', $
-            'ytext_color', $
-            'ytext_orientation', $
-            'ytextpos', $
-            'ythick', $
-            'ytickdir', $
-            'ytickfont_name', $
-            'ytickfont_size', $
-            'ytickfont_style', $
-            'ytickformat', $
-            'ytickinterval', $
-            'yticklayout', $
-            'yticklen', $
-            'ytickname', $
-            'ytickunits', $
-            'ytickvalues', $
-            'ytitle', $
-            'ytransparency', $
-            'zvalue', $
-            'zcolor', $
-            'zgridstyle', $
-            'zlog', $
-            'zmajor', $
-            'zminor', $
-            'zsubgridstyle', $
-            'zshowtext', $
-            'zstyle', $
-            'zsubticklen', $
-            'ztext_color', $
-            'ztext_orientation', $
-            'ztextpos', $
-            'zthick', $
-            'ztickdir', $
-            'ztickfont_name', $
-            'ztickfont_size', $
-            'ztickfont_style', $
-            'ztickformat', $
-            'ztickinterval', $
-            'zticklayout', $
-            'zticklen', $
-            'ztickname', $
-            'ztickunits', $
-            'ztickvalues', $
-            'ztitle', $
-            'ztransparency')
-idl_keywords['image'] = dictionary(keys.toarray())
-keys = list('data', $
-            'device', $
-            'normal', $
-            'relative', $
-            'target', $
-            'antialias', $
-            'border', $
-            'clip', $
-            'color', $
-            'font_name', $
-            'font_size', $
-            'font_style', $
-            'hide', $
-            'major', $
-            'minor', $
-            'name', $
-            'orientation', $
-            'position', $
-            'range', $
-            'rgb_table', $
-            'subticklen', $
-            'taper', $
-            'text_color', $
-            'text_orientation', $
-            'textpos', $
-            'thick', $
-            'tickdir', $
-            'tickformat', $
-            'tickinterval', $
-            'ticklayour', $
-            'ticklen', $
-            'tickname', $
-            'tickvalues', $
-            'title', $
-            'transparency', $
-            'uvalue', $
-            'window')
-idl_keywords['colorbar'] = dictionary(keys.toarray())
-
+idl_keywords['image'] = dictionary('axis_style', 0, $
+                                   'buffer', 0, $
+                                   'current', 0, $
+                                   'device', 0, $
+                                   'dimensions', 1, $
+                                   'layout', 1, $
+                                   'location', 1, $
+                                   'margin', 0, $
+                                   'no_toolbar', 0, $
+                                   'nodata', 0, $
+                                   'overplot', 0, $
+                                   'widgets', 0, $
+                                   'geotiff', 0, $
+                                   'image_dimensions', 0, $
+                                   'image_location', 0, $
+                                   'irregular', 0, $
+                                   'order', 0, $
+                                   'aspect_ratio', 0, $
+                                   'axes', 0, $
+                                   'background_color', 0, $
+                                   'background_transparency', 0, $
+                                   'clip', 0, $
+                                   'crosshair', 0, $
+                                   'font_color', 0, $
+                                   'font_name', 0, $
+                                   'font_size', 0, $
+                                   'font_style', 0, $
+                                   'grid_units', 0, $
+                                   'hide', 0, $
+                                   'interpolate', 0, $
+                                   'mapgrid', 0, $
+                                   'mapprojection', 0, $
+                                   'map_projection', 0, $
+                                   'max_value', 0, $
+                                   'min_value', 0, $
+                                   'name', 0, $
+                                   'position', 1, $
+                                   'rgb_table', 0, $
+                                   'scale_center', 1, $
+                                   'scale_factor', 0, $
+                                   'title', 0, $
+                                   'transparency', 0, $
+                                   'uvalue', 0, $
+                                   'window', 0, $
+                                   'window_title', 0, $
+                                   'xrange', 1, $
+                                   'xcolor', 0, $
+                                   'xgridstyle', 0, $
+                                   'xlog', 0, $
+                                   'xmajor', 0, $
+                                   'xminor', 0, $
+                                   'xsubgridstyle', 0, $
+                                   'xshowtext', 0, $
+                                   'xstyle', 0, $
+                                   'xsubticklen', 0, $
+                                   'xtext_color', 0, $
+                                   'xtext_orientation', 0, $
+                                   'xtextpos', 0, $
+                                   'xthick', 0, $
+                                   'xtickdir', 0, $
+                                   'xtickfont_name', 0, $
+                                   'xtickfont_size', 0, $
+                                   'xtickfont_style', 0, $
+                                   'xtickformat', 0, $
+                                   'xtickinterval', 0, $
+                                   'xticklayout', 0, $
+                                   'xticklen', 0, $
+                                   'xtickname', 1, $
+                                   'xtickunits', 0, $
+                                   'xtickvalues', 1, $
+                                   'xtitle', 0, $
+                                   'xtransparency', 0, $
+                                   'yrange', 1, $
+                                   'ycolor', 0, $
+                                   'ygridstyle', 0, $
+                                   'ylog', 0, $
+                                   'ymajor', 0, $
+                                   'yminor', 0, $
+                                   'ysubgridstyle', 0, $
+                                   'yshowtext', 0, $
+                                   'ystyle', 0, $
+                                   'ysubticklen', 0, $
+                                   'ytext_color', 0, $
+                                   'ytext_orientation', 0, $
+                                   'ytextpos', 0, $
+                                   'ythick', 0, $
+                                   'ytickdir', 0, $
+                                   'ytickfont_name', 0, $
+                                   'ytickfont_size', 0, $
+                                   'ytickfont_style', 0, $
+                                   'ytickformat', 0, $
+                                   'ytickinterval', 0, $
+                                   'yticklayout', 0, $
+                                   'yticklen', 0, $
+                                   'ytickname', 1, $
+                                   'ytickunits', 0, $
+                                   'ytickvalues', 1, $
+                                   'ytitle', 0, $
+                                   'ytransparency', 0, $
+                                   'zvalue', 0, $
+                                   'zcolor', 0, $
+                                   'zgridstyle', 0, $
+                                   'zlog', 0, $
+                                   'zmajor', 0, $
+                                   'zminor', 0, $
+                                   'zsubgridstyle', 0, $
+                                   'zshowtext', 0, $
+                                   'zstyle', 0, $
+                                   'zsubticklen', 0, $
+                                   'ztext_color', 0, $
+                                   'ztext_orientation', 0, $
+                                   'ztextpos', 0, $
+                                   'zthick', 0, $
+                                   'ztickdir', 0, $
+                                   'ztickfont_name', 0, $
+                                   'ztickfont_size', 0, $
+                                   'ztickfont_style', 0, $
+                                   'ztickformat', 0, $
+                                   'ztickinterval', 0, $
+                                   'zticklayout', 0, $
+                                   'zticklen', 0, $
+                                   'ztickname', 1, $
+                                   'ztickunits', 0, $
+                                   'ztickvalues', 1, $
+                                   'ztitle', 0, $
+                                   'ztransparency', 0)
+idl_keywords['colorbar'] = dictionary('data', 0, $
+                                      'device', 0, $
+                                      'normal', 0, $
+                                      'relative', 0, $
+                                      'target', 0, $
+                                      'antialias', 0, $
+                                      'border', 0, $
+                                      'clip', 0, $
+                                      'color', 0, $
+                                      'font_name', 0, $
+                                      'font_size', 0, $
+                                      'font_style', 0, $
+                                      'hide', 0, $
+                                      'major', 0, $
+                                      'minor', 0, $
+                                      'name', 0, $
+                                      'orientation', 0, $
+                                      'position', 1, $
+                                      'range', 1, $
+                                      'rgb_table', 0, $
+                                      'subticklen', 0, $
+                                      'taper', 0, $
+                                      'text_color', 0, $
+                                      'text_orientation', 0, $
+                                      'textpos', 0, $
+                                      'thick', 0, $
+                                      'tickdir', 0, $
+                                      'tickformat', 0, $
+                                      'tickinterval', 0, $
+                                      'ticklayour', 0, $
+                                      'ticklen', 0, $
+                                      'tickname', 1, $
+                                      'tickvalues', 1, $
+                                      'title', 0, $
+                                      'transparency', 0, $
+                                      'uvalue', 0, $
+                                      'window', 0)
