@@ -1,9 +1,20 @@
 ;+
-; Create plots of spectral power as a function
-; of |k|, angle, and frequency.
+; Create graphics of spectra from simulation quantities, including: 
+; -- Raw spectra as a function of time (kx,ky[,kz],t)
+; -- [TO DO] Raw spectra as a function of frequency (kx,ky[,kz],w)
+; -- [TO DO] RMS spectra as a function of time (kx,ky[,kz],t)
+; -- [TO DO] Spectral power as a function of |k|, angle, and frequency
 ;-
 
+;; loadStep = nout*lindgen(ntMax)
 @load_project
+
+;;==Create graphics
+;; plotStep = nout*[0,ntMax-1]
+dataName = prj.data.keys()
+nData = n_elements(dataName)
+raw_kt_spectra, prj,plotindex=plotStep/nout
+;; raw_kw_spectra, prj,plotindex=plotStep/nout
 
 ;; kmag = load_kmag(data = (transpose(data.den1,[1,0,2,3]))[768-128:768+127,*,*,*], $
 ;;                  filename = dataName[0]+'_kmag_freq.sav', $

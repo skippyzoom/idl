@@ -39,6 +39,7 @@ pro data_kw_image, name,kw,prj=prj,global=global
         end
         strcmp(name[id],'emag',4): rgb_table = 3
         strcmp(name[id],'E',1,/fold_case): rgb_table = 5
+        strcmp(name[id],'fft',3,/fold_case): rgb_table = 39
      endcase
      image['rgb_table'] = rgb_table
      if n_elements(prj) ne 0 then begin
@@ -47,15 +48,30 @@ pro data_kw_image, name,kw,prj=prj,global=global
                                   buffers=[0.00,0.05])                
         image['position'] = transpose(position)
         if keyword_set(global) then begin
-           if strcmp(name[id],'emag',4) then begin
-              max_value = max(prj.data[name[id]])
-              min_value = 0
-           endif $
-           else begin
-              max_abs = max(abs(prj.data[name[id]]))
-              max_value = max_abs
-              min_value = -max_abs
-           endelse
+           ;; if strcmp(name[id],'emag',4) then begin
+           ;;    max_value = max(prj.data[name[id]])
+           ;;    min_value = 0
+           ;; endif $
+           ;; else begin
+           ;;    max_abs = max(abs(prj.data[name[id]]))
+           ;;    max_value = max_abs
+           ;;    min_value = -max_abs
+           ;; endelse
+           case 1 of
+              strcmp(name[id],'emag',4): begin
+                 max_value = max(prj.data[name[id]])
+                 min_value = 0
+              end
+              strcmp(name[id],'fft',3,/fold_case): begin
+                 max_value = 0
+                 min_value = -100
+              end
+              else: begin
+                 max_abs = max(abs(prj.data[name[id]]))
+                 max_value = max_abs
+                 min_value = -max_abs
+              end
+           endcase                 
            add_keys = ['min_value','max_value']
            add_vals = list(min_value,max_value)
            image[add_keys] = add_vals           

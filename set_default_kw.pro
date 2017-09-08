@@ -1,9 +1,14 @@
 ;+
 ; Set the default keywords for making graphics of <name>.
 ; The user should call this function, then make project-specific
-; changes to the kw struct in a <name>.prm file that lives in
+; changes to the kw struct in a project.eppic file that lives in
 ; a subdirectory of ~/projects/.
 ;
+; NAME: The names of the quantities for which to set up keywords.
+;       Possible names include simulated quantities (e.g. den1 or
+;       phi) or quantities derived therefrom (e.g. emag or fft).
+;       See data_kw_* for currently available quantities and edit
+;       data_kw_* to add a new name.
 ; TO DO
 ;-
 function set_default_kw, name, $
