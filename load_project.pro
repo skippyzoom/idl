@@ -11,20 +11,15 @@ paths = source_project(projDir)
 !PATH = paths.proj
 
 ;;==Move to the project data directory
-if n_elements(projPath) eq 0 then projPath = './'
-cd, projPath
+if n_elements(fullPath) eq 0 then fullPath = './'
+cd, fullPath
 
 ;;==Load density and potential for specified time steps
 @load_eppic_params
-if n_elements(loadStep) eq 0 then loadStep = nout*[0,ntMax-1]
-dataName = list('den1','phi')
-dataType = ['ph5','ph5']
+if n_elements(loadStep) eq 0 then loadStep = 0
+if n_elements(dataName) eq 0 then dataName = list('den1','phi')
+if n_elements(dataType) eq 0 then dataType = ['ph5','ph5']
 data = load_eppic_data(dataName.toarray(),dataType,timestep=loadStep)
-
-;;==Calculate electric-field quantities and add to existing data set
-addName = 'emag'
-dataName.add, addName
-data[addName] = calc_emag(data.phi,phiSW=5.0,/add_E0,/verbose)
 
 ;;==Load the project graphics parameters
 @project.eppic

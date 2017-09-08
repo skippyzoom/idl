@@ -2,7 +2,7 @@
 ; Set default keyword parameters for all images of
 ; simulation data.
 ;-
-pro data_kw_image, name,kw,prj=prj,global=global
+pro data_kw_image, name,kw,prj=prj,global_colorbar=global_colorbar
 @eppic_defaults.pro
 
   image = dictionary('axis_style', 1, $
@@ -47,16 +47,7 @@ pro data_kw_image, name,kw,prj=prj,global=global
                                   edges=[0.12,0.10,0.80,0.80], $
                                   buffers=[0.00,0.05])                
         image['position'] = transpose(position)
-        if keyword_set(global) then begin
-           ;; if strcmp(name[id],'emag',4) then begin
-           ;;    max_value = max(prj.data[name[id]])
-           ;;    min_value = 0
-           ;; endif $
-           ;; else begin
-           ;;    max_abs = max(abs(prj.data[name[id]]))
-           ;;    max_value = max_abs
-           ;;    min_value = -max_abs
-           ;; endelse
+        if keyword_set(global_colorbar) then begin
            case 1 of
               strcmp(name[id],'emag',4): begin
                  max_value = max(prj.data[name[id]])

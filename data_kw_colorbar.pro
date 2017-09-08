@@ -2,7 +2,7 @@
 ; Set default keyword parameters for colobars on images
 ; of simulation data.
 ;-
-pro data_kw_colorbar, name,kw,prj=prj,global=global
+pro data_kw_colorbar, name,kw,prj=prj,global_colorbar=global_colorbar
 @eppic_defaults.pro
 
   colorbar = dictionary('orientation', 1, $
@@ -12,6 +12,7 @@ pro data_kw_colorbar, name,kw,prj=prj,global=global
                         'major', 7, $
                         'font_name', "Times", $
                         'font_size', 10.0)
+  if keyword_set(global_colorbar) then colorbar['global'] = 1B
 
   nNames = n_elements(name)
   for id=0,nNames-1 do begin
@@ -36,7 +37,7 @@ pro data_kw_colorbar, name,kw,prj=prj,global=global
            y0 = 0.50*(1-height)
            y1 = 0.50*(1+height)
            position = make_array(n_elements(prj['np']),4,type=4,value=-1)
-           if keyword_set(global) then position[0,*] = [x0,y0,x1,y1] $
+           if keyword_set(global_colorbar) then position[0,*] = [x0,y0,x1,y1] $
            else position = multi_position([1,prj['np']], $
                                           edges=[[reform(pos[*,2])],[reform(pos[*,1])]], $
                                           width=0.02,height=pos[0,3]-pos[0,1])
@@ -50,7 +51,7 @@ pro data_kw_colorbar, name,kw,prj=prj,global=global
            strcmp(name[id],'E',1,/fold_case): title += " "+prj.units[name[id]]
         endcase
 
-        if keyword_set(global) then begin
+        if keyword_set(global_colorbar) then begin
            tickvalues = kw[name[id]].image.min_value + $
                         (kw[name[id]].image.max_value - kw[name[id]].image.min_value)* $
                         findgen(colorbar.major)/(colorbar.major-1)
