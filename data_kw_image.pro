@@ -55,7 +55,7 @@ pro data_kw_image, name,kw,prj=prj,global_colorbar=global_colorbar
               end
               strcmp(name[id],'fft',3,/fold_case): begin
                  max_value = 0
-                 min_value = -100
+                 min_value = -30
               end
               else: begin
                  max_abs = max(abs(prj.data[name[id]]))

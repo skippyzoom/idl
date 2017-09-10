@@ -3,6 +3,8 @@
 ; keywords, called "kw", which the caller
 ; can pass to IDL's image().
 ;
+; Deprecate? 09Sep2017 (may)
+;
 ; TO DO
 ; -- Handle cases in which user doesn't pass info
 ;    necessary for a keyword (e.g. imgData for

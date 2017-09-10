@@ -9,6 +9,10 @@
 ;       phi) or quantities derived therefrom (e.g. emag or fft).
 ;       See data_kw_* for currently available quantities and edit
 ;       data_kw_* to add a new name.
+; IMAGE: Set this keyword to set up image graphics keywords.
+; COLORBAR: Set this keyword to set up colorbar graphics keywords.
+; TEXT: Set this keyword to set up text graphics keywords.
+;
 ; TO DO
 ;-
 function set_default_kw, name, $

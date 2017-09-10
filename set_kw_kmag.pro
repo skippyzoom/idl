@@ -5,6 +5,8 @@
 ; This function is designed to be called from
 ; set_kw.pro
 ;
+; Deprecate? 09Sep2017 (may)
+;
 ; TO DO
 ; -- Use this function to set defaults but allow
 ;    user to pass custom values through _EXTRA?

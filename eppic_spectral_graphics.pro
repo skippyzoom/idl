@@ -5,41 +5,63 @@
 ; -- [TO DO] RMS spectra as a function of time (kx,ky[,kz],t)
 ; -- [TO DO] Spectral power as a function of |k|, angle, and frequency
 ;-
+pro eppic_spectral_graphics, prj, $
+                             filetype=filetype, $
+                             global_colorbar=global_colorbar, $
+                             project_kw=project_kw
 
-;; loadStep = nout*lindgen(ntMax)
-@load_project
+  ;;==Defaults and guards
+  if n_elements(filetype) eq 0 then filetype = '.png'
+  if n_elements(global_colorbar) eq 0 then global_colorbar = 0B
 
-;;==Create graphics
-;; plotStep = nout*[0,ntMax-1]
-dataName = prj.data.keys()
-nData = n_elements(dataName)
-raw_kt_spectra, prj,plotindex=plotStep/nout
-;; raw_kw_spectra, prj,plotindex=plotStep/nout
+  ;;==Set up graphics keywords
+  kw = set_default_kw('fft', $
+                      prj = prj, $
+                      /image, $
+                      /colorbar, $
+                      global_colorbar = global_colorbar)
 
-;; kmag = load_kmag(data = (transpose(data.den1,[1,0,2,3]))[768-128:768+127,*,*,*], $
-;;                  filename = dataName[0]+'_kmag_freq.sav', $
-;;                  ;; /restore, $
-;;                  dt = dt*nout, $
-;;                  alpha = 0.5, $
-;;                  aspect = 0.0, $
-;;                  nTheta = 360, $
-;;                  nAlpha = 1, $
-;;                  shape = 'disk', $
-;;                  /verbose)
+  ;;==Incorporate project-specific keywords
+  for id=0,nData-1 do begin
+     data_kw = kw[dataName[id]]
+     graphics_keys = data_kw.keys()
+     nKeys = data_kw.count()
+     for ik=0,nKeys-1 do begin
+        update_kw = string_exists(project_kw[dataName[id]].keys(), $
+                                  graphics_keys[ik])
+        if update_kw then begin
+           current_kw = data_kw[graphics_keys[ik]]
+           add_keys = (project_kw[dataName[id]])[graphics_keys[ik]].keys
+           add_vals = (project_kw[dataName[id]])[graphics_keys[ik]].vals
+           current_kw[add_keys.toarray()] = add_vals              
+        endif
+     endfor
+  endfor
 
-;; ;;==Create images
-;; lambda = [3.0,8.3,12.0]
-;; nLambda = n_elements(lambda)
-;; strLambda = strcompress(string(lambda,format='(f4.1)'),/remove_all)
-;; ;; name = 'k_freq-'+strLambda+'m-dB.pdf'
-;; ;; for il=0,nLambda-1 do $
-;; ;;    k_freq_image, kmag,lambda=lambda[il],name=name[il], $
-;; ;;                  /power_dB
-;; ;; name = 'k_freq-'+strLambda+'m-norm_t.pdf'
-;; ;; for il=0,nLambda-1 do $
-;; ;;    k_freq_image, kmag,lambda=lambda[il],name=name[il], $
-;; ;;                  /normalize_theta
-;; name = 'k_freq-'+strLambda+'m-norm_m.pdf'
-;; for il=0,nLambda-1 do $
-;;    k_freq_image, kmag,lambda=lambda[il],name=name[il], $
-;;                  /normalize_max,/power_dB
+  ;;==Calculate spatial spectra v. time
+  dataSize = size(data)
+  if dataSize[0] eq 2 then nTimes = 1 $
+  else nTimes = dataSize[dataSize[0]]
+  if nTimes eq 1 then $
+     fftdata = fft_custom(data, $
+                          /zero_dc, $
+                          /skip_time_fft, $
+                          /single_time, $
+                          /center, $
+                          /normalize, $
+                          /verbose) $
+  else begin
+     fftdata = data*0.0
+     for it=0,nTimes-1 do begin
+        fftdata[*,*,it] = fft_custom(data[*,*,it], $
+                                     /zero_dc, $
+                                     /skip_time_fft, $
+                                     /center, $
+                                     /normalize, $
+                                     /verbose)
+     endfor
+  endelse
+
+  ;;==Create graphics
+  data_image, fftdata,
+end

@@ -54,7 +54,7 @@ pro data_image, imgData,xData,yData, $
      kw_text.remove, 'global'
   endif
 
-  ;;==Back-up keyword structs
+  ;;==Back-up keyword dictionaries
   if keyword_set(kw_image) then kw_image_orig = kw_image[*]
   if keyword_set(kw_colorbar) then kw_colorbar_orig = kw_colorbar[*]
   if keyword_set(kw_text) then kw_text_orig = kw_text[*]

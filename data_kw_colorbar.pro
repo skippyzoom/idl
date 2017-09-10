@@ -23,6 +23,8 @@ pro data_kw_colorbar, name,kw,prj=prj,global_colorbar=global_colorbar
         strcmp(name[id],'Ex'): title = "$E_{x}$"
         strcmp(name[id],'Ey'): title = "$E_{y}$"
         strcmp(name[id],'Ez'): title = "$E_{z}$"
+        strcmp(name[id],'fft',/fold_case): title = "Amplitude"
+        else: title = ''
      endcase     
      if n_elements(prj) ne 0 then begin
         if kw.haskey(name[id]) && $
@@ -49,6 +51,7 @@ pro data_kw_colorbar, name,kw,prj=prj,global_colorbar=global_colorbar
            strcmp(name[id],'phi',3): title += " "+prj.units[name[id]]
            strcmp(name[id],'emag',4): title += " "+prj.units[name[id]]
            strcmp(name[id],'E',1,/fold_case): title += " "+prj.units[name[id]]
+           else:
         endcase
 
         if keyword_set(global_colorbar) then begin
