@@ -2,7 +2,8 @@
 ; Create the project dictionary for graphics.
 ;-
 function set_current_prj, data,rngs,grid, $
-                          scale=scale,np=np,xyzt=xyzt,title=title
+                          scale=scale,xyzt=xyzt,title=title, $
+                          plotindex=plotindex,plotlayout=plotlayout
 
   dKeys = data.keys()
   nData = data.count()
@@ -24,7 +25,9 @@ function set_current_prj, data,rngs,grid, $
      message, "Parameter 'scale' must be a dictionary"
   missing = where(scale.haskey(dKeys) eq 0,count)
   if count ne 0 then scale[dKeys[missing]] = 1.0
-  if n_elements(np) eq 0 then np = 1
+  np = n_elements(plotindex)
+  if np eq 0 then plotindex = 0
+  if n_elements(plotlayout) eq 0 then plotlayout = [1,np]
   if n_elements(xyzt) eq 0 then $
      xyzt = (max(np) gt 1) ? [0,1,2,3] : [0,1,2]
   if n_elements(title) eq 0 then title = ' '
@@ -37,7 +40,8 @@ function set_current_prj, data,rngs,grid, $
   ;;==Create project dictionary
   prj = dictionary('data', data[*], $  ;[*] makes a copy and preserves original
                    'scale', scale, $
-                   'np', np, $
+                   'plotindex', plotindex, $
+                   'plotlayout', plotlayout, $
                    'xyzt', xyzt, $
                    'title', title, $
                    'xrng', rngs.(xyzt[0]), $
@@ -55,11 +59,16 @@ function set_current_prj, data,rngs,grid, $
   for ik=0,nData-1 do begin ;This could also be a foreach loop
      dataSize = size(prj.data[dKeys[ik]])
      if dataSize[0] eq 2 then xyzt = xyzt[0:1]
+     ;; prj.data[dKeys[ik]] = $
+     ;;    reform(transpose((data[dKeys[ik]])[rngs.x[0]:rngs.x[1], $
+     ;;                                      rngs.y[0]:rngs.y[1], $
+     ;;                                      rngs.z[0]:rngs.z[1], $
+     ;;                                      *],xyzt))*prj.scale[dKeys[ik]]
      prj.data[dKeys[ik]] = $
         reform(transpose((data[dKeys[ik]])[rngs.x[0]:rngs.x[1], $
                                           rngs.y[0]:rngs.y[1], $
                                           rngs.z[0]:rngs.z[1], $
-                                          *],xyzt))*prj.scale[dKeys[ik]]
+                                          *],xyzt))
   endfor
   xyzt = prj['xyzt']
 
