@@ -6,4 +6,4 @@
 project_data_graphics, prj
 
 ;;==Images of spectrally transformed data
-project_spectral_graphics, prj
+;; project_spectral_graphics, prj

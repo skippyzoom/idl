@@ -6,7 +6,7 @@
 ; -- Set up panel-specific colorbars. May require 
 ;    making img an array of object references.
 ; -- Allow for 3D data
-; -- If prj doesn't contain the necessary data, exit gracefully.
+; -- Decide whether imgData should be phi or efield.
 ;-
 function efield_graphics, prj=prj, $
                           imgData=imgData,xData=xData,yData=yData, $
@@ -17,7 +17,10 @@ function efield_graphics, prj=prj, $
      keyword_set(prj): begin
         print, "EFIELD_GRAPHICS: Using prj for graphics"
         if prj.data.haskey('phi') then begin
-           imgData = prj.data['phi']
+           phi = prj.data['phi']
+           efield = calc_efield(phi, $
+                                dx = dx, dy = dy, $
+                                /verbose)
            xData = prj.xvec
            yData = prj.yvec
         endif else begin

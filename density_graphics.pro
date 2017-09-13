@@ -8,7 +8,6 @@
 ; -- Allow for 3D data. Could supply name or dist # with
 ;    prj. That would also allow for doing multiple dists
 ;    in one function call.
-; -- If prj doesn't contain the necessary data, exit gracefully.
 ;-
 function density_graphics, prj=prj, $
                            imgData=imgData,xData=xData,yData=yData, $

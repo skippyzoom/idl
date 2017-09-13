@@ -73,8 +73,10 @@ function calc_efield, phi,smoothWidths, $
      Ez = fltarr(nxPhi,nyPhi,nzPhi,ntPhi)
      if keyword_set(verbose) then begin
         print, "CALC_EFIELD: Calculating E = -Grad[phi] ", $
-               "(dx = ",strcompress(string(dx,format='(e10.4)'),/remove_all),",", $
-               " dy = ",strcompress(string(dy,format='(e10.4)'),/remove_all),",", $
+               "(dx = ",strcompress(string(dx,format='(e10.4)'),/remove_all), $
+               ",", $
+               " dy = ",strcompress(string(dy,format='(e10.4)'),/remove_all), $
+               ",", $
                " dz = ",strcompress(string(dy,format='(e10.4)'),/remove_all),")"
      endif
      ;;==Calculate E field

@@ -1,5 +1,8 @@
 ;+
 ; Create images of EPPIC simulation output.
+;
+; Consider deprecating. Never really worked the way
+; I intended (especially the spectral part). 13Sep2017 (may)
 ;-
 pro eppic_project_graphics, prj, $
                             filetype=filetype, $

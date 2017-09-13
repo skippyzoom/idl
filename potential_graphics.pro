@@ -6,7 +6,6 @@
 ; -- Set up panel-specific colorbars. May require 
 ;    making img an array of object references.
 ; -- Allow for 3D data
-; -- If prj doesn't contain the necessary data, exit gracefully.
 ;-
 function potential_graphics, prj=prj, $
                              imgData=imgData,xData=xData,yData=yData, $

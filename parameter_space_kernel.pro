@@ -24,12 +24,17 @@ if n_elements(dataName) eq 0 then dataName = list('den1','phi')
 if n_elements(dataType) eq 0 then dataType = ['ph5','ph5']
 data = load_eppic_data(dataName.toarray(),dataType,timestep=nout*lindgen(ntMax))
 
+;;==Calculate E-field from phi and store with simulation data?
+
+;;==Pack up the project dictionary
 prj = set_current_prj(data,rngs,grid, $
                       scale = scale, $
                       xyzt = xyzt, $
                       description = description)
+;;==Free unneeded memory
 delvar, rngs
 
+;;==Set up appropriate units for graphics, based on prj.scale
 set_data_units, prj,units
 
 ;;==Declare which output steps to plot (if applicable)
@@ -42,7 +47,7 @@ prj['filetype'] = '.png'
 ;;==Declare whether to use global or panel-specific colorbar
 prj['colorbar_type'] = 'global'
 
-@eppic_graphics
+;; @eppic_graphics
 
 ;; @load_eppic_params
 ;; loadStep = nout*lindgen(ntMax)
