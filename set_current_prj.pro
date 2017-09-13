@@ -2,11 +2,12 @@
 ; Create the project dictionary for graphics.
 ;-
 function set_current_prj, data,rngs,grid, $
-                          scale=scale,xyzt=xyzt,title=title, $
-                          plotindex=plotindex,plotlayout=plotlayout
+                          scale=scale,xyzt=xyzt, $
+                          description=description
 
   dKeys = data.keys()
   nData = data.count()
+  dSize = size(data[dKeys[0]])
 
   ;;==Defaults and guards
   if n_elements(data) eq 0 then $
@@ -25,12 +26,14 @@ function set_current_prj, data,rngs,grid, $
      message, "Parameter 'scale' must be a dictionary"
   missing = where(scale.haskey(dKeys) eq 0,count)
   if count ne 0 then scale[dKeys[missing]] = 1.0
-  np = n_elements(plotindex)
-  if np eq 0 then plotindex = 0
-  if n_elements(plotlayout) eq 0 then plotlayout = [1,np]
-  if n_elements(xyzt) eq 0 then $
-     xyzt = (max(np) gt 1) ? [0,1,2,3] : [0,1,2]
-  if n_elements(title) eq 0 then title = ' '
+  ;; if n_elements(xyzt) eq 0 then $
+  ;;    xyzt = (max(np) gt 1) ? [0,1,2,3] : [0,1,2]
+  if n_elements(xyzt) eq 0 then xyzt = [0,1,2,3]
+  ;; if dSize[0] eq 2 then xyzt = xyzt[0:1] $
+  ;; else if dSize[0] eq 3 then xyzt = xyzt[0:2]
+  ;; xyzt = xyzt[0:dSize[0]-1]
+  
+  if n_elements(description) eq 0 then description = ' '
 
   ;;==Set up untransposed vecs
   vecs = {x: grid.x[rngs.x[0]:rngs.x[1]], $
@@ -40,10 +43,8 @@ function set_current_prj, data,rngs,grid, $
   ;;==Create project dictionary
   prj = dictionary('data', data[*], $  ;[*] makes a copy and preserves original
                    'scale', scale, $
-                   'plotindex', plotindex, $
-                   'plotlayout', plotlayout, $
-                   'xyzt', xyzt, $
-                   'title', title, $
+                   'xyzt', xyzt[0:dSize[0]-1], $
+                   'description', description, $
                    'xrng', rngs.(xyzt[0]), $
                    'yrng', rngs.(xyzt[1]), $
                    'zrng', rngs.(xyzt[2]), $
@@ -57,20 +58,12 @@ function set_current_prj, data,rngs,grid, $
 
   ;;==Transpose and scale data
   for ik=0,nData-1 do begin ;This could also be a foreach loop
-     dataSize = size(prj.data[dKeys[ik]])
-     if dataSize[0] eq 2 then xyzt = xyzt[0:1]
-     ;; prj.data[dKeys[ik]] = $
-     ;;    reform(transpose((data[dKeys[ik]])[rngs.x[0]:rngs.x[1], $
-     ;;                                      rngs.y[0]:rngs.y[1], $
-     ;;                                      rngs.z[0]:rngs.z[1], $
-     ;;                                      *],xyzt))*prj.scale[dKeys[ik]]
      prj.data[dKeys[ik]] = $
         reform(transpose((data[dKeys[ik]])[rngs.x[0]:rngs.x[1], $
                                           rngs.y[0]:rngs.y[1], $
                                           rngs.z[0]:rngs.z[1], $
-                                          *],xyzt))
+                                          *],prj.xyzt))*prj.scale[dKeys[ik]]
   endfor
-  xyzt = prj['xyzt']
 
   return, prj
 end

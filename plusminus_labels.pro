@@ -29,15 +29,19 @@ function plusminus_labels, values,format=format
   length = strlen(format)
   code = strmid(format,0,1)
   width = strmid(format,1,length-1)
-  dot = strpos(width,'.')
-  width = strcompress(strmid(width,0,dot)+1,/remove_all)+ $
-          '.'+ $
-          strcompress(strmid(width,dot+1,strlen(width)),/remove_all)
+  if width gt 1 then begin
+     dot = strpos(width,'.')
+     if dot ge 0 then $
+        width = strcompress(strmid(width,0,dot)+1,/remove_all)+ $
+                '.'+ $
+                strcompress(strmid(width,dot+1,strlen(width)),/remove_all) $
+     else width = strcompress(width+0,/remove_all)
+  endif
 
   ;;==Create labels
   labels = string(values,format='('+code+'+'+width+')')
-  iEq0 = where(values eq 0.0)
-  labels[iEq0] = string(0,format='('+format+')')
+  iEq0 = where(values eq 0.0,count)
+  if count gt 0 then labels[iEq0] = string(0,format='('+format+')')
   labels = strcompress(labels,/remove_all)
 
   return, labels
