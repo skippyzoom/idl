@@ -1,5 +1,5 @@
 ;+
-; Routine for producing graphics of EPPIC density
+; Routine for producing graphics of EPPIC potential
 ; from a project dictionary or struct
 ;
 ; TO DO
@@ -7,25 +7,23 @@
 ; -- Incorporate scale and data units for colorbar
 ; -- Set up panel-specific colorbars. That will require 
 ;    making img an array of object references.
-; -- Allow for 3D data. Could supply name or dist # with
-;    prj. That would also allow for doing multiple dists
-;    in one function call.
+; -- Allow for 3D data
 ;-
-function density_graphics, prj=prj, $
+function potential_graphics, prj=prj, $
                            imgData=imgData,xData=xData,yData=yData, $
                            plotindex=plotindex,plotlayout=plotlayout, $
                            global_colorbar=global_colorbar
 
   case 1 of
      keyword_set(prj): begin
-        print, "DENSITY_GRAPHICS: Using prj for graphics"
-        imgData = prj.data['den1']
+        print, "POTENTIAL_GRAPHICS: Using prj for graphics"
+        imgData = prj.data.den1
         xData = prj.xvec
         yData = prj.yvec
         
      end
      keyword_set(imgData): begin
-        print, "DENSITY_GRAPHICS: Using imgData for graphics"
+        print, "POTENTIAL_GRAPHICS: Using imgData for graphics"
         imgSize = size(imgData)
         xSize = imgSize[1]
         ySize = imgSize[2]
@@ -47,7 +45,7 @@ function density_graphics, prj=prj, $
   min_value = -max_abs
   max_value = max_abs
 
-  rgb_table = 5
+  ct = get_custom_ct(1) & rgb_table = [[ct.r],[ct.g],[ct.b]]
 
   xmajor = 5
   xminor = 1
@@ -110,9 +108,9 @@ function density_graphics, prj=prj, $
      tickvalues = min_value + $
                   (max_value-min_value)*findgen(major)/(major-1)
      tickname = plusminus_labels(tickvalues,format='f8.2')
-     title = "$\delta n/n_0$"
+     title = "$\phi$"
      if keyword_set(prj) && prj.haskey('units') then $
-        title += " "+prj.units['den1']
+        title += " "+prj.units['phi']
      clr = colorbar(title = title, $
                     position = [x0,y0,x1,y1], $
                     orientation = 1, $
