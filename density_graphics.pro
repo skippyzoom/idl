@@ -1,6 +1,6 @@
 ;+
 ; Routine for producing graphics of EPPIC density
-; from a project dictionary or struct
+; from a project dictionary or data array.
 ;
 ; TO DO
 ; -- Set up panel-specific colorbars. Mayrequire 
@@ -13,7 +13,7 @@
 function density_graphics, prj=prj, $
                            imgData=imgData,xData=xData,yData=yData, $
                            plotindex=plotindex,plotlayout=plotlayout, $
-                           global_colorbar=global_colorbar
+                           colorbar_type=colorbar_type
 
   case 1 of
      keyword_set(prj): begin
@@ -100,9 +100,13 @@ function density_graphics, prj=prj, $
                  font_name = "Times", $
                  current = (ip gt 0), $
                  /buffer)
+
+     if strcmp(colorbar_type,'panel',5) then begin
+        print, "DENSITY_GRAPHICS: Panel-specific colorbar not implemented"
+     endif
   endfor
 
-  if keyword_set(global_colorbar) then begin
+  if strcmp(colorbar_type,'global',6) then begin
      major = 7
      width = 0.0225
      height = 0.20

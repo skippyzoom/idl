@@ -6,24 +6,20 @@
 ; -- Check prj for available data and only call appropriate graphics
 ;    functions.
 ;-
-pro project_data_graphics, prj, $
-                           filetype = filetype, $
-                           plotindex=plotindex, $
-                           plotlayout=plotlayout, $
-                           global_colorbar=global_colorbar
+pro project_data_graphics, prj
 
   img = density_graphics(prj = prj, $
-                         plotindex = plotindex, $
-                         plotlayout = plotlayout, $
-                         global_colorbar = global_colorbar)
-  filename = 'den1'+filetype
+                         plotindex = prj.plotindex, $
+                         plotlayout = prj.plotlayout, $
+                         colorbar_type = prj.colorbar_type)
+  filename = 'den1'+prj.filetype
   image_save, img,filename = filename,/landscape
 
   img = potential_graphics(prj = prj, $
-                           plotindex = plotindex, $
-                           plotlayout = plotlayout, $
-                           global_colorbar = global_colorbar)
-  filename = 'phi'+filetype
+                           plotindex = prj.plotindex, $
+                           plotlayout = prj.plotlayout, $
+                           colorbar_type = prj.colorbar_type)
+  filename = 'phi'+prj.filetype
   image_save, img,filename = filename,/landscape
 
 end

@@ -9,7 +9,7 @@
 function fft_kt_graphics, data, $
                           plotindex=plotindex, $
                           plotlayout=plotlayout, $
-                          global_colorbar=global_colorbar
+                          colorbar_type=colorbar_type
 @load_eppic_params
 
   xData = (2*!pi/(grid.nx*dx))*(findgen(grid.nx) - 0.5*grid.nx)
@@ -79,18 +79,12 @@ function fft_kt_graphics, data, $
                  current = (ip gt 0), $
                  /buffer)
 
-     ;; clr = colorbar(target = img, $
-     ;;                orientation = 1, $
-     ;;                textpos = 1, $
-     ;;                tickdir = 1, $
-     ;;                ticklen = 0.2, $
-     ;;                major = 5, $
-     ;;                font_name = "Times", $
-     ;;                font_size = 10.0)
-                    
+     if strcmp(colorbar_type,'panel',5) then begin
+        print, "FFT_KT_GRAPHICS: Panel-specific colorbar not implemented"
+     endif                    
   endfor
 
-  if keyword_set(global_colorbar) then begin
+  if strcmp(colorbar_type,'global',6) then begin
      major = 7
      width = 0.0225
      height = 0.20

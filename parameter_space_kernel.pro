@@ -18,11 +18,7 @@ rngs = {x: [0,grid.nx-1], $
         y: [0,grid.ny-1], $
         z: [0,grid.nz-1]}
 
-;;==Declare which output steps to plot (if applicable)
-plotindex = [ntMax/4,ntMax/2,3*ntMax/4,ntMax-1]
-plotlayout = [2,2]
-;; plotindex = [ntMax/2,ntMax-1]
-;; plotlayout = [1,2]
+;;==Load simulation data
 @load_eppic_params
 if n_elements(dataName) eq 0 then dataName = list('den1','phi')
 if n_elements(dataType) eq 0 then dataType = ['ph5','ph5']
@@ -36,8 +32,15 @@ delvar, rngs
 
 set_data_units, prj,units
 
-filetype = '.png'
-global_colorbar = 1B
+;;==Declare which output steps to plot (if applicable)
+prj['plotindex'] = [ntMax/4,ntMax/2,3*ntMax/4,ntMax-1]
+prj['plotlayout'] = [2,2]
+
+;;==Declare file type for graphics
+prj['filetype'] = '.png'
+
+;;==Declare whether to use global or panel-specific colorbar
+prj['colorbar_type'] = 'global'
 
 @eppic_graphics
 
