@@ -6,10 +6,10 @@
 ; -- Allow for 3D data
 ; -- Implement panel-specific colorbars
 ;-
-function fft_graphics, data, $
-                       plotindex=plotindex, $
-                       plotlayout=plotlayout, $
-                       global_colorbar=global_colorbar
+function fft_kt_graphics, data, $
+                          plotindex=plotindex, $
+                          plotlayout=plotlayout, $
+                          global_colorbar=global_colorbar
 @load_eppic_params
 
   xData = (2*!pi/(grid.nx*dx))*(findgen(grid.nx) - 0.5*grid.nx)
