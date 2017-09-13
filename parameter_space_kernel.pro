@@ -34,6 +34,8 @@ prj = set_current_prj(data,rngs,grid, $
                       description = description)
 delvar, rngs
 
+set_data_units, prj,units
+
 filetype = '.png'
 global_colorbar = 1B
 

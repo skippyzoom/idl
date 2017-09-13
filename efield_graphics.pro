@@ -1,5 +1,5 @@
 ;+
-; Routine for producing graphics of EPPIC potential
+; Routine for producing graphics of EPPIC efield
 ; from a project dictionary or struct
 ;
 ; TO DO
@@ -8,25 +8,25 @@
 ; -- Allow for 3D data
 ; -- If prj doesn't contain the necessary data, exit gracefully.
 ;-
-function potential_graphics, prj=prj, $
-                             imgData=imgData,xData=xData,yData=yData, $
-                             plotindex=plotindex,plotlayout=plotlayout, $
-                             global_colorbar=global_colorbar
+function efield_graphics, prj=prj, $
+                          imgData=imgData,xData=xData,yData=yData, $
+                          plotindex=plotindex,plotlayout=plotlayout, $
+                          global_colorbar=global_colorbar
 
   case 1 of
      keyword_set(prj): begin
-        print, "POTENTIAL_GRAPHICS: Using prj for graphics"
+        print, "EFIELD_GRAPHICS: Using prj for graphics"
         if prj.data.haskey('phi') then begin
            imgData = prj.data['phi']
            xData = prj.xvec
            yData = prj.yvec
         endif else begin
-           print, "POTENTIAL_GRAPHICS: Did not find phi. Returning."
+           print, "EFIELD_GRAPHICS: Did not find phi. Returning."
            return, !NULL
         endelse        
      end
      keyword_set(imgData): begin
-        print, "POTENTIAL_GRAPHICS: Using imgData for graphics"
+        print, "EFIELD_GRAPHICS: Using imgData for graphics"
         imgSize = size(imgData)
         xSize = imgSize[1]
         ySize = imgSize[2]
@@ -48,7 +48,7 @@ function potential_graphics, prj=prj, $
   min_value = -max_abs
   max_value = max_abs
 
-  ct = get_custom_ct(1) & rgb_table = [[ct.r],[ct.g],[ct.b]]
+  rgb_table = 3
 
   xmajor = 5
   xminor = 1
@@ -111,9 +111,9 @@ function potential_graphics, prj=prj, $
      tickvalues = min_value + $
                   (max_value-min_value)*findgen(major)/(major-1)
      tickname = plusminus_labels(tickvalues,format='f8.2')
-     title = "$\phi$"
+     title = "$|E|$"
      if keyword_set(prj) && prj.haskey('units') then $
-        title += " "+prj.units['phi']
+        title += " "+prj.units['emag']
      clr = colorbar(title = title, $
                     position = [x0,y0,x1,y1], $
                     orientation = 1, $

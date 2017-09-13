@@ -3,13 +3,12 @@
 ; from a project dictionary or struct
 ;
 ; TO DO
-; -- Set up for multiple species
-; -- Incorporate scale and data units for colorbar
-; -- Set up panel-specific colorbars. That will require 
+; -- Set up panel-specific colorbars. Mayrequire 
 ;    making img an array of object references.
 ; -- Allow for 3D data. Could supply name or dist # with
 ;    prj. That would also allow for doing multiple dists
 ;    in one function call.
+; -- If prj doesn't contain the necessary data, exit gracefully.
 ;-
 function density_graphics, prj=prj, $
                            imgData=imgData,xData=xData,yData=yData, $
@@ -19,10 +18,15 @@ function density_graphics, prj=prj, $
   case 1 of
      keyword_set(prj): begin
         print, "DENSITY_GRAPHICS: Using prj for graphics"
-        imgData = prj.data['den1']
-        xData = prj.xvec
-        yData = prj.yvec
-        
+        name = 'den1'
+        if prj.data.haskey(name) then begin
+           imgData = prj.data[name]
+           xData = prj.xvec
+           yData = prj.yvec
+        endif else begin
+           print, "DENSITY_GRAPHICS: Did not find ",name,". Returning."
+           return, !NULL
+        endelse
      end
      keyword_set(imgData): begin
         print, "DENSITY_GRAPHICS: Using imgData for graphics"
@@ -112,7 +116,7 @@ function density_graphics, prj=prj, $
      tickname = plusminus_labels(tickvalues,format='f8.2')
      title = "$\delta n/n_0$"
      if keyword_set(prj) && prj.haskey('units') then $
-        title += " "+prj.units['den1']
+        title += " "+prj.units[name]
      clr = colorbar(title = title, $
                     position = [x0,y0,x1,y1], $
                     orientation = 1, $
