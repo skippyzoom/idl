@@ -7,11 +7,11 @@
 ; dimension even if there is only one time step).
 ; HAS NOT BEEN TESTED FOR 3-D
 ;
-; smoothWidths
+; SMOOTH_WIDTHS
 ;    The user may optionally provide a single smoothing
 ;    width to be applied to all spatial dimensions, or
 ;    one smoothing width per spatial dimension. If the
-;    size of smoothWidths is greater than one but not
+;    size of smooth_widths is greater than one but not
 ;    equal to the number of spatial dimensions of phi,
 ;    this routine will take the first N supplied widths,
 ;    where N is the number of spatial dimensions of phi.
@@ -28,12 +28,16 @@
 ;    loop and thus takes longer. This may not be necessary
 ;    if, for instance, the user is only interested in the
 ;    relative structure of |E|.
+;    NB: Rescaling may actually be physically misleading.
+;    For example: If there are isolated spikes that reach 
+;    up to 50 mV/m while the trend peaks at 20 mV/m,
+;    rescaling the result to 50 mV/m would be misleading. 
 ;
 ; TO DO:
-; -- Make smoothWidths a keyword?
+; -- Make smooth_widths a keyword?
 ;-
 
-function calc_efield, phi,smoothWidths, $
+function calc_efield, phi,smooth_widths, $
                       dx=dx,dy=dy,dz=dz, $
                       rescale=rescale, $
                       verbose=verbose
@@ -58,15 +62,15 @@ function calc_efield, phi,smoothWidths, $
   ;----------------------;
   if nDims eq 4 then begin
      ;;==Defaults
-     case n_elements(smoothWidths) of
-        0: smoothWidths = make_array(nDims-1,value=1)
-        1: smoothWidths = make_array(nDims-1,value=smoothWidths)
+     case n_elements(smooth_widths) of
+        0: smooth_widths = make_array(nDims-1,value=1)
+        1: smooth_widths = make_array(nDims-1,value=smooth_widths)
         (nDims-1): break
-        else: smoothWidths = smoothWidths[0:nDims-2]
+        else: smooth_widths = smooth_widths[0:nDims-2]
      endcase
-     smoothWidths = fix(smoothWidths)
+     smooth_widths = fix(smooth_widths)
      if keyword_set(verbose) then $
-        print, "CALC_EFIELD: Smoothing Widths = ",strcompress(smoothWidths)
+        print, "CALC_EFIELD: Smoothing Widths = ",strcompress(smooth_widths)
      ;;==Set up E-field arrays
      Ex = fltarr(nxPhi,nyPhi,nzPhi,ntPhi)
      Ey = fltarr(nxPhi,nyPhi,nzPhi,ntPhi)
@@ -87,13 +91,13 @@ function calc_efield, phi,smoothWidths, $
            xMax0 = max(gradPhi[*,*,*,0])
            yMax0 = max(gradPhi[*,*,*,1])
            zMax0 = max(gradPhi[*,*,*,2])
-           gradPhi = gradient(smooth(phi[*,*,*,it],smoothWidths,/edge_wrap), $
+           gradPhi = gradient(smooth(phi[*,*,*,it],smooth_widths,/edge_wrap), $
                               dx=dx,dy=dy,dz=dz)
            Ex[*,*,it] = -1.0*xMax0*(gradPhi[*,*,0]/max(abs(gradPhi[*,*,0])))
            Ey[*,*,it] = -1.0*yMax0*(gradPhi[*,*,1]/max(abs(gradPhi[*,*,1])))
            Ez[*,*,it] = -1.0*zMax0*(gradPhi[*,*,2]/max(abs(gradPhi[*,*,2])))
         endif else begin
-           gradPhi = gradient(smooth(phi[*,*,*,it],smoothWidths,/edge_wrap), $
+           gradPhi = gradient(smooth(phi[*,*,*,it],smooth_widths,/edge_wrap), $
                               dx=dx,dy=dy,dz=dz)
            Ex[*,*,*,it] = -1.0*gradPhi[*,*,*,0]
            Ey[*,*,*,it] = -1.0*gradPhi[*,*,*,1]
@@ -107,15 +111,15 @@ function calc_efield, phi,smoothWidths, $
   ;----------------------;
   endif else begin
      ;;==Defaults
-     case n_elements(smoothWidths) of
-        0: smoothWidths = make_array(nDims-1,value=1)
-        1: smoothWidths = make_array(nDims-1,value=smoothWidths)
+     case n_elements(smooth_widths) of
+        0: smooth_widths = make_array(nDims-1,value=1)
+        1: smooth_widths = make_array(nDims-1,value=smooth_widths)
         (nDims-1): break
-        else: smoothWidths = smoothWidths[0:nDims-2]
+        else: smooth_widths = smooth_widths[0:nDims-2]
      endcase
-     smoothWidths = fix(smoothWidths)
+     smooth_widths = fix(smooth_widths)
      if keyword_set(verbose) then $
-        print, "CALC_EFIELD: Smoothing Widths = ",strcompress(smoothWidths)
+        print, "CALC_EFIELD: Smoothing Widths = ",strcompress(smooth_widths)
      ;;==Set up E-field arrays
      Ex = fltarr(nxPhi,nyPhi,ntPhi)
      Ey = fltarr(nxPhi,nyPhi,ntPhi)
@@ -131,12 +135,12 @@ function calc_efield, phi,smoothWidths, $
                               dx=dx,dy=dy,dz=dz)
            xMax0 = max(abs(gradPhi[*,*,0]))
            yMax0 = max(abs(gradPhi[*,*,1]))
-           gradPhi = gradient(smooth(phi[*,*,it],smoothWidths,/edge_wrap), $
+           gradPhi = gradient(smooth(phi[*,*,it],smooth_widths,/edge_wrap), $
                               dx=dx,dy=dy,dz=dz)
            Ex[*,*,it] = -1.0*xMax0*(gradPhi[*,*,0]/max(abs(gradPhi[*,*,0])))
            Ey[*,*,it] = -1.0*yMax0*(gradPhi[*,*,1]/max(abs(gradPhi[*,*,1])))
         endif else begin
-           gradPhi = gradient(smooth(phi[*,*,it],smoothWidths,/edge_wrap), $
+           gradPhi = gradient(smooth(phi[*,*,it],smooth_widths,/edge_wrap), $
                               dx=dx,dy=dy,dz=dz)
            Ex[*,*,it] = -1.0*gradPhi[*,*,0]
            Ey[*,*,it] = -1.0*gradPhi[*,*,1]

@@ -18,9 +18,11 @@ function efield_graphics, prj=prj, $
         print, "EFIELD_GRAPHICS: Using prj for graphics"
         if prj.data.haskey('phi') then begin
            phi = prj.data['phi']
+           ;-->Calculate E-field and transform to polar for mag & ang
            efield = calc_efield(phi, $
                                 dx = dx, dy = dy, $
                                 /verbose)
+           ;<--
            xData = prj.xvec
            yData = prj.yvec
         endif else begin
