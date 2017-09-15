@@ -13,51 +13,53 @@
 ;    when only transfering a subset of files from another
 ;    system (e.g. Stampede).
 ;-
-function calc_timesteps, grid
-  if file_test('domain000',/directory) then bp = 'domain*/' $
-  else bp = './'
-  ntMax = 0
+function calc_timesteps, path,grid
+  
+  if file_test(expand_path(path+path_sep()+'domain000'),/directory) then $
+     bp = expand_path(path+path_sep()+'domain*/') $
+  else bp = expand_path(path+path_sep()+'./')
+  nt_max = 0
   case 1 of
-     file_test('moments1.out'): begin
-        ntMax = file_lines('moments1.out')-1
-        print, "CALC_TIMESTEPS: Computed ntMax from 'moments1.out'"
+     file_test(expand_path(path+path_sep()+'moments1.out')): begin
+        nt_max = file_lines(expand_path(path+path_sep()+'moments1.out'))-1
+        print, "CALC_TIMESTEPS: Computed max time steps from 'moments1.out'"
      end
-     file_test('moments0.out'): begin
-        ntMax = file_lines('moments0.out')-1
-        print, "CALC_TIMESTEPS: Computed ntMax from 'moments0.out'"
+     file_test(expand_path(path+path_sep()+'moments0.out')): begin
+        nt_max = file_lines(expand_path(path+path_sep()+'moments0.out'))-1
+        print, "CALC_TIMESTEPS: Computed max time steps from 'moments0.out'"
      end
-     file_test('domain000/moments1.out'): begin
-        ntMax = file_lines('domain000/moments1.out')-1
-        print, "CALC_TIMESTEPS: Computed ntMax from 'domain000/moments1.out'"
+     file_test(expand_path(path+path_sep()+'domain000/moments1.out')): begin
+        nt_max = file_lines(expand_path(path+path_sep()+'domain000/moments1.out'))-1
+        print, "CALC_TIMESTEPS: Computed max time steps from 'domain000/moments1.out'"
      end
-     file_test('domain000/moments0.out'): begin
-        ntMax = file_lines('domain000/moments0.out')-1
-        print, "CALC_TIMESTEPS: Computed ntMax from 'domain000/moments0.out'"
+     file_test(expand_path(path+path_sep()+'domain000/moments0.out')): begin
+        nt_max = file_lines(expand_path(path+path_sep()+'domain000/moments0.out'))-1
+        print, "CALC_TIMESTEPS: Computed max time steps from 'domain000/moments0.out'"
      end
-     file_test('parallel',/directory): begin
-        !NULL = file_search('parallel/*.h5',count=count)
-        ntMax = count
-        print, "CALC_TIMESTEPS: Computed ntMax from parallel/*.h5"
+     file_test(expand_path(path+path_sep()+'parallel',/directory)): begin
+        !NULL = file_search(expand_path(path+path_sep()+'parallel/*.h5'),count=count)
+        nt_max = count
+        print, "CALC_TIMESTEPS: Computed max time steps from parallel/*.h5"
      end
-     file_test('den1.bin'): begin
-        ntMax = timesteps('den1.bin', $
+     file_test(expand_path(path+path_sep()+'den1.bin')): begin
+        nt_max = timesteps(expand_path(path+path_sep()+'den1.bin'), $
                           grid.sizepertime,grid.nsubdomains,basepath=bp)
-        print, "CALC_TIMESTEPS: Computed ntMax from den1.bin"
+        print, "CALC_TIMESTEPS: Computed max time steps from den1.bin"
      end
-     file_test('phi.bin'): begin
-        ntMax = timesteps('phi.bin', $
+     file_test(expand_path(path+path_sep()+'phi.bin')): begin
+        nt_max = timesteps(expand_path(path+path_sep()+'phi.bin'), $
                           grid.sizepertime,grid.nsubdomains,basepath=bp)
-        print, "CALC_TIMESTEPS: Computed ntMax from phi.bin"
+        print, "CALC_TIMESTEPS: Computed max time steps from phi.bin"
      end
-     file_test('den0.bin'): begin
-        ntMax = timesteps('den0.bin', $
+     file_test(expand_path(path+path_sep()+'den0.bin')): begin
+        nt_max = timesteps(expand_path(path+path_sep()+'den0.bin'), $
                           grid.sizepertime,grid.nsubdomains,basepath=bp)
-        print, "CALC_TIMESTEPS: Computed ntMax from 'den0.bin'"
+        print, "CALC_TIMESTEPS: Computed max time steps from 'den0.bin'"
      end
-     else: print, "CALC_TIMESTEPS: Could not compute ntMax"
+     else: print, "CALC_TIMESTEPS: Could not compute max time steps"
   endcase
-  ;; times = dt*nout*findgen(ntMax)/(ntMax-1)
+  ;; times = dt*nout*findgen(nt_max)/(nt_max-1)
 
-  return, ntMax
+  return, nt_max
 
 end

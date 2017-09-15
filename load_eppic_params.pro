@@ -4,6 +4,7 @@
 ; and calculate other useful quantities.
 ;-
 @eppic_defaults.pro
-grid = set_grid()
-ntMax = calc_timesteps(grid)
-moment_vars = analyze_moments(ntMax)
+if n_elements(path) eq 0 then path = '.'
+grid = set_grid(path)
+nt_max = calc_timesteps(grid)
+moment_vars = analyze_moments(nt_max)
