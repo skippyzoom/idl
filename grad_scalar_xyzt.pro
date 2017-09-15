@@ -1,10 +1,13 @@
 ;+
-; Calculate a vector field from a scalar potential
-; and optionally scale by a constant (F = c*Grad[f]).
+; Calculate a time-dependent vector field from a scalar 
+; potential and optionally scale by a constant (F = c*Grad[f]).
 ;
 ; NOTES
 ; -- Requires a gradient function. Originally written to
 ;    use ~/eppic/idl/tools_calc/gradient.pro
+;
+; TO DO
+; -- Let scale be a 1-D array of values.
 ;-
 function grad_scalar_xyzt, field,dx=dx,dy=dy,dz=dz, $
                            scale=scale, $
@@ -28,6 +31,7 @@ function grad_scalar_xyzt, field,dx=dx,dy=dy,dz=dz, $
      1: Fx = field*0.0
   endswitch
 
+  ;;==Echo parameters
   if keyword_set(verbose) then begin
      print, "GRAD_SCALAR_XYZT: Calculating F = c*Grad[f] ", $
             "(dx = ",strcompress(string(dx,format='(e10.4)'),/remove_all), $
@@ -37,6 +41,7 @@ function grad_scalar_xyzt, field,dx=dx,dy=dy,dz=dz, $
             " dz = ",strcompress(string(dy,format='(e10.4)'),/remove_all),")"
   endif
 
+  ;;==Calculate F = c*Grad[f]
   for it=0L,nt-1 do begin
      case nDims of
         3: begin                ;2 space + 1 time

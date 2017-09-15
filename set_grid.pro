@@ -3,7 +3,8 @@
 ;
 ; The purpose of the grid struct is that other routines can
 ; build subsets of the coordinates without running into 
-; recursion problems.
+; recursion problems. It also allows routines to pass around
+; the struct instead of calling @eppic_defaults.
 ;
 ; Parallel HDF routines swap the X and Z dimensions in 
 ; output.cc, so this routine will undo that swap if it 
@@ -54,7 +55,9 @@ function set_grid
      nsubdomains = nsubdomains
   endelse
 
-  grid = {x:x, y:y, z:z, nx:nxg, ny:nyg, nz:nzg, $
+  grid = {x:x, y:y, z:z, $
+          nx:nxg, ny:nyg, nz:nzg, $
+          dx:dx, dy:dy, dz:dz, $
           sizepertime:sizepertime, $
           nout_avg:nout_avg, nsubdomains:nsubdomains}
   return, grid
