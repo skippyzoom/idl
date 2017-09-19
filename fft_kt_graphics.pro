@@ -2,18 +2,29 @@
 ; Routine for producing graphics of spatial spectra as 
 ; a function of time.
 ;
+; NOTES
+; -- This function should not require a project dictionary.
+;
 ; TO DO
 ; -- Allow for 3D data
 ; -- Implement panel-specific colorbars
 ;-
 function fft_kt_graphics, data, $
+                          dx=dx,dy=dy, $
                           plotindex=plotindex, $
                           plotlayout=plotlayout, $
                           colorbar_type=colorbar_type
-@load_eppic_params
+;; @load_eppic_params
 
-  xData = (2*!pi/(grid.nx*dx))*(findgen(grid.nx) - 0.5*grid.nx)
-  yData = (2*!pi/(grid.ny*dy))*(findgen(grid.ny) - 0.5*grid.ny)
+  if n_elements(dx) eq 0 then dx = 1.0
+  if n_elements(dy) eq 0 then dy = 1.0
+  ;; xdata = (2*!pi/(grid.nx*dx))*(findgen(grid.nx) - 0.5*grid.nx)
+  ;; ydata = (2*!pi/(grid.ny*dy))*(findgen(grid.ny) - 0.5*grid.ny)
+  imgsize = size(data)
+  xsize = imgsize[1]
+  ysize = imgsize[2]
+  xdata = (2*!pi/(xsize*dx))*(findgen(xsize) - 0.5*xsize)
+  ydata = (2*!pi/(ysize*dy))*(findgen(ysize) - 0.5*ysize)
 
   if n_elements(plotindex) eq 0 then plotindex = 0
   np = n_elements(plotindex)
@@ -41,11 +52,11 @@ function fft_kt_graphics, data, $
   ytitle = "$k_{ver}/\pi$ [m$^{-1}$]"
 
   for ip=0,np-1 do begin
-     imgData = abs(fft(data[*,*,plotindex[ip]],/center))
-     imgData /= max(imgData)
-     imgData = 10*alog10(imgData^2)
+     imgdata = abs(fft(data[*,*,plotindex[ip]],/center))
+     imgdata /= max(imgdata)
+     imgdata = 10*alog10(imgdata^2)
 
-     img = image(imgData,xData,yData, $
+     img = image(imgdata,xdata,ydata, $
                  position = position[*,ip], $
                  min_value = min_value, $
                  max_value = max_value, $

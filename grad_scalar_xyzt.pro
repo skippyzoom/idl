@@ -20,12 +20,12 @@ function grad_scalar_xyzt, field,dx=dx,dy=dy,dz=dz, $
 
   ;;==Get dimensions
   field = reform(field)
-  fSize = size(field)
-  nDims = fSize[0]
-  nt = fSize[fSize[0]]
+  fsize = size(field)
+  n_dims = fsize[0]
+  nt = fsize[fsize[0]]
 
   ;;==Set up field arrays
-  switch nDims of
+  switch n_dims of
      3: Fz = field*0.0
      2: Fy = field*0.0
      1: Fx = field*0.0
@@ -43,18 +43,18 @@ function grad_scalar_xyzt, field,dx=dx,dy=dy,dz=dz, $
 
   ;;==Calculate F = c*Grad[f]
   for it=0L,nt-1 do begin
-     case nDims of
+     case n_dims of
         3: begin                ;2 space + 1 time
            gradf = scale*gradient(field[*,*,it],dx=dx,dy=dy)
-           Fx = vecField[*,*,*,0]
-           Fy = vecField[*,*,*,1]
+           Fx = gradf[*,*,*,0]
+           Fy = gradf[*,*,*,1]
            vecF = dictionary('x',Fx,'y',Fy)
         end
         4: begin                ;3 space + 1 time
            gradf = scale*gradient(field[*,*,*,it],dx=dx,dy=dy,dz=dz)
-           Fx = vecField[*,*,*,0]
-           Fy = vecField[*,*,*,1]
-           Fz = vecField[*,*,*,2]
+           Fx = gradf[*,*,*,0]
+           Fy = gradf[*,*,*,1]
+           Fz = gradf[*,*,*,2]
            vecF = dictionary('x',Fx,'y',Fy,'z',Fz)
         end
      endcase

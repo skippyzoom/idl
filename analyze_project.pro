@@ -38,7 +38,7 @@ pro analyze_project, path, $
   data = load_eppic_data(target.data_name.toarray(), $
                          target.data_type, $
                          path, $
-                         timestep = params.nout*lindgen(nt_max))
+                         timestep = target.params.nout*lindgen(nt_max))
 
   ;;==Pack up the project dictionary
   dKeys = data.keys()
@@ -47,12 +47,12 @@ pro analyze_project, path, $
   target = set_project_data(data,target.grid,target=target[*])
 
   ;;==Set up appropriate units for graphics, based on target.scale
-  set_data_units, target,params.units
+  set_data_units, target,target.params.units
 
   ;;==Images of raw data
-  ;; project_data_graphics, target
+  project_data_graphics, target
 
   ;;==Images of spectrally transformed data
-  ;; project_spectral_graphics, target
-STOP
+  project_spectral_graphics, target
+
 end
