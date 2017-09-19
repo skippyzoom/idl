@@ -84,7 +84,7 @@ function set_eppic_params, path
                                   'z', -21, $         ;zepto
                                   'y', -24)           ;yocto
   params.units['bases'] = hash('abs_den', '$m^{-3}$', $      ;Absolute density
-                               'rel_den', '', $              ;Relative density
+                               'rel_den', 'rel.', $          ;Relative density
                                'phi', 'V', $                 ;Electrostatic potential
                                'E', 'V/m')                   ;Electric field
 
