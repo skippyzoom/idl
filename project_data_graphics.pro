@@ -14,14 +14,14 @@ pro project_data_graphics, target
                          plotlayout = target.plotlayout, $
                          colorbar_type = target.colorbar_type)
   filename = 'den1'+target.filetype
-  image_save, img,filename = filename,/landscape
+  image_save, img,filename = target.path+path_sep()+filename,/landscape
 
   img = potential_graphics(target = target, $
                            plotindex = target.plotindex, $
                            plotlayout = target.plotlayout, $
                            colorbar_type = target.colorbar_type)
   filename = 'phi'+target.filetype
-  image_save, img,filename = filename,/landscape
+  image_save, img,filename = target.path+path_sep()+filename,/landscape
 
   ;; case size(target.data.phi,/n_dim) of
   ;;    3: begin

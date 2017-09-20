@@ -22,13 +22,20 @@ pro project_spectral_graphics, target
                            plotlayout = target.plotlayout, $
                            colorbar_type = target.colorbar_type)
      filename = name[ik]+'-fft_kt'+target.filetype
-     image_save, img,filename = filename,/landscape
+     image_save, img,filename = target.path+path_sep()+filename,/landscape
   endfor
 
   ;;==RMS spatial power
 
   ;;==Full k-w spectrum
-  img = fft_kw_graphics()
-  filename = name[ik]+'-fft_kw'+target.filetype
-  image_save, img,filename = filename,/landscape
+  for ik=0,target.data.count()-1 do begin
+     img = fft_kw_graphics(smooth(target.data[name[ik]],smooth_widths,/edge_wrap), $
+                           dx = target.params.dx*target.params.nout_avg, $
+                           dy = target.params.dy*target.params.nout_avg, $
+                           dt = target.params.dt*target.params.nout, $
+                           colorbar_type = target.colorbar_type)
+     filename = name[ik]+'-fft_kw'+target.filetype
+     image_save, img,filename = target.path+path_sep()+filename,/landscape
+  endfor
+
 end

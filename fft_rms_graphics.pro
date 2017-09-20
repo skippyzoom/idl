@@ -1,6 +1,5 @@
 ;+
-; Routine for producing graphics of spatial spectra as 
-; a function of time.
+; Routine for producing graphics of RMS (in time) spatial spectra.
 ;
 ; NOTES
 ; -- This function should not require a project dictionary.
@@ -11,14 +10,10 @@
 ;-
 function fft_kt_graphics, data, $
                           dx=dx,dy=dy, $
-                          plotindex=plotindex, $
-                          plotlayout=plotlayout, $
                           colorbar_type=colorbar_type
 
   if n_elements(dx) eq 0 then dx = 1.0
   if n_elements(dy) eq 0 then dy = 1.0
-  ;; xdata = (2*!pi/(grid.nx*dx))*(findgen(grid.nx) - 0.5*grid.nx)
-  ;; ydata = (2*!pi/(grid.ny*dy))*(findgen(grid.ny) - 0.5*grid.ny)
   imgsize = size(data)
   xsize = imgsize[1]
   ysize = imgsize[2]

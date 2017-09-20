@@ -13,11 +13,11 @@ pro analyze_project, path, $
   if ~target.haskey('filetype') then target.filetype = '.png'
   if ~target.haskey('colorbar_type') then target.colorbar_type = 'global'
 
-  ;;==Echo working path
+  ;;==Echo working path and store in project dictionary
   print, "ANALYZE_PROJECT: In ",path
+  target['path'] = path
 
   ;;==Read the input file
-  ;; params = set_eppic_params(path)
   target['params'] = set_eppic_params(path)
 
   ;;==Assign grid to project
@@ -50,9 +50,9 @@ pro analyze_project, path, $
   set_data_units, target,target.params.units
 
   ;;==Images of raw data
-  project_data_graphics, target
+  ;; project_data_graphics, target
 
   ;;==Images of spectrally transformed data
-  project_spectral_graphics, target
+  ;; project_spectral_graphics, target
 
 end
