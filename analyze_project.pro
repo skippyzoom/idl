@@ -50,9 +50,9 @@ pro analyze_project, path, $
   set_data_units, target,target.params.units
 
   ;;==Images of raw data
-  project_data_graphics, target
+  ;; project_data_graphics, target
 
   ;;==Images of spectrally transformed data
-  project_spectral_graphics, target
-
+  ;; project_spectral_graphics, target
+STOP
 end
