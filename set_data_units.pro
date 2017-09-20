@@ -47,7 +47,7 @@ pro set_data_units, target,units, $
            strcmp(dKeys[ik],'e',1,/fold_case): $
               target.units[dKeys[ik]] = data_prefix.remove()+units.bases['E']
         endcase
-        target.units[dKeys[ik]] = "["+target.units[dKeys[ik]]+"]"
+        target.units[dKeys[ik]] = "["+target.units[dKeys[ik]]+"]"        
      endfor
   endif $
   else print, "SET_DATA_UNITS: Needs to know project data names."
