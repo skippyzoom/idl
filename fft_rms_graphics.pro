@@ -8,25 +8,28 @@
 ; -- Allow for 3D data
 ; -- Implement panel-specific colorbars
 ;-
-function fft_kt_graphics, data, $
-                          dx=dx,dy=dy, $
-                          colorbar_type=colorbar_type
+function fft_rms_graphics, data, $
+                           dx=dx,dy=dy, $
+                           colorbar_type=colorbar_type
 
   if n_elements(dx) eq 0 then dx = 1.0
   if n_elements(dy) eq 0 then dy = 1.0
   imgsize = size(data)
-  xsize = imgsize[1]
-  ysize = imgsize[2]
-  xdata = (2*!pi/(xsize*dx))*(findgen(xsize) - 0.5*xsize)
-  ydata = (2*!pi/(ysize*dy))*(findgen(ysize) - 0.5*ysize)
+  nx = imgsize[1]
+  ny = imgsize[2]
+  nt = imgsize[imgsize[0]]
+  xdata = (2*!pi/(nx*dx))*(findgen(nx) - 0.5*nx)
+  ydata = (2*!pi/(ny*dy))*(findgen(ny) - 0.5*ny)
 
-  if n_elements(plotindex) eq 0 then plotindex = 0
-  np = n_elements(plotindex)
-  if n_elements(plotlayout) eq 0 then plotlayout = [1,np]
-  position = multi_position(plotlayout, $
+  np = 4
+  position = multi_position([2,2], $
                             edges=[0.12,0.10,0.80,0.80], $
                             buffers=[0.05,0.15])
 
+  trange = [[0,nt/4-1], $
+            [nt/4,nt/2-1], $
+            [nt/2,3*nt/4-1], $
+            [3*nt/4,nt-1]]
   min_value = -30
   max_value = 0
 
@@ -46,11 +49,13 @@ function fft_kt_graphics, data, $
   ytickname = plusminus_labels(ytickvalues/!pi,format='i')
   ytitle = "$k_{ver}/\pi$ [m$^{-1}$]"
 
+  for it=0,nt-1 do data[*,*,it] = abs(fft(data[*,*,it],/center,/overwrite))
+
   for ip=0,np-1 do begin
-     imgdata = abs(fft(data[*,*,plotindex[ip]],/center))
+     imgdata = rms(data[*,*,trange[0,ip]:trange[1,ip]],dim=3)
      imgdata /= max(imgdata)
      imgdata = 10*alog10(imgdata^2)
-
+     
      img = image(imgdata,xdata,ydata, $
                  position = position[*,ip], $
                  min_value = min_value, $
@@ -86,7 +91,7 @@ function fft_kt_graphics, data, $
                  /buffer)
 
      if strcmp(colorbar_type,'panel',5) then begin
-        print, "FFT_KT_GRAPHICS: Panel-specific colorbar not implemented"
+        print, "FFT_RMS_GRAPHICS: Panel-specific colorbar not implemented"
      endif                    
   endfor
 
