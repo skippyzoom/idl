@@ -1,5 +1,5 @@
 ;+
-; Routine for producing graphics of EPPIC density
+; Routine for producing graphics of EPPIC electrostatic potential
 ; from a project dictionary or data array.
 ;
 ; NOTES

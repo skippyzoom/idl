@@ -30,10 +30,12 @@ pro project_spectral_graphics, target
 
   ;;==RMS spatial power
   for ik=0,target.data.count()-1 do begin
-     img = fft_rms_graphics(smooth(target.data[name[ik]],smooth_widths,/edge_wrap), $
-                            dx = target.params.dx, $
-                            dy = target.params.dy, $
-                            colorbar_type = target.colorbar_type)
+     img = fft_rms_graphics( $
+           smooth(target.data[name[ik]],smooth_widths,/edge_wrap), $
+           dx = target.params.dx, $
+           dy = target.params.dy, $
+           colorbar_type = target.colorbar_type $
+                           )
      filename = name[ik]+'-fft_rms'+target.filetype
      image_save, img,filename = target.path+path_sep()+filename,/landscape
   endfor
