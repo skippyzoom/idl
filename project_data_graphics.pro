@@ -8,33 +8,40 @@
 ;-
 pro project_data_graphics, target
 
+  ;; imgdata = (target.data['den1'])[target.xrng[0]:target.xrng[1], $
+  ;;                                  target.yrng[0]:target.yrng[1], $
+  ;;                                  *]*target.scale['den1']
+  ;; xdata = target.xvec[target.xrng[0]:target.xrng[1]]
+  ;; ydata = target.yvec[target.yrng[0]:target.yrng[1]]
+  ;; img = density_graphics(imgdata,xdata,ydata, $
+  ;;                        plotindex = target.plotindex, $
+  ;;                        plotlayout = target.plotlayout, $
+  ;;                        colorbar_type = target.colorbar_type, $
+  ;;                        colorbar_units = target.units['den1'])
+
+  ;; filename = 'den1'+target.filetype
+  ;; image_save, img,filename = target.path+path_sep()+filename,/landscape
+
+  ;; imgdata = (target.data['phi'])[target.xrng[0]:target.xrng[1], $
+  ;;                                  target.yrng[0]:target.yrng[1], $
+  ;;                                  *]*target.scale['phi']
+  ;; xdata = target.xvec[target.xrng[0]:target.xrng[1]]
+  ;; ydata = target.yvec[target.yrng[0]:target.yrng[1]]
+  ;; img = potential_graphics(imgdata,xdata,ydata, $
+  ;;                          plotindex = target.plotindex, $
+  ;;                          plotlayout = target.plotlayout, $
+  ;;                          colorbar_type = target.colorbar_type, $
+  ;;                          colorbar_units = target.units['phi'])
+
+  ;; filename = 'phi'+target.filetype
+  ;; image_save, img,filename = target.path+path_sep()+filename,/landscape
+
+  
   imgdata = (target.data['den1'])[target.xrng[0]:target.xrng[1], $
                                    target.yrng[0]:target.yrng[1], $
                                    *]*target.scale['den1']
   xdata = target.xvec[target.xrng[0]:target.xrng[1]]
   ydata = target.yvec[target.yrng[0]:target.yrng[1]]
-  img = density_graphics(imgdata,xdata,ydata, $
-                         plotindex = target.plotindex, $
-                         plotlayout = target.plotlayout, $
-                         colorbar_type = target.colorbar_type, $
-                         colorbar_units = target.units['den1'])
-
-  filename = 'den1'+target.filetype
-  image_save, img,filename = target.path+path_sep()+filename,/landscape
-
-  imgdata = (target.data['phi'])[target.xrng[0]:target.xrng[1], $
-                                   target.yrng[0]:target.yrng[1], $
-                                   *]*target.scale['phi']
-  xdata = target.xvec[target.xrng[0]:target.xrng[1]]
-  ydata = target.yvec[target.yrng[0]:target.yrng[1]]
-  img = potential_graphics(imgdata,xdata,ydata, $
-                           plotindex = target.plotindex, $
-                           plotlayout = target.plotlayout, $
-                           colorbar_type = target.colorbar_type, $
-                           colorbar_units = target.units['phi'])
-
-  filename = 'phi'+target.filetype
-  image_save, img,filename = target.path+path_sep()+filename,/landscape
 
   ;; case size(target.data.phi,/n_dim) of
   ;;    3: begin

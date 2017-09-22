@@ -37,7 +37,7 @@ pro analyze_project, path, $
   ;;==Load simulation data
   data = load_eppic_data(target.data_name.toarray(), $
                          target.data_type, $
-                         path, $
+                         path = target.path, $
                          timestep = target.params.nout*lindgen(nt_max))
 
   ;;==Pack up the project dictionary

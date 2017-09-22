@@ -17,26 +17,32 @@
 ;    for kmag_interpolate-related routines.
 ;-
 
-function load_eppic_data, data_name,data_type,path, $
+;; function load_eppic_data, data_name,data_type,path, $
+;;                           timestep=timestep, $
+;;                           _EXTRA=ex
+function load_eppic_data, data_name,data_type, $
+                          path=path, $
                           timestep=timestep, $
                           _EXTRA=ex
-;; @load_eppic_params
+
+  ;;==Load the simulation run parameters
   if n_elements(path) eq 0 then path = '.'
   params = set_eppic_params(path)
   grid = set_grid(path)
   nt_max = calc_timesteps(path,grid)
 
+  ;;==Loop through given data names and read data
   if n_elements(data_name) gt 0 then begin
-     nData = n_elements(data_name)
-     nType = n_elements(data_type)
-     if nType gt 0 and nType ne nData then $
-        data_type = make_array(nData,value=data_type[0]) $
-     else data_type = make_array(nData,value='ph5')
+     n_data = n_elements(data_name)
+     n_type = n_elements(data_type)
+     if n_type gt 0 and n_type ne n_data then $
+        data_type = make_array(n_data,value=data_type[0]) $
+     else data_type = make_array(n_data,value='ph5')
      if n_elements(timestep) eq 0 then nt = params.nout*nt_max $
      else nt = n_elements(timestep)
 
      data = dictionary()
-     for id=0,nData-1 do begin
+     for id=0,n_data-1 do begin
         print, "LOAD_EPPIC_DATA: Loading ",data_name[id],"..."
         data[data_name[id]] = read_xxx_data(data_name[id], $
                                             data_type[id], $
