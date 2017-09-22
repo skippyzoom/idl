@@ -13,9 +13,9 @@
 ; -- Add padding option for spatial coordinates
 ;    (e.g. nkx = next_power2(nx)).
 ;-
-function fft_kw_graphics, data, $
-                          dx=dx,dy=dy,dt=dt, $
-                          colorbar_type=colorbar_type
+function kxyzw_images, data, $
+                       dx=dx,dy=dy,dt=dt, $
+                       colorbar_type=colorbar_type
 
   if n_elements(dx) eq 0 then dx = 1.0
   if n_elements(dy) eq 0 then dy = 1.0

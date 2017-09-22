@@ -9,11 +9,11 @@
 ; -- Allow for 3D data
 ; -- Implement panel-specific colorbars
 ;-
-function fft_kt_graphics, data, $
-                          dx=dx,dy=dy, $
-                          plotindex=plotindex, $
-                          plotlayout=plotlayout, $
-                          colorbar_type=colorbar_type
+function kxyzt_images, data, $
+                       dx=dx,dy=dy, $
+                       plotindex=plotindex, $
+                       plotlayout=plotlayout, $
+                       colorbar_type=colorbar_type
 
   if n_elements(dx) eq 0 then dx = 1.0
   if n_elements(dy) eq 0 then dy = 1.0
