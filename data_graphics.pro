@@ -14,7 +14,7 @@ function data_graphics, imgdata,xdata,ydata, $
                            plotlayout=plotlayout, $
                            rgb_table=rgb_table, $
                            colorbar_type=colorbar_type, $
-                           colorbar_title=colorbar_title, $
+                           colorbar_title=colorbar_title
 
   if n_elements(imgdata) eq 0 then begin
      print, "DATA_GRAPHICS: Please supply image array. No graphics produced."

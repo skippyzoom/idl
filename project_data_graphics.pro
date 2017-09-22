@@ -36,12 +36,37 @@ pro project_data_graphics, target
   ;; filename = 'phi'+target.filetype
   ;; image_save, img,filename = target.path+path_sep()+filename,/landscape
 
-  
-  imgdata = (target.data['den1'])[target.xrng[0]:target.xrng[1], $
-                                   target.yrng[0]:target.yrng[1], $
-                                   *]*target.scale['den1']
-  xdata = target.xvec[target.xrng[0]:target.xrng[1]]
-  ydata = target.yvec[target.yrng[0]:target.yrng[1]]
+  ;;==Get data names
+  name = target.data.keys()
+
+  ;;==Build colorbar titles
+  colorbar_title = target.data_label
+
+  ;;==Smooth data in space
+  if target.params.ndim_space eq 2 then smooth_widths = [0.1/target.params.dx, $
+                                                         0.1/target.params.dy, $
+                                                         1] $
+  else smooth_widths = [0.1/target.params.dx, $
+                        0.1/target.params.dy, $
+                        0.1/target.params.dz, $
+                        1]
+
+  for ik=0,target.data.count()-1 do begin
+     imgdata = (target.data[name[ik]])[target.xrng[0]:target.xrng[1], $
+                                     target.yrng[0]:target.yrng[1], $
+                                     *]*target.scale[name[ik]]
+     xdata = target.xvec[target.xrng[0]:target.xrng[1]]
+     ydata = target.yvec[target.yrng[0]:target.yrng[1]]
+     colorbar_title = target.data_label[name[ik]]+" "+target.units[name[ik]]
+     img = data_graphics(imgdata,xdata,ydata, $
+                         plotindex = target.plotindex, $
+                         plotlayout = target.plotlayout, $
+                         rgb_table = target.rgb_table[name[ik]], $
+                         colorbar_type = target.colorbar_type, $
+                         colorbar_title = colorbar_title)
+     filename = name[ik]+target.filetype
+     image_save, img,filename = target.path+path_sep()+filename,/landscape
+  endfor
 
   ;; case size(target.data.phi,/n_dim) of
   ;;    3: begin
