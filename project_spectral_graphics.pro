@@ -8,13 +8,15 @@ pro project_spectral_graphics, target
   name = target.data.keys()
 
   ;;==Smooth data in space
-  if target.params.ndim_space eq 2 then smooth_widths = [0.1/target.params.dx, $
-                                                         0.1/target.params.dy, $
-                                                         1] $
-  else smooth_widths = [0.1/target.params.dx, $
-                        0.1/target.params.dy, $
-                        0.1/target.params.dz, $
-                        1]
+  if target.params.ndim_space eq 2 then $
+     smooth_widths = [0.1/target.params.dx, $
+                      0.1/target.params.dy, $
+                      1] $
+  else $
+     smooth_widths = [0.1/target.params.dx, $
+                      0.1/target.params.dy, $
+                      0.1/target.params.dz, $
+                      1]
 
   ;;==Spatial power as a function of time
   for ik=0,target.data.count()-1 do begin
@@ -41,6 +43,8 @@ pro project_spectral_graphics, target
      filename = name[ik]+'-fft_rms'+target.filetype
      image_save, img,filename = target.path+path_sep()+filename,/landscape
   endfor
+
+  ;--> Use xyz_rtp.pro to plot power at a given |k| over time
 
   ;;==Full k-w spectrum
   for ik=0,target.data.count()-1 do begin
