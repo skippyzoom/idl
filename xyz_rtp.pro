@@ -1,8 +1,14 @@
 ;+
 ; Interpolate data on a Cartesian grid to data on a polar grid.
+;
+; NOTES
+; -- This function is based on kmag_interpolate.pro but 
+;    nx, ny, and nz here correspond to nx/2... in that
+;    function.
 ;-
 function xyz_rtp, xyz, $
-                  dx=dx,dy=dy,dz=dz,dr=dr, $
+                  dx=dx,dy=dy,dz=dz, $
+                  r_min=r_min, $
                   n_theta=n_theta,n_phi=n_phi, $
                   shape=shape, $
                   missing=missing
@@ -25,7 +31,7 @@ function xyz_rtp, xyz, $
         ;; y_min = 2*!pi/dy/ny
         x_min = !pi/dx/nx
         y_min = !pi/dy/ny
-        if n_elements(dr) eq 0 then dr = max([x_min,y_min])
+        if n_elements(r_min) eq 0 then r_min = max([x_min,y_min])
      end
      3: begin
         nx = xyz_size[1]/2
@@ -35,13 +41,16 @@ function xyz_rtp, xyz, $
         if n_elements(dx) eq 0 then dx = 1.0/nx
         if n_elements(dy) eq 0 then dy = 1.0/ny
         if n_elements(dz) eq 0 then dz = 1.0/nz
-        x_min = 2*!pi/dx/nx
-        y_min = 2*!pi/dy/ny
-        z_min = 2*!pi/dz/nz
-        if n_elements(dr) eq 0 then dr = max([x_min,y_min,z_min])
+        ;; x_min = 2*!pi/dx/nx
+        ;; y_min = 2*!pi/dy/ny
+        ;; z_min = 2*!pi/dz/nz
+        x_min = !pi/dx/nx
+        y_min = !pi/dy/ny
+        z_min = !pi/dz/nz
+        if n_elements(r_min) eq 0 then r_min = max([x_min,y_min,z_min])
      end
   endcase
-  r_vals = dr*(1.0+dindgen(nr))
+  r_vals = r_min*(1.0+dindgen(nr))
 
   case n_dims of 
      2: begin
