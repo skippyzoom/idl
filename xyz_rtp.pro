@@ -21,8 +21,10 @@ function xyz_rtp, xyz, $
         nr = min([nx,ny])
         if n_elements(dx) eq 0 then dx = 1.0/nx
         if n_elements(dy) eq 0 then dy = 1.0/ny
-        x_min = 2*!pi/dx/nx
-        y_min = 2*!pi/dy/ny
+        ;; x_min = 2*!pi/dx/nx
+        ;; y_min = 2*!pi/dy/ny
+        x_min = !pi/dx/nx
+        y_min = !pi/dy/ny
         if n_elements(dr) eq 0 then dr = max([x_min,y_min])
      end
      3: begin
@@ -47,12 +49,13 @@ function xyz_rtp, xyz, $
         for ir=0,nr-1 do begin
            t_size = 8*fix(r_vals[ir]/min([x_min,y_min]))
            t_vals = 2*!pi*dindgen(t_size)/t_size
-           x_interp = cos(t_vals)*r_vals[ir]/x_min + nx/2
-           y_interp = cos(t_vals)*r_vals[ir]/y_min + ny/2
+           x_interp = cos(t_vals)*r_vals[ir]/x_min + nx
+           y_interp = sin(t_vals)*r_vals[ir]/y_min + ny
            r_interp = interpolate(xyz, $
                                   x_interp,y_interp, $
                                   missing = missing)
            rtp[ir,*] = congrid(r_interp,n_theta,/interp)
+
         endfor
      end
      3: begin
