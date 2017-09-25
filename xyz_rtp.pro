@@ -5,10 +5,12 @@
 ; -- This function is based on kmag_interpolate.pro but 
 ;    nx, ny, and nz here correspond to nx/2... in that
 ;    function.
+;
+; TO DO
+; -- Allow arbitrary angle ranges.
 ;-
 function xyz_rtp, xyz, $
                   dx=dx,dy=dy,dz=dz, $
-                  r_min=r_min, $
                   n_theta=n_theta,n_phi=n_phi, $
                   shape=shape, $
                   missing=missing
@@ -18,8 +20,11 @@ function xyz_rtp, xyz, $
   if n_elements(shape) eq 0 then shape = 'cone'
   if n_elements(missing) eq 0 then missing = 0.0
 
+  rtp = dictionary()
+
   xyz_size = size(xyz)
   n_dims = xyz_size[0]
+  rtp['n_dims'] = n_dims
   case n_dims of
      2: begin
         nx = xyz_size[1]/2
@@ -27,11 +32,9 @@ function xyz_rtp, xyz, $
         nr = min([nx,ny])
         if n_elements(dx) eq 0 then dx = 1.0/nx
         if n_elements(dy) eq 0 then dy = 1.0/ny
-        ;; x_min = 2*!pi/dx/nx
-        ;; y_min = 2*!pi/dy/ny
         x_min = !pi/dx/nx
         y_min = !pi/dy/ny
-        if n_elements(r_min) eq 0 then r_min = max([x_min,y_min])
+        r_min = max([x_min,y_min])
      end
      3: begin
         nx = xyz_size[1]/2
@@ -41,34 +44,31 @@ function xyz_rtp, xyz, $
         if n_elements(dx) eq 0 then dx = 1.0/nx
         if n_elements(dy) eq 0 then dy = 1.0/ny
         if n_elements(dz) eq 0 then dz = 1.0/nz
-        ;; x_min = 2*!pi/dx/nx
-        ;; y_min = 2*!pi/dy/ny
-        ;; z_min = 2*!pi/dz/nz
         x_min = !pi/dx/nx
         y_min = !pi/dy/ny
         z_min = !pi/dz/nz
-        if n_elements(r_min) eq 0 then r_min = max([x_min,y_min,z_min])
+        r_min = max([x_min,y_min,z_min])
      end
   endcase
-  r_vals = r_min*(1.0+dindgen(nr))
+  rtp['r_vals'] = r_min*(1.0+dindgen(nr))
 
   case n_dims of 
      2: begin
-        rtp = fltarr(nr,n_theta)
+        rtp['t_vals'] = indgen(n_theta)
+        data = fltarr(nr,n_theta)
         for ir=0,nr-1 do begin
-           t_size = 8*fix(r_vals[ir]/min([x_min,y_min]))
-           t_vals = 2*!pi*dindgen(t_size)/t_size
-           x_interp = cos(t_vals)*r_vals[ir]/x_min + nx
-           y_interp = sin(t_vals)*r_vals[ir]/y_min + ny
-           r_interp = interpolate(xyz, $
+           t_size = 8*fix(rtp.r_vals[ir]/min([x_min,y_min]))
+           t_interp = 2*!pi*dindgen(t_size)/t_size
+           x_interp = cos(t_interp)*rtp.r_vals[ir]/x_min + nx
+           y_interp = sin(t_interp)*rtp.r_vals[ir]/y_min + ny
+           data_tmp = interpolate(xyz, $
                                   x_interp,y_interp, $
                                   missing = missing)
-           rtp[ir,*] = congrid(r_interp,n_theta,/interp)
-
+           data[ir,*] = congrid(data_tmp,n_theta,/interp)
         endfor
+        rtp['data'] = data
      end
      3: begin
-        rtp = fltarr(nr,n_theta,n_phi)
         print, "XYZ_RTP: 3D not set up yet."
      end
   endcase
