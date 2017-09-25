@@ -15,6 +15,16 @@ function xyz_rtp, xyz, $
   xyz_size = size(xyz)
   n_dims = xyz_size[0]
   case n_dims of
+     2: begin
+        nx = xyz_size[1]/2
+        ny = xyz_size[2]/2
+        nr = min([nx,ny])
+        if n_elements(dx) eq 0 then dx = 1.0/nx
+        if n_elements(dy) eq 0 then dy = 1.0/ny
+        x_min = 2*!pi/dx/nx
+        y_min = 2*!pi/dy/ny
+        if n_elements(dr) eq 0 then dr = max([x_min,y_min])
+     end
      3: begin
         nx = xyz_size[1]/2
         ny = xyz_size[2]/2
@@ -26,15 +36,7 @@ function xyz_rtp, xyz, $
         x_min = 2*!pi/dx/nx
         y_min = 2*!pi/dy/ny
         z_min = 2*!pi/dz/nz
-     end
-     2: begin
-        nx = xyz_size[1]/2
-        ny = xyz_size[2]/2
-        nr = min([nx,ny])
-        if n_elements(dx) eq 0 then dx = 1.0/nx
-        if n_elements(dy) eq 0 then dy = 1.0/ny
-        x_min = 2*!pi/dx/nx
-        y_min = 2*!pi/dy/ny
+        if n_elements(dr) eq 0 then dr = max([x_min,y_min,z_min])
      end
   endcase
   r_vals = dr*(1.0+dindgen(nr))
@@ -43,7 +45,7 @@ function xyz_rtp, xyz, $
      2: begin
         rtp = fltarr(nr,n_theta)
         for ir=0,nr-1 do begin
-           t_size = 8*fix(r_vals[ir]/dr)
+           t_size = 8*fix(r_vals[ir]/min([x_min,y_min]))
            t_vals = 2*!pi*dindgen(t_size)/t_size
            x_interp = cos(t_vals)*r_vals[ir]/x_min + nx/2
            y_interp = cos(t_vals)*r_vals[ir]/y_min + ny/2

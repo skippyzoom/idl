@@ -51,7 +51,7 @@ pro analyze_project, path, $
   target['data_label'] = set_data_labels(target.data_name.toarray())
 
   ;;==Images of raw data
-  project_data_graphics, target
+  ;; project_data_graphics, target
 
   ;;==Images of spectrally transformed data
   project_spectral_graphics, target
