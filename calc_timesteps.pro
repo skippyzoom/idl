@@ -36,7 +36,7 @@ function calc_timesteps, path,grid
         nt_max = file_lines(expand_path(path+path_sep()+'domain000/moments0.out'))-1
         print, "CALC_TIMESTEPS: Computed max time steps from 'domain000/moments0.out'"
      end
-     file_test(expand_path(path+path_sep()+'parallel',/directory)): begin
+     file_test(expand_path(path+path_sep()+'parallel'),/directory): begin
         !NULL = file_search(expand_path(path+path_sep()+'parallel/*.h5'),count=count)
         nt_max = count
         print, "CALC_TIMESTEPS: Computed max time steps from parallel/*.h5"

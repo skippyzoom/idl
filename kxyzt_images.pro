@@ -20,10 +20,10 @@ function kxyzt_images, data, $
   ;; xdata = (2*!pi/(grid.nx*dx))*(findgen(grid.nx) - 0.5*grid.nx)
   ;; ydata = (2*!pi/(grid.ny*dy))*(findgen(grid.ny) - 0.5*grid.ny)
   imgsize = size(data)
-  xsize = imgsize[1]
-  ysize = imgsize[2]
-  xdata = (2*!pi/(xsize*dx))*(findgen(xsize) - 0.5*xsize)
-  ydata = (2*!pi/(ysize*dy))*(findgen(ysize) - 0.5*ysize)
+  nx = imgsize[1]
+  ny = imgsize[2]
+  xdata = (2*!pi/(nx*dx))*(findgen(nx) - 0.5*nx)
+  ydata = (2*!pi/(ny*dy))*(findgen(ny) - 0.5*ny)
 
   if n_elements(plotindex) eq 0 then plotindex = 0
   np = n_elements(plotindex)
