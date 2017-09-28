@@ -25,6 +25,7 @@ pro analyze_project, path, $
 
   ;;==Calculate max number of time steps available
   nt_max = calc_timesteps(path,target.grid)
+  target.params['nt_max'] = nt_max
 
   ;;==Set up graphics output steps
   if ~target.haskey('plotindex') then target['plotindex'] = [0,1]

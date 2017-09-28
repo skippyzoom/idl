@@ -6,6 +6,14 @@
 ; Credit for original code goes to Ron Kneusel
 ;
 ; I believe the ishft arguments go to 64 to cover 64-bit systems.
+;
+; NOTES
+; -- This function returns the smallest possible power of 2.
+;    In other words, if x is a power of 2, it will return x. 
+;    That is useful when the user just wants to make sure an
+;    array has dimensions that are powers of 2 without knowing
+;    the dimensions until runtime (e.g. when padding an array
+;    before taking the FFT). 
 ;-
 function next_power2, x
   compile_opt idl2, logical_predicate

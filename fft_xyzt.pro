@@ -1,6 +1,15 @@
 ;+
 ; Take the FFT of an array containing spatial and
 ; temporal data. The temporal FFT is optional.
+;
+; NOTES
+; -- This function expects data to have a time 
+;    dimension. Therefore, it will calculate the
+;    number of spatial dimensions (n_dims) as one
+;    less than the number of dimensions returned
+;    by size().
+; -- The user is responsible for padding the input
+;    array.
 ;-
 function fft_xyzt, data, $
                    alpha=alpha, $
@@ -14,7 +23,7 @@ function fft_xyzt, data, $
                    _EXTRA=ex
 
   dsize = size(data)
-  n_dims = dsize[0]
+  n_dims = dsize[0]-1
   nt = dsize[n_dims]
   nx = dsize[1]
   ny = dsize[2]

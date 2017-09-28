@@ -1,6 +1,7 @@
 ;+
 ; Routine for producing graphics of spatial spectra as 
-; a function of time.
+; a function of time. This routine only handles graphics;
+; it does not perform the FFT.
 ;
 ; NOTES
 ; -- This function should not require a project dictionary.
@@ -17,8 +18,6 @@ function kxyzt_images, data, $
 
   if n_elements(dx) eq 0 then dx = 1.0
   if n_elements(dy) eq 0 then dy = 1.0
-  ;; xdata = (2*!pi/(grid.nx*dx))*(findgen(grid.nx) - 0.5*grid.nx)
-  ;; ydata = (2*!pi/(grid.ny*dy))*(findgen(grid.ny) - 0.5*grid.ny)
   imgsize = size(data)
   nx = imgsize[1]
   ny = imgsize[2]
@@ -35,8 +34,6 @@ function kxyzt_images, data, $
   min_value = -30
   max_value = 0
 
-  aspect_ratio = 1.0
-
   xrange = [-4*!pi,4*!pi]
   xtickvalues = [xrange[0],0.5*xrange[0],0,0.5*xrange[1],xrange[1]]
   xmajor = n_elements(xtickvalues)
@@ -51,18 +48,25 @@ function kxyzt_images, data, $
   ytickname = plusminus_labels(ytickvalues/!pi,format='i')
   ytitle = "$k_{ver}/\pi$ [m$^{-1}$]"
 
+  aspect_ratio = 1.0
+  if n_elements(xtickvalues) ge 2 && n_elements(xtickvalues) ge 2 then $
+     aspect_ratio = float(xtickvalues[xmajor-1]-xtickvalues[0])/$
+                    float(ytickvalues[ymajor-1]-ytickvalues[0])
+
   for ip=0,np-1 do begin
-     imgdata = abs(fft(data[*,*,plotindex[ip]],/center))
+     ;; imgdata = abs(fft(data[*,*,plotindex[ip]],/center))
+     ;; imgdata /= max(imgdata)
+     ;; imgdata = 10*alog10(imgdata^2)
+     imgdata = data[*,*,plotindex[ip]]
      imgdata /= max(imgdata)
      imgdata = 10*alog10(imgdata^2)
-
      img = image(imgdata,xdata,ydata, $
                  position = position[*,ip], $
                  min_value = min_value, $
                  max_value = max_value, $
                  rgb_table = 39, $
                  axis_style = 1, $
-                 aspect_ratio = 1.0, $
+                 aspect_ratio = aspect_ratio, $
                  xstyle = 1, $
                  ystyle = 1, $
                  xtitle = xtitle, $
