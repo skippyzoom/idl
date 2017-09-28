@@ -23,7 +23,7 @@ function xyz_rtp, xyz, $
   rtp = dictionary()
 
   xyz_size = size(xyz)
-  n_dims = xyz_size[0]
+  n_dims = xyz_size[0]-1
   rtp['n_dims'] = n_dims
   case n_dims of
      2: begin

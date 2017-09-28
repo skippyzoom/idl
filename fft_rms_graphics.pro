@@ -53,7 +53,6 @@ function fft_rms_graphics, data, $
 
   for ip=0,np-1 do begin
      imgdata = rms(data[*,*,trange[0,ip]:trange[1,ip]],dim=3)
-STOP
      imgdata /= max(imgdata)
      imgdata = 10*alog10(imgdata^2)
      

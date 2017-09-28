@@ -54,6 +54,6 @@ pro analyze_project, path, $
   ;; project_data_graphics, target
 
   ;;==Images of spectrally transformed data
-  ;; project_spectral_graphics, target
-STOP
+  project_spectral_graphics, target
+
 end
