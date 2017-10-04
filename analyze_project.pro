@@ -1,6 +1,10 @@
 ;+
 ; Execute common analysis code on data in
 ; the specified path.
+;
+; TO DO
+; -- Check for consistency between plotlayout and plotindex?
+;    May be better to do that in graphics routines.
 ;-
 pro analyze_project, path, $
                      target, $
@@ -52,9 +56,9 @@ pro analyze_project, path, $
   target['data_label'] = set_data_labels(target.data_name.toarray())
 
   ;;==Images of raw data
-  ;; project_data_graphics, target
+  project_data_graphics, target
 
   ;;==Images of spectrally transformed data
-  project_spectral_graphics, target
+  ;; project_spectral_graphics, target
 
 end

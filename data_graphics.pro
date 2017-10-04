@@ -8,13 +8,19 @@
 ; TO DO
 ; -- Set up panel-specific colorbars. May require 
 ;    making img an array of object references.
+; -- Check for consistency between plotlayout and plotindex.
+; -- Allow user to set middle of colorbar to zero? Some data
+;    ranges cause the middle to be a very small +/- number,
+;    which causes plusminus_labels to add a sign even though
+;    the tick name after formatting is '0.0'. There is a
+;    work-around in place, so this isn't urgent.
 ;-
 function data_graphics, imgdata,xdata,ydata, $
-                           plotindex=plotindex, $
-                           plotlayout=plotlayout, $
-                           rgb_table=rgb_table, $
-                           colorbar_type=colorbar_type, $
-                           colorbar_title=colorbar_title
+                        plotindex=plotindex, $
+                        plotlayout=plotlayout, $
+                        rgb_table=rgb_table, $
+                        colorbar_type=colorbar_type, $
+                        colorbar_title=colorbar_title
 
   if n_elements(imgdata) eq 0 then begin
      print, "DATA_GRAPHICS: Please supply image array. No graphics produced."
@@ -33,7 +39,6 @@ function data_graphics, imgdata,xdata,ydata, $
      if n_elements(plotlayout) eq 0 then plotlayout = [1,np]
      if n_elements(rgb_table) eq 0 then rgb_table = 0
      if n_elements(colorbar_type) eq 0 then colorbar_type = 'global'
-     ;; if n_elements(colorbar_units) eq 0 then colorbar_units = ''
      if n_elements(colorbar_title) eq 0 then colorbar_title = ''
 
      position = multi_position(plotlayout, $
@@ -42,8 +47,6 @@ function data_graphics, imgdata,xdata,ydata, $
      max_abs = max(abs(imgdata))
      min_value = -max_abs
      max_value = max_abs
-
-     ;; rgb_table = 5
 
      xmajor = 5
      xminor = 1
@@ -112,10 +115,12 @@ function data_graphics, imgdata,xdata,ydata, $
         y1 = 0.50*(1+height)
         tickvalues = min_value + $
                      (max_value-min_value)*findgen(major)/(major-1)
+        ;;-->This is kind of a hack
+        if (major mod 2) ne 0 && (min_value+max_value eq 0) then $
+           tickvalues[major/2] = 0.0
+        ;;<--
         tickname = plusminus_labels(tickvalues,format='f8.2')
-        ;; title = "$\delta n/n_0$"+" "+colorbar_units
         clr = colorbar(position = [x0,y0,x1,y1], $
-                       ;; title = title, $
                        title = colorbar_title, $
                        orientation = 1, $
                        tickvalues = tickvalues, $
