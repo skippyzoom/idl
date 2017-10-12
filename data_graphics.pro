@@ -8,6 +8,9 @@
 ; TO DO
 ; -- Set up panel-specific colorbars. May require 
 ;    making img an array of object references.
+; -- Give user more control over min/max value. 
+;    Panel-specific colorbars will require panel-specific
+;    min/max, so this may need to connect to colorbar_type.
 ; -- Check for consistency between plotlayout and plotindex.
 ; -- Allow user to set middle of colorbar to zero? Some data
 ;    ranges cause the middle to be a very small +/- number,
