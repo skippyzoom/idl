@@ -12,14 +12,12 @@ function read_parameter_file, path, $
   if n_elements(name) eq 0 then name = 'ppic3d.i'
   if n_elements(comment) eq 0 then comment = ';'
 
-  ;; filename = expand_path(path+path_sep()+'ppic3d.i')
   filename = expand_path(path+path_sep()+name)
   openr, rlun,filename,/get_lun
   line = ''
   params = dictionary()
   for il=0,file_lines(filename)-1 do begin
      readf, rlun,line
-     ;; if ~strcmp(strmid(line,0,1),';') then begin
      if ~strcmp(strmid(line,0,1),comment) then begin
         eq_pos = strpos(line,'=')
         if eq_pos ge 0 then begin

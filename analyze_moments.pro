@@ -1,5 +1,3 @@
-;; pro moment_analysis
-
 ;+
 ; Analysis of moments*.out files. This program is based on
 ; moment_plots.pro (M. Oppenheim). 
@@ -13,28 +11,6 @@
 ; The original moment_plots.pro was written by Meers Oppenheim
 ; in May 2006. This version analyzes either pure PIC or hybrid
 ; runs, based on the value of efield_algorithm.
-;
-; Notes on nue_scale and nui_scale:
-;    Normally, moment_analysis.pro calculates the
-;    collision frequencies as a function of time
-;    via the Pedersen and Hall drifts for a subthreshold 
-;    run. Therefore, it may not find physically meaningful
-;    expressions when |E_0|=0. The appropriate scale factors
-;    may be used to scale the input collision frequency to
-;    the actual frequencies calculated during simulation runs.
-;
-;    Values for hybrid simulation came from the coupled FB/GD 
-;    project, using PPIC3D. Values for pure PIC have not been
-;    determined. 
-;
-;    Average collision frequencies may be unphysically high if
-;    the simulation runs for too few time steps for the calculated 
-;    frequency to have time to settle down. In that case, this 
-;    routine will reset the average collision frequency to the 
-;    scaled value.
-;
-; Set make_plots = 0 to suppress plotting when you only want 
-; this routine to calculate quantities for other routines.
 ;-
 
 function analyze_moments, ntMax
@@ -67,7 +43,6 @@ function analyze_moments, ntMax
   if (n_elements(Ey0_external) eq 0) then Ey0_external = 0.
   if (n_elements(Ez0_external) eq 0) then Ez0_external = 0.
   if n_elements(efield_algorithm) eq 0 then efield_algorithm = 0
-  if n_elements(make_plots) eq 0 then make_plots = 0B
   if n_elements(vx0d0) eq 0 then vx0d0 = 0.0
   if n_elements(vy0d0) eq 0 then vy0d0 = 0.0
   if n_elements(vz0d0) eq 0 then vz0d0 = 0.0
