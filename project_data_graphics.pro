@@ -14,7 +14,7 @@ pro project_data_graphics, target
   ;;==Build colorbar titles
   colorbar_title = target.data_label
 
-  ;;==Smooth data in space
+  ;;==Set up data smoothing
   if target.params.ndim_space eq 2 then smooth_widths = [0.1/target.params.dx, $
                                                          0.1/target.params.dy, $
                                                          1] $
@@ -23,23 +23,42 @@ pro project_data_graphics, target
                         0.1/target.params.dz, $
                         1]
 
+  ;;==Loop over all data quantities
   for ik=0,target.data.count()-1 do begin
+
+     ;;==Set up data for graphics routines
      imgdata = (target.data[name[ik]])[target.xrng[0]:target.xrng[1], $
                                        target.yrng[0]:target.yrng[1], $
                                        *]*target.scale[name[ik]]
      xdata = target.xvec[target.xrng[0]:target.xrng[1]]
      ydata = target.yvec[target.yrng[0]:target.yrng[1]]
      colorbar_title = target.data_label[name[ik]]+" "+target.units[name[ik]]
-     img = data_graphics(imgdata,xdata,ydata, $
-                         plot_index = target.plot_index, $
-                         plot_layout = target.plot_layout, $
-                         rgb_table = target.rgb_table[name[ik]], $
-                         colorbar_type = target.colorbar_type, $
-                         colorbar_title = colorbar_title)
+
+     ;;==Create single- or multi-panel images
+     img = data_image(imgdata,xdata,ydata, $
+                      plot_index = target.plot_index, $
+                      plot_layout = target.plot_layout, $
+                      rgb_table = target.rgb_table[name[ik]], $
+                      colorbar_type = target.colorbar_type, $
+                      colorbar_title = colorbar_title)
      if target.haskey('img_desc') && ~strcmp(target.img_desc,'') then $
         filename = name[ik]+'-'+target.img_desc+target.img_type $
      else filename = name[ik]+target.img_type
      image_save, img,filename = target.path+path_sep()+filename,/landscape
+
+     ;;==Create movies (if requested)
+     if target.make_movies then begin
+        if target.haskey('mov_desc') && ~strcmp(target.mov_desc,'') then $
+           filename = name[ik]+'-'+target.mov_desc+target.mov_type $
+        else filename = name[ik]+target.mov_type
+        data_movie, imgdata,xdata,ydata, $
+                    filename = target.path+path_sep()+filename, $
+                    /timestamps, $
+                    rgb_table = target.rgb_table[name[ik]], $
+                    dimensions = target.dimensions[0:1], $
+                    colorbar_title = colorbar_title
+     endif
+
   endfor
 
   ;; case size(target.data.phi,/n_dim) of
