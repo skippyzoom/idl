@@ -64,9 +64,9 @@ function set_project_data, data,grid,target=target
      target['xrng'] = ranges.(target.transpose[0])
      target['yrng'] = ranges.(target.transpose[1])
      target['zrng'] = ranges.(target.transpose[2])
-     target['dimensions'] = [target.xrng[1]-target.xrng[0], $
-                             target.yrng[1]-target.yrng[0], $
-                             target.zrng[1]-target.zrng[0]]
+     target['dimensions'] = [target.xrng[1]-target.xrng[0]+1, $
+                             target.yrng[1]-target.yrng[0]+1, $
+                             target.zrng[1]-target.zrng[0]+1]
      target['xvec'] = vecs.(target.transpose[0])
      target['yvec'] = vecs.(target.transpose[1])
      target['zvec'] = vecs.(target.transpose[2])
