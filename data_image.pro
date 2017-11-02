@@ -1,6 +1,7 @@
 ;+
-; Routine for producing graphics of EPPIC data
-; from a project dictionary or data array.
+; Routine for producing single- or multi-panel 
+; images of EPPIC data from a project dictionary 
+; or data array.
 ;
 ; NOTES
 ; -- This function should remain independent of any project dictionary.
@@ -18,7 +19,7 @@
 ;    the tick name after formatting is '0.0'. There is a
 ;    work-around in place, so this isn't urgent.
 ;-
-function data_graphics, imgdata,xdata,ydata, $
+function data_image, imgdata,xdata,ydata, $
                         plot_index=plot_index, $
                         plot_layout=plot_layout, $
                         rgb_table=rgb_table, $
@@ -26,7 +27,7 @@ function data_graphics, imgdata,xdata,ydata, $
                         colorbar_title=colorbar_title
 
   if n_elements(imgdata) eq 0 then begin
-     print, "DATA_GRAPHICS: Please supply image array. No graphics produced."
+     print, "DATA_IMAGE: Please supply image array. No graphics produced."
      return, !NULL
   endif $
   else begin
@@ -108,7 +109,7 @@ function data_graphics, imgdata,xdata,ydata, $
                     /buffer)
 
         if strcmp(colorbar_type,'panel',5) then begin
-           print, "DATA_GRAPHICS: Panel-specific colorbar not implemented"
+           print, "DATA_IMAGE: Panel-specific colorbar not implemented"
         endif
      endfor
 
