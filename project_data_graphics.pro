@@ -56,6 +56,7 @@ pro project_data_graphics, target
                     /timestamps, $
                     rgb_table = target.rgb_table[name[ik]], $
                     dimensions = target.dimensions[0:1], $
+                    expand = target.movie_expand, $
                     colorbar_title = colorbar_title
      endif
 

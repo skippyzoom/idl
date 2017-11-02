@@ -18,6 +18,7 @@ pro analyze_project, path, $
   if ~target.haskey('img_type') then target.img_type = '.png'
   if ~target.haskey('mov_type') then target.mov_type = '.mp4'
   if ~target.haskey('make_movies') then target.make_movies = 0B
+  if ~target.haskey('movie_expand') then target.movie_expand = 1.0
   if ~target.haskey('colorbar_type') then target.colorbar_type = 'global'
   if ~target.haskey('plot_index') then target.plot_index = [0,1]
   if ~target.haskey('plot_layout') then target.plot_layout = [1,2]

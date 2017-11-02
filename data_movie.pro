@@ -17,6 +17,13 @@
 ;    user does not pass in the dimensions keyword, this routine 
 ;    sets it to [xsize,ysize], where xsize and ysize are derived 
 ;    from the input data array.
+; -- This routine automatically scales the data image to 80% of 
+;    the expansion factor (expand).
+;
+; TO DO
+; -- Make image scale independent of expand keyword.
+; -- Use different image scale factors for movies with 
+;    and without colorbar.
 ;-
 pro data_movie, movdata,xdata,ydata, $
                 filename=filename, $
@@ -24,6 +31,7 @@ pro data_movie, movdata,xdata,ydata, $
                 timestamps=timestamps, $
                 rgb_table=rgb_table, $
                 dimensions=dimensions, $
+                expand=expand, $
                 colorbar_title=colorbar_title
 
   if n_elements(movdata) eq 0 then begin
@@ -48,6 +56,7 @@ pro data_movie, movdata,xdata,ydata, $
      if n_elements(framerate) eq 0 then framerate = 20
      if n_elements(rgb_table) eq 0 then rgb_table = 0
      if n_elements(dimensions) eq 0 then dimensions = [xsize,ysize]
+     if n_elements(expand) eq 0 then expand = 1.0
 
      ;;==Set up graphics parameters
      max_abs = max(abs(movdata))
@@ -73,13 +82,15 @@ pro data_movie, movdata,xdata,ydata, $
 
      ;;==Open video stream
      video = idlffvideowrite(filename)
-     stream = video.addvideostream(dimensions[0],dimensions[1],framerate)
+     stream = video.addvideostream(expand*dimensions[0], $
+                                   expand*dimensions[1], $
+                                   framerate)
 
      ;;==Write data to video stream
      for it=0,tsize-1 do begin
         img = image(movdata[*,*,it], $
                     xdata,ydata, $
-                    dimensions = dimensions, $
+                    dimensions = expand*dimensions, $
                     min_value = min_value, $
                     max_value = max_value, $
                     rgb_table = rgb_table, $
@@ -110,8 +121,7 @@ pro data_movie, movdata,xdata,ydata, $
                     font_size = 16.0, $
                     font_name = "Times", $
                     /buffer)
-
-        img.scale, 0.7,0.7
+        img.scale, 0.8*expand,0.8*expand
         if keyword_set(colorbar_title) then begin
            pos = img.position
            position = [pos[2]+0.02, $
@@ -123,7 +133,6 @@ pro data_movie, movdata,xdata,ydata, $
                           position = position, $
                           orientation = 1, $
                           textpos = 1)
-           clr.scale, 0.8,0.8
         endif
         if keyword_set(timestamps) then begin
                                 ;-->This may be possible with fill_background and
