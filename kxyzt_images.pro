@@ -12,8 +12,8 @@
 ;-
 function kxyzt_images, data, $
                        dx=dx,dy=dy, $
-                       plotindex=plotindex, $
-                       plotlayout=plotlayout, $
+                       plot_index=plot_index, $
+                       plot_layout=plot_layout, $
                        colorbar_type=colorbar_type
 
   if n_elements(dx) eq 0 then dx = 1.0
@@ -24,10 +24,10 @@ function kxyzt_images, data, $
   xdata = (2*!pi/(nx*dx))*(findgen(nx) - 0.5*nx)
   ydata = (2*!pi/(ny*dy))*(findgen(ny) - 0.5*ny)
 
-  if n_elements(plotindex) eq 0 then plotindex = 0
-  np = n_elements(plotindex)
-  if n_elements(plotlayout) eq 0 then plotlayout = [1,np]
-  position = multi_position(plotlayout, $
+  if n_elements(plot_index) eq 0 then plot_index = 0
+  np = n_elements(plot_index)
+  if n_elements(plot_layout) eq 0 then plot_layout = [1,np]
+  position = multi_position(plot_layout, $
                             edges=[0.12,0.10,0.80,0.80], $
                             buffers=[0.05,0.15])
 
@@ -54,10 +54,10 @@ function kxyzt_images, data, $
                     float(ytickvalues[ymajor-1]-ytickvalues[0])
 
   for ip=0,np-1 do begin
-     ;; imgdata = abs(fft(data[*,*,plotindex[ip]],/center))
+     ;; imgdata = abs(fft(data[*,*,plot_index[ip]],/center))
      ;; imgdata /= max(imgdata)
      ;; imgdata = 10*alog10(imgdata^2)
-     imgdata = data[*,*,plotindex[ip]]
+     imgdata = data[*,*,plot_index[ip]]
      imgdata /= max(imgdata)
      imgdata = 10*alog10(imgdata^2)
      img = image(imgdata,xdata,ydata, $

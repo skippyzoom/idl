@@ -26,14 +26,14 @@ function set_project_data, data,grid,target=target
      message, "Parameter 'grid' must be a struct"
 
   ;;==Set up untransposed vecs
-  if n_elements(target) ne 0 && target.haskey('rngs') then begin
-     rngs = {x: [target.rngs[0,0]*grid.nx,target.rngs[1,0]*grid.nx-1], $
-             y: [target.rngs[0,1]*grid.ny,target.rngs[1,1]*grid.ny-1], $
-             z: [target.rngs[0,2]*grid.nz,target.rngs[1,2]*grid.nz-1]}
-     target.remove, 'rngs'
+  if n_elements(target) ne 0 && target.haskey('ranges') then begin
+     ranges = {x: [target.ranges[0,0]*grid.nx,target.ranges[1,0]*grid.nx-1], $
+             y: [target.ranges[0,1]*grid.ny,target.ranges[1,1]*grid.ny-1], $
+             z: [target.ranges[0,2]*grid.nz,target.ranges[1,2]*grid.nz-1]}
+     target.remove, 'ranges'
   endif $
   else begin
-     rngs = {x: [0,grid.nx-1], $
+     ranges = {x: [0,grid.nx-1], $
              y: [0,grid.ny-1], $
              z: [0,grid.nz-1]}
   endelse
@@ -43,33 +43,33 @@ function set_project_data, data,grid,target=target
 
   ;;==Create or update project dictionary
   if n_elements(target) eq 0 then begin
-     xyzt = ([0,1,2,3])[0:d_size[0]-1]
+     transpose = ([0,1,2,3])[0:d_size[0]-1]
      target = dictionary('data', data[*], $
                          'grid', grid, $
-                         'xrng', rngs.(xyzt[0]), $
-                         'yrng', rngs.(xyzt[1]), $
-                         'zrng', rngs.(xyzt[2]), $
-                         'xvec', vecs.(xyzt[0]), $
-                         'yvec', vecs.(xyzt[1]), $
-                         'zvec', vecs.(xyzt[2]))
+                         'xrng', ranges.(transpose[0]), $
+                         'yrng', ranges.(transpose[1]), $
+                         'zrng', ranges.(transpose[2]), $
+                         'xvec', vecs.(transpose[0]), $
+                         'yvec', vecs.(transpose[1]), $
+                         'zvec', vecs.(transpose[2]))
      target['scale'] = make_array(target.data.count(),value=1.0)
-     target['xyzt'] = xyzt
+     target['transpose'] = transpose
   endif $
   else begin
-     if ~target.haskey('xyzt') then $
-        target['xyzt'] = ([0,1,2,3])[0:d_size[0]-1] $
-     else target['xyzt'] = (target['xyzt'])[0:d_size[0]-1]
+     if ~target.haskey('transpose') then $
+        target['transpose'] = ([0,1,2,3])[0:d_size[0]-1] $
+     else target['transpose'] = (target['transpose'])[0:d_size[0]-1]
      target['data'] = data[*]
      target['grid'] = grid
-     target['xrng'] = rngs.(target.xyzt[0])
-     target['yrng'] = rngs.(target.xyzt[1])
-     target['zrng'] = rngs.(target.xyzt[2])
+     target['xrng'] = ranges.(target.transpose[0])
+     target['yrng'] = ranges.(target.transpose[1])
+     target['zrng'] = ranges.(target.transpose[2])
      target['dimensions'] = [target.xrng[1]-target.xrng[0], $
                              target.yrng[1]-target.yrng[0], $
                              target.zrng[1]-target.zrng[0]]
-     target['xvec'] = vecs.(target.xyzt[0])
-     target['yvec'] = vecs.(target.xyzt[1])
-     target['zvec'] = vecs.(target.xyzt[2])
+     target['xvec'] = vecs.(target.transpose[0])
+     target['yvec'] = vecs.(target.transpose[1])
+     target['zvec'] = vecs.(target.transpose[2])
      if ~target.haskey('scale') then $
         target['scale'] = dictionary(target.data_name.toarray(), $
                                      make_array(target.data.count(),value=1.0)) $
@@ -83,18 +83,10 @@ function set_project_data, data,grid,target=target
   target['aspect_ratio'] = (1 + float(target.yrng[1]) - float(target.yrng[0]))/ $
                         (1 + float(target.xrng[1]) - float(target.xrng[0])) 
 
-  ;;==Transpose and scale data
-  ;; for ik=0,n_data-1 do begin ;This could also be a foreach loop
-  ;;    target.data[d_keys[ik]] = $
-  ;;       reform(transpose((data[d_keys[ik]])[rngs.x[0]:rngs.x[1], $
-  ;;                                         rngs.y[0]:rngs.y[1], $
-  ;;                                         rngs.z[0]:rngs.z[1], $
-  ;;                                         *],target.xyzt))*target.scale[d_keys[ik]]
-  ;; endfor
   ;;==Transpose data, if applicable
   for ik=0,n_data-1 do begin
-     if ~array_equal(target.xyzt,([0,1,2,3])[0:d_size[0]-1]) then begin
-        target.data[d_keys[ik]] = transpose(data[d_keys[ik]],target.xyzt)
+     if ~array_equal(target.transpose,([0,1,2,3])[0:d_size[0]-1]) then begin
+        target.data[d_keys[ik]] = transpose(data[d_keys[ik]],target.transpose)
      endif
      target.data[d_keys[ik]] = reform(target.data[d_keys[ik]])
   endfor

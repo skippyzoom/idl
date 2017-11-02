@@ -1,4 +1,6 @@
 ;+
+; ***Consider using DATA_GRAPHICS.PRO, which supersedes this routine***
+;
 ; Routine for producing graphics of EPPIC efield
 ; from a project dictionary or data array.
 ;
@@ -13,8 +15,11 @@
 ;-
 function efield_graphics, target=target, $
                           imgdata=imgdata,xdata=xdata,ydata=ydata, $
-                          plotindex=plotindex,plotlayout=plotlayout, $
+                          plot_index=plot_index,plot_layout=plot_layout, $
                           colorbar_type=colorbar_type
+
+  print, $
+     "***Consider using DATA_GRAPHICS.PRO, which supersedes this routine***"
 
   case 1 of
      keyword_set(target): begin
@@ -46,10 +51,10 @@ function efield_graphics, target=target, $
                  "or project dictionary"
   endcase
 
-  if n_elements(plotindex) eq 0 then plotindex = 0
-  np = n_elements(plotindex)
-  if n_elements(plotlayout) eq 0 then plotlayout = [1,np]
-  position = multi_position(plotlayout, $
+  if n_elements(plot_index) eq 0 then plot_index = 0
+  np = n_elements(plot_index)
+  if n_elements(plot_layout) eq 0 then plot_layout = [1,np]
+  position = multi_position(plot_layout, $
                             edges=[0.12,0.10,0.80,0.80], $
                             buffers=[0.00,0.10])
   max_abs = max(abs(imgdata))
@@ -72,7 +77,7 @@ function efield_graphics, target=target, $
   yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
 
   for ip=0,np-1 do begin
-     img = image(imgdata[*,*,plotindex[ip]],xdata,ydata, $
+     img = image(imgdata[*,*,plot_index[ip]],xdata,ydata, $
                  position = position[*,ip], $
                  min_value = min_value, $
                  max_value = max_value, $

@@ -43,10 +43,10 @@ pro project_spectral_graphics, target
      img = kxyzt_images(fftdata, $
                         dx = target.params.dx, $
                         dy = target.params.dy, $
-                        plotindex = target.plotindex, $
-                        plotlayout = target.plotlayout, $
+                        plot_index = target.plot_index, $
+                        plot_layout = target.plot_layout, $
                         colorbar_type = target.colorbar_type)
-     filename = name[ik]+'-kxyzt'+target.filetype
+     filename = name[ik]+'-kxyzt'+target.img_type
      image_save, img,filename = target.path+path_sep()+filename,/landscape
   endfor
 
@@ -56,7 +56,7 @@ pro project_spectral_graphics, target
   ;;                           dx = target.params.dx, $
   ;;                           dy = target.params.dy, $
   ;;                           colorbar_type = target.colorbar_type)
-  ;;    filename = name[ik]+'-fft_rms'+target.filetype
+  ;;    filename = name[ik]+'-fft_rms'+target.img_type
   ;;    image_save, img,filename = target.path+path_sep()+filename,/landscape
   ;; endfor
 
@@ -69,7 +69,7 @@ pro project_spectral_graphics, target
   ;;                       dy = target.params.dy*target.params.nout_avg, $
   ;;                       dt = target.params.dt*target.params.nout, $
   ;;                       colorbar_type = target.colorbar_type)
-  ;;    filename = name[ik]+'-kxyzw'+target.filetype
+  ;;    filename = name[ik]+'-kxyzw'+target.img_type
   ;;    image_save, img,filename = target.path+path_sep()+filename,/landscape
   ;; endfor
 

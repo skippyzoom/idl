@@ -3,7 +3,7 @@
 ; the specified path.
 ;
 ; TO DO
-; -- Check for consistency between plotlayout and plotindex?
+; -- Check for consistency between plot_layout and plot_index?
 ;    May be better to do that in graphics routines.
 ;-
 pro analyze_project, path, $
@@ -15,11 +15,11 @@ pro analyze_project, path, $
   if ~target.haskey('data_name') then target.data_name = list('den1','phi')
   nNames = target.data_name.count()
   if ~target.haskey('data_type') then target.data_type = ['ph5','ph5']
-  if ~target.haskey('imgtype') then target.imgtype = '.png'
-  if ~target.haskey('movtype') then target.movtype = '.mp4'
+  if ~target.haskey('img_type') then target.img_type = '.png'
+  if ~target.haskey('mov_type') then target.mov_type = '.mp4'
   if ~target.haskey('colorbar_type') then target.colorbar_type = 'global'
-  if ~target.haskey('plotindex') then target.plotindex = [0,1]
-  if ~target.haskey('plotlayout') then target.plotlayout = [1,2]
+  if ~target.haskey('plot_index') then target.plot_index = [0,1]
+  if ~target.haskey('plot_layout') then target.plot_layout = [1,2]
   if ~target.haskey('rgb_table') then $
      target.rgb_table = dictionary(target.data_name.toarray(),make_array(nNames,value=0))
 
@@ -38,10 +38,10 @@ pro analyze_project, path, $
   target.params['nt_max'] = nt_max
 
   ;;==Set up graphics output steps
-  temp = floor(target.plotindex*nt_max)
+  temp = floor(target.plot_index*nt_max)
   ge_max = where(temp ge nt_max,count)
   if count gt 0 then temp[ge_max] = nt_max-1
-  target['plotindex'] = temp
+  target['plot_index'] = temp
 
   ;;==Load simulation data
   data = load_eppic_data(target.data_name.toarray(), $
@@ -52,7 +52,7 @@ pro analyze_project, path, $
   ;;==Pack up the project dictionary
   dKeys = data.keys()
   dSize = size(data[dKeys[0]])
-  if target.haskey('xyzt') then target['xyzt'] = target.xyzt[0:dSize[0]-1]
+  if target.haskey('transpose') then target['transpose'] = target.transpose[0:dSize[0]-1]
   target = set_project_data(data,target.grid,target=target[*])
 
   ;;==Set up appropriate units for graphics, based on target.scale

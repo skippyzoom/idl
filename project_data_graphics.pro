@@ -31,14 +31,14 @@ pro project_data_graphics, target
      ydata = target.yvec[target.yrng[0]:target.yrng[1]]
      colorbar_title = target.data_label[name[ik]]+" "+target.units[name[ik]]
      img = data_graphics(imgdata,xdata,ydata, $
-                         plotindex = target.plotindex, $
-                         plotlayout = target.plotlayout, $
+                         plot_index = target.plot_index, $
+                         plot_layout = target.plot_layout, $
                          rgb_table = target.rgb_table[name[ik]], $
                          colorbar_type = target.colorbar_type, $
                          colorbar_title = colorbar_title)
-     if target.haskey('imgdesc') && ~strcmp(target.imgdesc,'') then $
-        filename = name[ik]+'-'+target.imgdesc+target.imgtype $
-     else filename = name[ik]+target.imgtype
+     if target.haskey('img_desc') && ~strcmp(target.img_desc,'') then $
+        filename = name[ik]+'-'+target.img_desc+target.img_type $
+     else filename = name[ik]+target.img_type
      image_save, img,filename = target.path+path_sep()+filename,/landscape
   endfor
 

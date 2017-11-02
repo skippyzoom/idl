@@ -30,9 +30,9 @@ pro project_data_movies, target
      xdata = target.xvec[target.xrng[0]:target.xrng[1]]
      ydata = target.yvec[target.yrng[0]:target.yrng[1]]
      colorbar_title = target.data_label[name[ik]]+" "+target.units[name[ik]]
-     if target.haskey('movdesc') && ~strcmp(target.movdesc,'') then $
-        filename = name[ik]+'-'+target.movdesc+target.movtype $
-     else filename = name[ik]+target.movtype
+     if target.haskey('mov_desc') && ~strcmp(target.mov_desc,'') then $
+        filename = name[ik]+'-'+target.mov_desc+target.mov_type $
+     else filename = name[ik]+target.mov_type
      data_movie, imgdata,xdata,ydata, $
                  filename = target.path+path_sep()+filename, $
                  /timestamps, $

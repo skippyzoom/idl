@@ -1,4 +1,6 @@
 ;+
+; ***Consider using DATA_GRAPHICS.PRO, which supersedes this routine***
+;
 ; Routine for producing graphics of EPPIC electrostatic potential
 ; from a project dictionary or data array.
 ;
@@ -10,10 +12,13 @@
 ;    making img an array of object references.
 ;-
 function potential_graphics, imgdata,xdata,ydata, $
-                             plotindex=plotindex, $
-                             plotlayout=plotlayout, $
+                             plot_index=plot_index, $
+                             plot_layout=plot_layout, $
                              colorbar_type=colorbar_type, $
                              colorbar_units=colorbar_units
+
+  print, $
+     "***Consider using DATA_GRAPHICS.PRO, which supersedes this routine***"
 
   if n_elements(imgdata) eq 0 then begin
      print, "POTENTIAL_GRAPHICS: Please supply image array. No graphics produced."
@@ -27,13 +32,13 @@ function potential_graphics, imgdata,xdata,ydata, $
      ysize = imgsize[2]
      if n_elements(xdata) eq 0 then xdata = indgen(xsize)
      if n_elements(ydata) eq 0 then ydata = indgen(ysize)
-     if n_elements(plotindex) eq 0 then plotindex = 0
-     np = n_elements(plotindex)
-     if n_elements(plotlayout) eq 0 then plotlayout = [1,np]
+     if n_elements(plot_index) eq 0 then plot_index = 0
+     np = n_elements(plot_index)
+     if n_elements(plot_layout) eq 0 then plot_layout = [1,np]
      if n_elements(colorbar_type) eq 0 then colorbar_type = 'global'
      if n_elements(colorbar_units) eq 0 then colorbar_units = ''
 
-     position = multi_position(plotlayout, $
+     position = multi_position(plot_layout, $
                                edges=[0.12,0.10,0.80,0.80], $
                                buffers=[0.00,0.10])
      max_abs = max(abs(imgdata))
@@ -59,7 +64,7 @@ function potential_graphics, imgdata,xdata,ydata, $
 
      aspect_ratio = 1.0
      for ip=0,np-1 do begin
-        img = image(imgdata[*,*,plotindex[ip]],xdata,ydata, $
+        img = image(imgdata[*,*,plot_index[ip]],xdata,ydata, $
                     position = position[*,ip], $
                     min_value = min_value, $
                     max_value = max_value, $
