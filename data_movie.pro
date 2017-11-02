@@ -30,6 +30,7 @@ pro data_movie, movdata,xdata,ydata, $
      print, "DATA_MOVIE: Please supply image array. No movie produced."
   endif $
   else begin
+     print, "DATA_MOVIE: Creating ",filename
 
      ;;==Get data dimensions
      movdata = reform(movdata)
@@ -110,12 +111,20 @@ pro data_movie, movdata,xdata,ydata, $
                     font_name = "Times", $
                     /buffer)
 
-        if keyword_set(colorbar_title) then $
+        img.scale, 0.7,0.7
+        if keyword_set(colorbar_title) then begin
+           pos = img.position
+           position = [pos[2]+0.02, $
+                       pos[0]+0.03, $
+                       pos[2]+0.04, $
+                       pos[3]-0.02]
            clr = colorbar(target = img, $
                           title = colorbar_title, $
+                          position = position, $
                           orientation = 1, $
                           textpos = 1)
-
+           clr.scale, 0.8,0.8
+        endif
         if keyword_set(timestamps) then begin
                                 ;-->This may be possible with fill_background and
                                 ;   fill_color properties in text().
@@ -147,7 +156,8 @@ pro data_movie, movdata,xdata,ydata, $
 
      ;;==Close video stream
      video.cleanup
-     print, "DATA_MOVIE: Created ",filename
+     ;; print, "DATA_MOVIE: Created ",filename
+     print, "DATA_MOVIE: Finished"
 
   endelse
 
