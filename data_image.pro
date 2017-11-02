@@ -1,190 +1,147 @@
 ;+
-; Loop over image data to make a multi-panel image,
-; then save the image.
+; Routine for producing graphics of EPPIC data
+; from a project dictionary or data array.
 ;
-; This procedure assumes that the final dimension of
-; imgData and all panel-specific keywords is the loop 
-; dimension (e.g. time steps). It also assumes that 
-; xData and yData are the same for all panels.
+; NOTES
+; -- This function should remain independent of any project dictionary.
 ;
-; This procedure places panels according to user-supplied
-; position information or the layout keyword to image().
-; If the user did not pass position as a member of kw_image, 
-; this procedure will use the layout keyword with best 
-; guesses for numbers of columns and rows.
-; If the user passed position as a member of kw_image,
-; that will override the hardcoded layout keyword.
-;
-; TO DO:
-; -- Add text options.
-; -- Add axes-manipulation options.
-; -- Handle global colorbar and text separately?
-; -- Make the kw_colorbar block independent of the kw_image block?
-;    It should be rare to set the former without the latter but it
-;    would handle more cases. On the other hand, this routine would
-;    need to distinguish between panel-specific colorbars and a 
-;    global colorbar.
-; -- Consider passing in only kw struct/dictionary and extracting 
-;    individual dictionaries here. Update: This may be impractical,
-;    given the current project paradigm, since the prj dictionary
-;    is organized as prj.kw.<dataName>.<image,colorbar,etc.>. That 
-;    means this routine would need to explicitly know the dataName
-;    in order to extract the correct image, colorbar, etc. info.
+; TO DO
+; -- Set up panel-specific colorbars. May require 
+;    making img an array of object references.
+; -- Give user more control over min/max value. 
+;    Panel-specific colorbars will require panel-specific
+;    min/max, so this may need to connect to colorbar_type.
+; -- Check for consistency between plot_layout and plot_index.
+; -- Allow user to set middle of colorbar to zero? Some data
+;    ranges cause the middle to be a very small +/- number,
+;    which causes plusminus_labels to add a sign even though
+;    the tick name after formatting is '0.0'. There is a
+;    work-around in place, so this isn't urgent.
 ;-
+function data_graphics, imgdata,xdata,ydata, $
+                        plot_index=plot_index, $
+                        plot_layout=plot_layout, $
+                        rgb_table=rgb_table, $
+                        colorbar_type=colorbar_type, $
+                        colorbar_title=colorbar_title
 
-pro data_image, imgData,xData,yData, $
-                filename=filename, $
-                kw_image=kw_image, $
-                kw_colorbar=kw_colorbar, $
-                kw_text=kw_text, $
-                colorbar_on=colorbar_on, $
-                _EXTRA=ex
-
-  ;;==Check for global colorbar
-  global_colorbar = 0B
-  if n_elements(kw_colorbar) ne 0 && kw_colorbar.haskey('global') then begin
-     global_colorbar = kw_colorbar['global']
-     kw_colorbar.remove, 'global'
-  endif
-
-  ;;==Check for global text
-  global_text = 0B
-  if n_elements(kw_text) ne 0 && kw_text.haskey('global') then begin
-     global_text = kw_text['global']
-     kw_text.remove, 'global'
-  endif
-
-  ;;==Back-up keyword dictionaries
-  if keyword_set(kw_image) then kw_image_orig = kw_image[*]
-  if keyword_set(kw_colorbar) then kw_colorbar_orig = kw_colorbar[*]
-  if keyword_set(kw_text) then kw_text_orig = kw_text[*]
-
-  ;;==Get data dimensions
-  imgData = reform(imgData)
-  imgSize = size(imgData)
-  nx = imgSize[1]
-  ny = imgSize[2]
-  if n_elements(xData) eq 0 then xData = indgen(nx)
-  if n_elements(yData) eq 0 then yData = indgen(ny)
-
-  ;;==Create image
-  if imgSize[0] eq 3 then begin
-     np = imgSize[3]
-     if keyword_set(kw_image) then begin
-        nc = fix(sqrt(np))+((sqrt(np) mod 1) gt 0)
-        nr = nc
-        flag = get_timestep_kw(kw_image[*],'image')
-        for ip=0,np-1 do begin
-           nKeys = flag.count()
-           for ik=0,nKeys-1 do $
-              kw_image[flag[ik]] = reform((kw_image_orig[flag[ik]])[ip,*])
-           img = image(imgData[*,*,ip],xData,yData, $
-                       current = (ip gt 0), $
-                       layout = [nc,nr,ip+1], $
-                       _EXTRA = kw_image.tostruct())
-           if keyword_set(kw_colorbar) && ~global_colorbar then begin
-              kw_colorbar['position'] = reform(kw_colorbar_orig.position[ip,*])
-              clr = colorbar(target = img, $
-                             _EXTRA = kw_colorbar.tostruct())
-           endif
-           if keyword_set(kw_text) && ~global_text then begin ;UNTESTED
-              ;Possible approaches: 1) include X, Y, string, and 
-              ;format in kw_text and extract them here before
-              ;passing kw_text to text() via _EXTRA; 2) pass a
-              ;dedicated hash for X, Y, string, and format. I
-              ;think the first is better. Either way, we need
-              ;to check dimensions of those four to know if they
-              ;are panel-specific.
-              ;; txt = text(X, Y, string, format, _EXTRA=kw_text.tostruct())
-           endif
-        endfor
-        if global_colorbar then begin
-           kw_colorbar['position'] = reform(kw_colorbar_orig.position[0,*])
-           clr = colorbar(target = img, $
-                          _EXTRA = kw_colorbar.tostruct())
-        endif
-        if global_text then begin
-           print, "MULTI_IMAGE: global text not implemented yet."
-        endif
-     endif else begin ;kw_image
-        for ip=0,np-1 do begin
-           if n_elements(ex) ne 0 then $
-              ex = remove_tag(ex,'buffer',/quiet)
-           if tag_exist(ex,'layout',/quiet) then begin
-              img = image(imgData[*,*,ip],xData,yData, $
-                          /buffer, $
-                          current = (ip gt 0), $
-                          _EXTRA=ex)
-              if keyword_set(colorbar_on) then begin
-                 img_pos = img.position
-                 clr_pos = [img_pos[2]+0.01, $
-                            img_pos[1], $
-                            img_pos[2]+0.04, $
-                            img_pos[3]]
-                 clr = colorbar(target = img, $
-                                orientation = 1, $
-                                textpos = 1, $
-                                font_size = 6.0, $
-                                position = clr_pos)
-                 clr.scale, 0.50,0.75
-              endif
-           endif else begin
-              nc = fix(sqrt(np))+((sqrt(np) mod 1) gt 0)
-              nr = nc
-              img = image(imgData[*,*,ip],xData,yData, $
-                          /buffer, $
-                          current = (ip gt 0), $
-                          layout = [nc,nr,ip+1], $
-                          _EXTRA=ex)
-              if keyword_set(colorbar_on) then begin
-                 img_pos = img.position
-                 clr_pos = [img_pos[2]+0.01, $
-                            img_pos[1], $
-                            img_pos[2]+0.04, $
-                            img_pos[3]]
-                 clr = colorbar(target = img, $
-                                orientation = 1, $
-                                textpos = 1, $
-                                font_size = 6.0, $
-                                position = clr_pos)
-                 clr.scale, 0.50,0.75
-              endif
-           endelse
-        endfor
-     endelse
+  if n_elements(imgdata) eq 0 then begin
+     print, "DATA_GRAPHICS: Please supply image array. No graphics produced."
+     return, !NULL
+  endif $
+  else begin
      
-     ;;==Save image
-     image_save, img,filename=filename,/landscape
+     ;;==Get data dimensions
+     imgsize = size(imgdata)
+     xsize = imgsize[1]
+     ysize = imgsize[2]
+     if n_elements(xdata) eq 0 then xdata = indgen(xsize)
+     if n_elements(ydata) eq 0 then ydata = indgen(ysize)
 
-  endif else begin
-     ;;==Create single-panel image
-     if keyword_set(kw_image) then begin
-        img = image(imgData,xData,yData, $
-                    _EXTRA = kw_image.tostruct())
-        if keyword_set(kw_colorbar) then begin
-           clr = colorbar(target = img, $
-                          _EXTRA = kw_colorbar.tostruct())
+     ;;==Defaults and guards
+     if n_elements(plot_index) eq 0 then plot_index = 0
+     np = n_elements(plot_index)
+     if n_elements(plot_layout) eq 0 then plot_layout = [1,np]
+     if n_elements(rgb_table) eq 0 then rgb_table = 0
+     if n_elements(colorbar_type) eq 0 then colorbar_type = 'global'
+     if n_elements(colorbar_title) eq 0 then colorbar_title = ''
+
+     ;;==Set up graphics parameters
+     position = multi_position(plot_layout, $
+                               edges=[0.12,0.10,0.80,0.80], $
+                               buffers=[0.00,0.10])
+     max_abs = max(abs(imgdata))
+     min_value = -max_abs
+     max_value = max_abs
+
+     xmajor = 5
+     xminor = 1
+     xsize = n_elements(xdata)
+     xtickvalues = xdata[0] + $
+                   (1+xdata[xsize-1]-xdata[1])*indgen(xmajor)/(xmajor-1)
+     xtickname = strcompress(fix(xtickvalues),/remove_all)
+     xrange = [xtickvalues[0],xtickvalues[xmajor-1]]
+     ymajor = 5
+     yminor = 1
+     ysize = n_elements(ydata)
+     ytickvalues = ydata[0] + $
+                   (1+ydata[ysize-1]-ydata[1])*indgen(ymajor)/(ymajor-1)
+     ytickname = strcompress(fix(ytickvalues),/remove_all)
+     yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
+
+     aspect_ratio = 1.0
+
+     ;;==Create image panel(s)
+     for ip=0,np-1 do begin
+        img = image(imgdata[*,*,plot_index[ip]],xdata,ydata, $
+                    position = position[*,ip], $
+                    min_value = min_value, $
+                    max_value = max_value, $
+                    rgb_table = rgb_table, $
+                    axis_style = 1, $
+                    aspect_ratio = aspect_ratio, $
+                    xstyle = 1, $
+                    ystyle = 1, $
+                    xtitle = "Zonal [m]", $
+                    ytitle = "Vertical [m]", $
+                    xmajor = xmajor, $
+                    xminor = xminor, $
+                    ymajor = ymajor, $
+                    yminor = yminor, $
+                    xtickname = xtickname, $
+                    ytickname = ytickname, $
+                    xtickvalues = xtickvalues, $
+                    ytickvalues = ytickvalues, $
+                    xrange = xrange, $
+                    yrange = yrange, $
+                    xticklen = 0.02, $
+                    yticklen = 0.02*aspect_ratio, $
+                    xsubticklen = 0.5, $
+                    ysubticklen = 0.5, $
+                    xtickdir = 1, $
+                    ytickdir = 1, $
+                    xtickfont_size = 14.0, $
+                    ytickfont_size = 14.0, $
+                    font_size = 16.0, $
+                    font_name = "Times", $
+                    current = (ip gt 0), $
+                    /buffer)
+
+        if strcmp(colorbar_type,'panel',5) then begin
+           print, "DATA_GRAPHICS: Panel-specific colorbar not implemented"
         endif
-        if keyword_set(kw_text) then begin ;UNTESTED
-           ;See note in FOR loop above.
-           ;; txt = text(X, Y, string, format, _EXTRA=kw_text.tostruct())
-        endif
-     endif else begin ;kw_image
-        if n_elements(ex) ne 0 then $
-           ex = remove_tag(ex,'buffer',/quiet)
-        img = image(imgData,xData,yData, $
-                    /buffer, $
-                    _EXTRA = ex)
-     endelse
+     endfor
 
-     ;;==Save image
-     image_save, img,filename=filename,/landscape
+     if strcmp(colorbar_type,'global',6) then begin
+        major = 7
+        width = 0.0225
+        height = 0.20
+        buffer = 0.03
+        x0 = max(position[2,*])+buffer
+        x1 = x0+width
+        y0 = 0.50*(1-height)
+        y1 = 0.50*(1+height)
+        tickvalues = min_value + $
+                     (max_value-min_value)*findgen(major)/(major-1)
+        ;;-->This is kind of a hack
+        if (major mod 2) ne 0 && (min_value+max_value eq 0) then $
+           tickvalues[major/2] = 0.0
+        ;;<--
+        tickname = plusminus_labels(tickvalues,format='f8.2')
+        clr = colorbar(position = [x0,y0,x1,y1], $
+                       title = colorbar_title, $
+                       orientation = 1, $
+                       tickvalues = tickvalues, $
+                       tickname = tickname, $
+                       textpos = 1, $
+                       tickdir = 1, $
+                       ticklen = 0.2, $
+                       major = major, $
+                       font_name = "Times", $
+                       font_size = 10.0)
+     endif
 
+     return, img
   endelse
-
-  ;;==Reset keyword structs
-  if keyword_set(kw_image) then kw_image = kw_image_orig[*]
-  if keyword_set(kw_colorbar) then kw_colorbar = kw_colorbar_orig[*]
-  if keyword_set(kw_text) then kw_text = kw_text_orig[*]
 
 end
