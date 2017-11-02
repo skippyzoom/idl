@@ -36,9 +36,9 @@ pro project_data_graphics, target
                          rgb_table = target.rgb_table[name[ik]], $
                          colorbar_type = target.colorbar_type, $
                          colorbar_title = colorbar_title)
-     if target.haskey('filedesc') && ~strcmp(target.filedesc,'') then $
-        filename = name[ik]+'-'+target.filedesc+target.filetype $
-     else filename = name[ik]+target.filetype
+     if target.haskey('imgdesc') && ~strcmp(target.imgdesc,'') then $
+        filename = name[ik]+'-'+target.imgdesc+target.imgtype $
+     else filename = name[ik]+target.imgtype
      image_save, img,filename = target.path+path_sep()+filename,/landscape
   endfor
 

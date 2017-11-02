@@ -37,9 +37,6 @@ function set_project_data, data,grid,target=target
              y: [0,grid.ny-1], $
              z: [0,grid.nz-1]}
   endelse
-  ;; vecs = {x: grid.x[rngs.x[0]:rngs.x[1]], $
-  ;;         y: grid.y[rngs.y[0]:rngs.y[1]], $
-  ;;         z: grid.z[rngs.z[0]:rngs.z[1]]} 
   vecs = {x: grid.x, $
           y: grid.y, $
           z: grid.z} 
@@ -67,6 +64,9 @@ function set_project_data, data,grid,target=target
      target['xrng'] = rngs.(target.xyzt[0])
      target['yrng'] = rngs.(target.xyzt[1])
      target['zrng'] = rngs.(target.xyzt[2])
+     target['dimensions'] = [target.xrng[1]-target.xrng[0], $
+                             target.yrng[1]-target.yrng[0], $
+                             target.zrng[1]-target.zrng[0]]
      target['xvec'] = vecs.(target.xyzt[0])
      target['yvec'] = vecs.(target.xyzt[1])
      target['zvec'] = vecs.(target.xyzt[2])

@@ -31,12 +31,14 @@ function data_graphics, imgdata,xdata,ydata, $
   endif $
   else begin
      
-     ;;==Defaults and guards
+     ;;==Get data dimensions
      imgsize = size(imgdata)
      xsize = imgsize[1]
      ysize = imgsize[2]
      if n_elements(xdata) eq 0 then xdata = indgen(xsize)
      if n_elements(ydata) eq 0 then ydata = indgen(ysize)
+
+     ;;==Defaults and guards
      if n_elements(plotindex) eq 0 then plotindex = 0
      np = n_elements(plotindex)
      if n_elements(plotlayout) eq 0 then plotlayout = [1,np]
@@ -44,6 +46,7 @@ function data_graphics, imgdata,xdata,ydata, $
      if n_elements(colorbar_type) eq 0 then colorbar_type = 'global'
      if n_elements(colorbar_title) eq 0 then colorbar_title = ''
 
+     ;;==Set up graphics parameters
      position = multi_position(plotlayout, $
                                edges=[0.12,0.10,0.80,0.80], $
                                buffers=[0.00,0.10])
@@ -67,6 +70,8 @@ function data_graphics, imgdata,xdata,ydata, $
      yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
 
      aspect_ratio = 1.0
+
+     ;;==Create image panel(s)
      for ip=0,np-1 do begin
         img = image(imgdata[*,*,plotindex[ip]],xdata,ydata, $
                     position = position[*,ip], $
