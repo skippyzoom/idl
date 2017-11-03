@@ -3,8 +3,6 @@
 ; Originally created for EPPIC simulation data.
 ;
 ; TO DO
-; -- Check target for available data and only call appropriate graphics
-;    functions.
 ;-
 pro project_data_graphics, target
 
@@ -48,15 +46,21 @@ pro project_data_graphics, target
 
      ;;==Create movies (if requested)
      if target.make_movies then begin
+        string_time = string(target.params.dt*target.params.nout* $
+                                 1e3* $
+                                 lindgen(target.params.nt_max), format='(f7.2)')
+        string_time = strcompress(string_time,/remove_all)+" ms"
         if target.haskey('mov_desc') && ~strcmp(target.mov_desc,'') then $
            filename = name[ik]+'-'+target.mov_desc+target.mov_type $
         else filename = name[ik]+target.mov_type
         data_movie, imgdata,xdata,ydata, $
                     filename = target.path+path_sep()+filename, $
-                    /timestamps, $
+                    ;; timestamps = target.movie_timestamps, $
+                    title = string_time, $
                     rgb_table = target.rgb_table[name[ik]], $
                     dimensions = target.dimensions[0:1], $
                     expand = target.movie_expand, $
+                    rescale = target.movie_rescale, $
                     colorbar_title = colorbar_title
      endif
 

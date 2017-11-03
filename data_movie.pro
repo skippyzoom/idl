@@ -21,17 +21,19 @@
 ;    the expansion factor (expand).
 ;
 ; TO DO
-; -- Make image scale independent of expand keyword.
 ; -- Use different image scale factors for movies with 
 ;    and without colorbar.
+; -- Allow different values of rescale for x and y.
 ;-
 pro data_movie, movdata,xdata,ydata, $
                 filename=filename, $
                 framerate=framerate, $
                 timestamps=timestamps, $
+                title=title, $
                 rgb_table=rgb_table, $
                 dimensions=dimensions, $
                 expand=expand, $
+                rescale=rescale, $
                 colorbar_title=colorbar_title
 
   if n_elements(movdata) eq 0 then begin
@@ -54,6 +56,15 @@ pro data_movie, movdata,xdata,ydata, $
      ;;==Defaults and guards
      if n_elements(filename) eq 0 then filename = 'data_movie.mp4'
      if n_elements(framerate) eq 0 then framerate = 20
+     case 1B of
+        (n_elements(title) eq 0): title = make_array(tsize,value = '')
+        (n_elements(title) eq 1): title = make_array(tsize,value = title)
+        (n_elements(title) eq tsize): ;Do nothing
+        else: begin
+           print, "DATA_MOVIE: Cannot use title (Incommensurate number of elements)."
+           title = make_array(tsize,value = '')
+        end
+     endcase
      if n_elements(rgb_table) eq 0 then rgb_table = 0
      if n_elements(dimensions) eq 0 then dimensions = [xsize,ysize]
      if n_elements(expand) eq 0 then expand = 1.0
@@ -90,6 +101,7 @@ pro data_movie, movdata,xdata,ydata, $
      for it=0,tsize-1 do begin
         img = image(movdata[*,*,it], $
                     xdata,ydata, $
+                    title = title[it], $
                     dimensions = expand*dimensions, $
                     min_value = min_value, $
                     max_value = max_value, $
@@ -121,13 +133,13 @@ pro data_movie, movdata,xdata,ydata, $
                     font_size = 16.0, $
                     font_name = "Times", $
                     /buffer)
-        img.scale, 0.8*expand,0.8*expand
+        img.scale, rescale*expand,rescale*expand
         if keyword_set(colorbar_title) then begin
            pos = img.position
            position = [pos[2]+0.02, $
-                       pos[0]+0.03, $
+                       pos[0]+0.15, $
                        pos[2]+0.04, $
-                       pos[3]-0.02]
+                       pos[3]-0.15]
            clr = colorbar(target = img, $
                           title = colorbar_title, $
                           position = position, $
