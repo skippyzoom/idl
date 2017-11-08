@@ -14,16 +14,12 @@ pro analyze_project, path, $
 
   ;;==Defaults and guards
   if n_elements(context) eq 0 then context = dictionary('data')
-  if ~context.haskey('data_name') then context.data_name = list('den1','phi')
-  nNames = context.data_name.count()
-  if ~context.haskey('data_type') then context.data_type = ['ph5','ph5']
-  ;; if ~context.haskey('img_type') then context.img_type = '.png'
-  ;; if ~context.haskey('mov_type') then context.mov_type = '.mp4'
-  ;; if ~context.haskey('make_movies') then context.make_movies = 0B
-  ;; if ~context.haskey('movie_timestamps') then context.movie_timestamps = 0B
-  ;; if ~context.haskey('movie_expand') then context.movie_expand = 1.0
-  ;; if ~context.haskey('movie_rescale') then context.movie_rescale = 1.0
-  ;; if ~context.haskey('colorbar_type') then context.colorbar_type = 'global'
+  ;; if ~context.haskey('data_name') then context.data_name = list('den1','phi')
+  ;; n_names = context.data_name.count()
+  ;; if ~context.haskey('data_type') then context.data_type = ['ph5','ph5']
+  n_names = context.data.name.count()
+  if ~context.data.haskey('name') then context.data.name = list('den1','phi')
+  if ~context.data.haskey('type') then context.data.type = ['ph5','ph5']
   if ~context.haskey('image') then $
      context.image = dictionary('type', '.png', $
                                 'desc', '')
@@ -49,7 +45,7 @@ pro analyze_project, path, $
   if ~context.panel.haskey('layout') then context.panel.layout = [1,2]
   if ~context.panel.haskey('show') then context.panel.show = 0B
   if ~context.haskey('rgb_table') then $
-     context.rgb_table = dictionary(context.data_name.toarray(),make_array(nNames,value=0))
+     context.rgb_table = dictionary(context.data.name.toarray(),make_array(n_names,value=0))
 
   ;;==Echo working path and store in project dictionary
   print, "ANALYZE_PROJECT: In ",path
@@ -72,20 +68,20 @@ pro analyze_project, path, $
   context.panel['index'] = temp
 
   ;;==Load simulation data
-  data = load_eppic_data(context.data_name.toarray(), $
-                         context.data_type, $
+  data = load_eppic_data(context.data.name.toarray(), $
+                         context.data.type, $
                          path = context.path, $
                          timestep = context.params.nout*lindgen(nt_max))
 
   ;;==Pack up the project dictionary
-  dKeys = data.keys()
-  dSize = size(data[dKeys[0]])
-  if context.haskey('transpose') then context['transpose'] = context.transpose[0:dSize[0]-1]
+  d_keys = data.keys()
+  d_size = size(data[d_keys[0]])
+  if context.haskey('transpose') then context['transpose'] = context.transpose[0:d_size[0]-1]
   context = set_project_data(data,context.grid,context=context[*])
 
   ;;==Set up appropriate units for graphics, based on context.scale
   set_data_units, context,context.params.units
-  context['data_label'] = set_data_labels(context.data_name.toarray())
+  context.data['label'] = set_data_labels(context.data.name.toarray())
 
   ;; ;;==Images of raw data
   ;; project_spatial_graphics, context

@@ -26,11 +26,26 @@ function set_project_data, data,grid,context=context
      message, "Parameter 'grid' must be a struct"
 
   ;;==Set up untransposed vecs
-  if n_elements(context) ne 0 && context.haskey('ranges') then begin
-     ranges = {x: [context.ranges[0,0]*grid.nx,context.ranges[1,0]*grid.nx-1], $
-               y: [context.ranges[0,1]*grid.ny,context.ranges[1,1]*grid.ny-1], $
-               z: [context.ranges[0,2]*grid.nz,context.ranges[1,2]*grid.nz-1]}
-     context.remove, 'ranges'
+  ;; if n_elements(context) ne 0 && context.haskey('ranges') then begin
+  ;;    ranges = {x: [context.ranges[0,0]*grid.nx,context.ranges[1,0]*grid.nx-1], $
+  ;;              y: [context.ranges[0,1]*grid.ny,context.ranges[1,1]*grid.ny-1], $
+  ;;              z: [context.ranges[0,2]*grid.nz,context.ranges[1,2]*grid.nz-1]}
+  ;;    context.remove, 'ranges'
+  ;; endif $
+  ;; else begin
+  ;;    ranges = {x: [0,grid.nx-1], $
+  ;;              y: [0,grid.ny-1], $
+  ;;              z: [0,grid.nz-1]}
+  ;; endelse
+  if (n_elements(context) ne 0) && $
+     (context.haskey('data') && context.data.haskey('ranges')) then begin
+     ranges = {x: [context.data.ranges[0,0]*grid.nx, $
+                   context.data.ranges[1,0]*grid.nx-1], $
+               y: [context.data.ranges[0,1]*grid.ny, $
+                   context.data.ranges[1,1]*grid.ny-1], $
+               z: [context.data.ranges[0,2]*grid.nz, $
+                   context.data.ranges[1,2]*grid.nz-1]}
+     context.data.remove, 'ranges'
   endif $
   else begin
      ranges = {x: [0,grid.nx-1], $
@@ -44,51 +59,64 @@ function set_project_data, data,grid,context=context
   ;;==Create or update project dictionary
   if n_elements(context) eq 0 then begin
      transpose = ([0,1,2,3])[0:d_size[0]-1]
-     context = dictionary('data', data[*], $
-                          'grid', grid, $
-                          'xrng', ranges.(transpose[0]), $
-                          'yrng', ranges.(transpose[1]), $
-                          'zrng', ranges.(transpose[2]), $
-                          'xvec', vecs.(transpose[0]), $
-                          'yvec', vecs.(transpose[1]), $
-                          'zvec', vecs.(transpose[2]))
-     context['scale'] = make_array(context.data.count(),value=1.0)
-     context['transpose'] = transpose
+     ;; context = dictionary('data', data[*], $
+     ;;                      'grid', grid, $
+     ;;                      'xrng', ranges.(transpose[0]), $
+     ;;                      'yrng', ranges.(transpose[1]), $
+     ;;                      'zrng', ranges.(transpose[2]), $
+     ;;                      'xvec', vecs.(transpose[0]), $
+     ;;                      'yvec', vecs.(transpose[1]), $
+     ;;                      'zvec', vecs.(transpose[2]))
+     ;; context['scale'] = make_array(context.data.count(),value=1.0)
+     ;; context['transpose'] = transpose
+     context = dictionary('data', dictionary(), $
+                          'grid', grid)
+     context.data['array'] = data[*]
+     context.data['transpose'] = transpose
+     context.data['xrng'] = ranges.(transpose[0])
+     context.data['yrng'] = ranges.(transpose[1])
+     context.data['zrng'] = ranges.(transpose[2])
+     context.data['xvec'] = vecs.(transpose[0])
+     context.data['yvec'] = vecs.(transpose[1])
+     context.data['zvec'] = vecs.(transpose[2])
+     context.data['scale'] = make_array(context.data.count(),value=1.0)
   endif $
   else begin
-     if ~context.haskey('transpose') then $
-        context['transpose'] = ([0,1,2,3])[0:d_size[0]-1] $
-     else context['transpose'] = (context['transpose'])[0:d_size[0]-1]
-     context['data'] = data[*]
-     context['grid'] = grid
-     context['xrng'] = ranges.(context.transpose[0])
-     context['yrng'] = ranges.(context.transpose[1])
-     context['zrng'] = ranges.(context.transpose[2])
-     context['dimensions'] = [context.xrng[1]-context.xrng[0]+1, $
-                              context.yrng[1]-context.yrng[0]+1, $
-                              context.zrng[1]-context.zrng[0]+1]
-     context['xvec'] = vecs.(context.transpose[0])
-     context['yvec'] = vecs.(context.transpose[1])
-     context['zvec'] = vecs.(context.transpose[2])
-     if ~context.haskey('scale') then $
-        context['scale'] = dictionary(context.data_name.toarray(), $
-                                      make_array(context.data.count(),value=1.0)) $
+     if ~context.haskey('data') then context.data = dictionary()
+     context.data['array'] = data[*]
+     context.data['grid'] = grid
+     if ~context.data.haskey('transpose') then $
+        context.data['transpose'] = ([0,1,2,3])[0:d_size[0]-1] $
+     else context.data['transpose'] = (context.data['transpose'])[0:d_size[0]-1]
+     context.data['xrng'] = ranges.(context.data.transpose[0])
+     context.data['yrng'] = ranges.(context.data.transpose[1])
+     context.data['zrng'] = ranges.(context.data.transpose[2])
+     context.data['dimensions'] = [context.data.xrng[1]-context.data.xrng[0]+1, $
+                                   context.data.yrng[1]-context.data.yrng[0]+1, $
+                                   context.data.zrng[1]-context.data.zrng[0]+1]
+     context.data['xvec'] = vecs.(context.data.transpose[0])
+     context.data['yvec'] = vecs.(context.data.transpose[1])
+     context.data['zvec'] = vecs.(context.data.transpose[2])
+     if ~context.data.haskey('scale') then $
+        context.name['scale'] = dictionary(context.data.name.toarray(), $
+                                           make_array(context.data.count(),value=1.0)) $
      else begin
-        missing = where(context.scale.haskey(d_keys) eq 0,count)
-        if count ne 0 then context.scale[d_keys[missing]] = 1.0  
+        missing = where(context.data.scale.haskey(d_keys) eq 0,count)
+        if count ne 0 then context.data.scale[d_keys[missing]] = 1.0  
      endelse
   endelse
 
   ;;==Calculate the aspect ratio (useful for images)
-  context['aspect_ratio'] = (1 + float(context.yrng[1]) - float(context.yrng[0]))/ $
-                            (1 + float(context.xrng[1]) - float(context.xrng[0])) 
+  context['aspect_ratio'] = (1 + float(context.data.yrng[1]) - float(context.data.yrng[0]))/ $
+                            (1 + float(context.data.xrng[1]) - float(context.data.xrng[0])) 
 
   ;;==Transpose data, if applicable
   for ik=0,n_data-1 do begin
-     if ~array_equal(context.transpose,([0,1,2,3])[0:d_size[0]-1]) then begin
-        context.data[d_keys[ik]] = transpose(data[d_keys[ik]],context.transpose)
+     if ~array_equal(context.data.transpose,([0,1,2,3])[0:d_size[0]-1]) then begin
+        context.data.array[d_keys[ik]] = transpose(data.array[d_keys[ik]], $
+                                                   context.data.transpose)
      endif
-     context.data[d_keys[ik]] = reform(context.data[d_keys[ik]])
+     context.data.array[d_keys[ik]] = reform(context.data.array[d_keys[ik]])
   endfor
 
   return, context
