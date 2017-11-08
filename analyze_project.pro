@@ -44,8 +44,8 @@ pro analyze_project, path, $
   if ~context.panel.haskey('index') then context.panel.index = [0,1]
   if ~context.panel.haskey('layout') then context.panel.layout = [1,2]
   if ~context.panel.haskey('show') then context.panel.show = 0B
-  if ~context.haskey('rgb_table') then $
-     context.rgb_table = dictionary(context.data.name.toarray(),make_array(n_names,value=0))
+  if ~context.image.haskey('rgb_table') then $
+     context.image.rgb_table = dictionary(context.data.name.toarray(),make_array(n_names,value=0))
 
   ;;==Echo working path and store in project dictionary
   print, "ANALYZE_PROJECT: In ",path
@@ -88,7 +88,7 @@ pro analyze_project, path, $
 
   ;; ;;==Images of spectrally transformed data
   ;; project_spectral_graphics, context
-STOP
+
   ;;==All images
   project_graphics, context
 
