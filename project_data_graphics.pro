@@ -4,72 +4,72 @@
 ;
 ; TO DO
 ;-
-pro project_data_graphics, target
+pro project_data_graphics, context
 
   ;;==Get data names
-  name = target.data.keys()
+  name = context.data.keys()
 
   ;;==Build colorbar titles
-  colorbar_title = target.data_label
+  colorbar_title = context.data_label
 
   ;;==Set up data smoothing
-  if target.params.ndim_space eq 2 then smooth_widths = [0.1/target.params.dx, $
-                                                         0.1/target.params.dy, $
-                                                         1] $
-  else smooth_widths = [0.1/target.params.dx, $
-                        0.1/target.params.dy, $
-                        0.1/target.params.dz, $
+  if context.params.ndim_space eq 2 then smooth_widths = [0.1/context.params.dx, $
+                                                          0.1/context.params.dy, $
+                                                          1] $
+  else smooth_widths = [0.1/context.params.dx, $
+                        0.1/context.params.dy, $
+                        0.1/context.params.dz, $
                         1]
 
   ;;==Loop over all data quantities
-  for ik=0,target.data.count()-1 do begin
+  for ik=0,context.data.count()-1 do begin
 
      ;;==Set up data for graphics routines
-     imgdata = (target.data[name[ik]])[target.xrng[0]:target.xrng[1], $
-                                       target.yrng[0]:target.yrng[1], $
-                                       *]*target.scale[name[ik]]
-     xdata = target.xvec[target.xrng[0]:target.xrng[1]]
-     ydata = target.yvec[target.yrng[0]:target.yrng[1]]
-     colorbar_title = target.data_label[name[ik]]+" "+target.units[name[ik]]
+     imgdata = (context.data[name[ik]])[context.xrng[0]:context.xrng[1], $
+                                        context.yrng[0]:context.yrng[1], $
+                                        *]*context.scale[name[ik]]
+     xdata = context.xvec[context.xrng[0]:context.xrng[1]]
+     ydata = context.yvec[context.yrng[0]:context.yrng[1]]
+     colorbar_title = context.data_label[name[ik]]+" "+context.units[name[ik]]
 
      ;;==Create single- or multi-panel images
      img = data_image(imgdata,xdata,ydata, $
-                      plot_index = target.plot_index, $
-                      plot_layout = target.plot_layout, $
-                      rgb_table = target.rgb_table[name[ik]], $
-                      colorbar_type = target.colorbar_type, $
+                      plot_index = context.plot_index, $
+                      plot_layout = context.plot_layout, $
+                      rgb_table = context.rgb_table[name[ik]], $
+                      colorbar_type = context.colorbar_type, $
                       colorbar_title = colorbar_title)
-     if target.haskey('img_desc') && ~strcmp(target.img_desc,'') then $
-        filename = name[ik]+'-'+target.img_desc+target.img_type $
-     else filename = name[ik]+target.img_type
-     image_save, img,filename = target.path+path_sep()+filename,/landscape
+     if context.haskey('img_desc') && ~strcmp(context.img_desc,'') then $
+        filename = name[ik]+'-'+context.img_desc+context.img_type $
+     else filename = name[ik]+context.img_type
+     image_save, img,filename = context.path+path_sep()+filename,/landscape
 
      ;;==Create movies (if requested)
-     if target.make_movies then begin
-        string_time = string(target.params.dt*target.params.nout* $
-                                 1e3* $
-                                 lindgen(target.params.nt_max), format='(f7.2)')
+     if context.make_movies then begin
+        string_time = string(context.params.dt*context.params.nout* $
+                             1e3* $
+                             lindgen(context.params.nt_max), format='(f7.2)')
         string_time = strcompress(string_time,/remove_all)+" ms"
-        if target.haskey('mov_desc') && ~strcmp(target.mov_desc,'') then $
-           filename = name[ik]+'-'+target.mov_desc+target.mov_type $
-        else filename = name[ik]+target.mov_type
+        if context.haskey('mov_desc') && ~strcmp(context.mov_desc,'') then $
+           filename = name[ik]+'-'+context.mov_desc+context.mov_type $
+        else filename = name[ik]+context.mov_type
         data_movie, imgdata,xdata,ydata, $
-                    filename = target.path+path_sep()+filename, $
+                    filename = context.path+path_sep()+filename, $
                     title = string_time, $
-                    rgb_table = target.rgb_table[name[ik]], $
-                    dimensions = target.dimensions[0:1], $
-                    expand = target.movie_expand, $
-                    rescale = target.movie_rescale, $
+                    rgb_table = context.rgb_table[name[ik]], $
+                    dimensions = context.dimensions[0:1], $
+                    expand = context.movie_expand, $
+                    rescale = context.movie_rescale, $
                     colorbar_title = colorbar_title
      endif
 
   endfor
 
-  ;; case size(target.data.phi,/n_dim) of
+  ;; case size(context.data.phi,/n_dim) of
   ;;    3: begin
   ;;       sw = max([floor(0.25/dx),1])
   ;;       smooth_widths = [sw,sw,1]
-  ;;       efield = calc_efield(smooth(target.data.phi,smooth_widths,/edge_wrap), $
+  ;;       efield = calc_efield(smooth(context.data.phi,smooth_widths,/edge_wrap), $
   ;;                            dx = dx, $
   ;;                            dy = dy, $
   ;;                            /verbose)
@@ -77,7 +77,7 @@ pro project_data_graphics, target
   ;;    4: begin
   ;;       sw = max([floor(0.25/dx),1])
   ;;       smooth_widths = [sw,sw,sw,1]
-  ;;       efield = calc_efield(smooth(target.data.phi,smooth_widths,/edge_wrap), $
+  ;;       efield = calc_efield(smooth(context.data.phi,smooth_widths,/edge_wrap), $
   ;;                            dx = dx, $
   ;;                            dy = dy, $
   ;;                            dz = dz, $
@@ -85,15 +85,15 @@ pro project_data_graphics, target
   ;;    end
   ;; endcase
 
-  ;; efield = grad_scalar_xyzt(target.data.phi, $
-  ;;                           dx = target.grid.dx, $
-  ;;                           dy = target.grid.dy, $
-  ;;                           dz = target.grid.dz, $
+  ;; efield = grad_scalar_xyzt(context.data.phi, $
+  ;;                           dx = context.grid.dx, $
+  ;;                           dy = context.grid.dy, $
+  ;;                           dz = context.grid.dz, $
   ;;                           scale = -1.0, $
   ;;                           /verbose)
-  ;; efield.x += target.params.Ex0_external
-  ;; efield.y += target.params.Ey0_external
-  ;; if target.params.ndim_space eq 3 then efield.z += target.params.Ez0_external
+  ;; efield.x += context.params.Ex0_external
+  ;; efield.y += context.params.Ey0_external
+  ;; if context.params.ndim_space eq 3 then efield.z += context.params.Ez0_external
   ;; efield = vector_transform(efield,['x','y'],['r','t'],/verbose)
 
 end
