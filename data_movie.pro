@@ -32,6 +32,12 @@ pro data_movie, movdata,xdata,ydata, $
                 timestamps=timestamps, $
                 title=title, $
                 rgb_table=rgb_table, $
+                min_value=min_value, $
+                max_value=max_value, $
+                xtitle=xtitle, $
+                ytitle=ytitle, $
+                xrange=xrange, $
+                yrange=yrange, $
                 dimensions=dimensions, $
                 expand=expand, $
                 rescale=rescale, $
@@ -67,28 +73,61 @@ pro data_movie, movdata,xdata,ydata, $
         end
      endcase
      if n_elements(rgb_table) eq 0 then rgb_table = 0
+     if n_elements(min_value) eq 0 then min_value = !NULL
+     if n_elements(max_value) eq 0 then max_value = !NULL
+     if n_elements(xtitle) eq 0 then xtitle = ''
+     if n_elements(ytitle) eq 0 then ytitle = ''
      if n_elements(dimensions) eq 0 then dimensions = [xsize,ysize]
      if n_elements(expand) eq 0 then expand = 1.0
 
      ;;==Set up graphics parameters
-     max_abs = max(abs(movdata))
-     min_value = -max_abs
-     max_value = max_abs
+     ;; max_abs = max(abs(movdata))
+     ;; min_value = -max_abs
+     ;; max_value = max_abs
 
-     xmajor = 5
-     xminor = 1
-     xsize = n_elements(xdata)
-     xtickvalues = xdata[0] + $
-                   (1+xdata[xsize-1]-xdata[1])*indgen(xmajor)/(xmajor-1)
-     xtickname = strcompress(fix(xtickvalues),/remove_all)
-     xrange = [xtickvalues[0],xtickvalues[xmajor-1]]
-     ymajor = 5
-     yminor = 1
-     ysize = n_elements(ydata)
-     ytickvalues = ydata[0] + $
-                   (1+ydata[ysize-1]-ydata[1])*indgen(ymajor)/(ymajor-1)
-     ytickname = strcompress(fix(ytickvalues),/remove_all)
-     yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
+     ;; xmajor = 5
+     ;; xminor = 1
+     ;; xsize = n_elements(xdata)
+     ;; xtickvalues = xdata[0] + $
+     ;;               (1+xdata[xsize-1]-xdata[1])*indgen(xmajor)/(xmajor-1)
+     ;; xtickname = strcompress(fix(xtickvalues),/remove_all)
+     ;; xrange = [xtickvalues[0],xtickvalues[xmajor-1]]
+     ;; ymajor = 5
+     ;; yminor = 1
+     ;; ysize = n_elements(ydata)
+     ;; ytickvalues = ydata[0] + $
+     ;;               (1+ydata[ysize-1]-ydata[1])*indgen(ymajor)/(ymajor-1)
+     ;; ytickname = strcompress(fix(ytickvalues),/remove_all)
+     ;; yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
+     if keyword_set(xrange) then begin
+        xtickvalues = [xrange[0],0.5*xrange[0],0,0.5*xrange[1],xrange[1]]
+        xmajor = n_elements(xtickvalues)
+        xminor = 1
+        xtickname = plusminus_labels(xtickvalues/!pi,format='i')
+     endif else begin
+        xmajor = 5
+        xminor = 1
+        xsize = n_elements(xdata)
+        xtickvalues = xdata[0] + $
+                      (1+xdata[xsize-1]-xdata[1])*indgen(xmajor)/(xmajor-1)
+        xtickname = strcompress(fix(xtickvalues),/remove_all)
+        xrange = [xtickvalues[0],xtickvalues[xmajor-1]]
+     endelse
+
+     if keyword_set(yrange) then begin
+        ytickvalues = [yrange[0],0.5*yrange[0],0,0.5*yrange[1],yrange[1]]
+        ymajor = n_elements(ytickvalues)
+        yminor = 1
+        ytickname = plusminus_labels(ytickvalues/!pi,format='i')
+     endif else begin
+        ymajor = 5
+        yminor = 1
+        ysize = n_elements(ydata)
+        ytickvalues = ydata[0] + $
+                      (1+ydata[ysize-1]-ydata[1])*indgen(ymajor)/(ymajor-1)
+        ytickname = strcompress(fix(ytickvalues),/remove_all)
+        yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
+     endelse
 
      aspect_ratio = 1.0
 
@@ -111,8 +150,10 @@ pro data_movie, movdata,xdata,ydata, $
                     aspect_ratio = aspect_ratio, $
                     xstyle = 1, $
                     ystyle = 1, $
-                    xtitle = "Zonal [m]", $
-                    ytitle = "Vertical [m]", $
+                    xtitle = xtitle, $
+                    ytitle = ytitle, $
+                    ;; xtitle = "Zonal [m]", $
+                    ;; ytitle = "Vertical [m]", $
                     xmajor = xmajor, $
                     xminor = xminor, $
                     ymajor = ymajor, $

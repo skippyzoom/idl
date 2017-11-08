@@ -9,9 +9,6 @@
 ; TO DO
 ; -- Set up panel-specific colorbars. May require 
 ;    making img an array of object references.
-; -- Give user more control over min/max value. 
-;    Panel-specific colorbars will require panel-specific
-;    min/max, so this may need to connect to colorbar_type.
 ; -- Check for consistency between plot_layout and plot_index.
 ; -- Allow user to set middle of colorbar to zero? Some data
 ;    ranges cause the middle to be a very small +/- number,
@@ -61,10 +58,6 @@ function data_image, imgdata,xdata,ydata, $
      position = multi_position(plot_layout, $
                                edges=[0.12,0.10,0.80,0.80], $
                                buffers=[0.00,0.10])
-
-     ;; max_abs = max(abs(imgdata))
-     ;; min_value = -max_abs
-     ;; max_value = max_abs
 
      if keyword_set(xrange) then begin
         xtickvalues = [xrange[0],0.5*xrange[0],0,0.5*xrange[1],xrange[1]]
@@ -148,8 +141,6 @@ function data_image, imgdata,xdata,ydata, $
         x1 = x0+width
         y0 = 0.50*(1-height)
         y1 = 0.50*(1+height)
-        ;; tickvalues = min_value + $
-        ;;              (max_value-min_value)*findgen(major)/(major-1)
         tickvalues = img.min_value[0] + $
                      (img.max_value[0]-img.min_value[0])*findgen(major)/(major-1)
         ;;-->This is kind of a hack
