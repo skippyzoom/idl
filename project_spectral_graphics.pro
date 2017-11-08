@@ -35,6 +35,7 @@ pro project_spectral_graphics, context
   ;; endfor  
 
   ;;==Spatial power as a function of time
+  graphics_class = 'kxyzt'
   for ik=0,context.data.count()-1 do begin
      datadims = size(context.data[name[ik]],/dim)
      nt = datadims[context.params.ndim_space]
@@ -46,7 +47,10 @@ pro project_spectral_graphics, context
                         plot_index = context.plot_index, $
                         plot_layout = context.plot_layout, $
                         colorbar_type = context.colorbar_type)
-     filename = name[ik]+'-kxyzt'+context.img_type
+     ;; filename = name[ik]+'-kxyzt'+context.img_type
+     if context.haskey('img_desc') && ~strcmp(context.img_desc,'') then $
+        filename = name[ik]+'_'+graphics_class+'-'+context.img_desc+context.img_type $
+     else filename = name[ik]+'_'+graphics_class+context.img_type
      image_save, img,filename = context.path+path_sep()+filename,/landscape
   endfor
 

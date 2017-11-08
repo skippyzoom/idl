@@ -20,11 +20,15 @@
 ;    work-around in place, so this isn't urgent.
 ;-
 function data_image, imgdata,xdata,ydata, $
-                        plot_index=plot_index, $
-                        plot_layout=plot_layout, $
-                        rgb_table=rgb_table, $
-                        colorbar_type=colorbar_type, $
-                        colorbar_title=colorbar_title
+                     plot_index=plot_index, $
+                     plot_layout=plot_layout, $
+                     rgb_table=rgb_table, $
+                     xtitle=xtitle, $
+                     ytitle=ytitle, $
+                     xrange=xrange, $
+                     yrange=yrange, $
+                     colorbar_type=colorbar_type, $
+                     colorbar_title=colorbar_title
 
   if n_elements(imgdata) eq 0 then begin
      print, "DATA_IMAGE: Please supply image array. No graphics produced."
@@ -44,6 +48,8 @@ function data_image, imgdata,xdata,ydata, $
      np = n_elements(plot_index)
      if n_elements(plot_layout) eq 0 then plot_layout = [1,np]
      if n_elements(rgb_table) eq 0 then rgb_table = 0
+     if n_elements(xtitle) eq 0 then xtitle = ''
+     if n_elements(ytitle) eq 0 then ytitle = ''
      if n_elements(colorbar_type) eq 0 then colorbar_type = 'global'
      if n_elements(colorbar_title) eq 0 then colorbar_title = ''
 
@@ -83,8 +89,8 @@ function data_image, imgdata,xdata,ydata, $
                     aspect_ratio = aspect_ratio, $
                     xstyle = 1, $
                     ystyle = 1, $
-                    xtitle = "Zonal [m]", $
-                    ytitle = "Vertical [m]", $
+                    xtitle = xtitle, $
+                    ytitle = ytitle, $
                     xmajor = xmajor, $
                     xminor = xminor, $
                     ymajor = ymajor, $
@@ -124,10 +130,10 @@ function data_image, imgdata,xdata,ydata, $
         y1 = 0.50*(1+height)
         ;; tickvalues = min_value + $
         ;;              (max_value-min_value)*findgen(major)/(major-1)
-        tickvalues = img.min_value + $
-                     (img.max_value-img.min_value)*findgen(major)/(major-1)
+        tickvalues = img.min_value[0] + $
+                     (img.max_value[0]-img.min_value[0])*findgen(major)/(major-1)
         ;;-->This is kind of a hack
-        if (major mod 2) ne 0 && (min_value+max_value eq 0) then $
+        if (major mod 2) ne 0 && (img.min_value[0]+img.max_value[0] eq 0) then $
            tickvalues[major/2] = 0.0
         ;;<--
         tickname = plusminus_labels(tickvalues,format='f8.2')

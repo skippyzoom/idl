@@ -110,8 +110,8 @@ function kxyzt_images, data, $
      y1 = 0.50*(1+height)
      ;; tickvalues = min_value + $
      ;;              (max_value-min_value)*findgen(major)/(major-1)
-     tickvalues = img.min_value + $
-                  (img.max_value-img.min_value)*findgen(major)/(major-1)
+     tickvalues = img.min_value[0] + $
+                  (img.max_value[0]-img.min_value[0])*findgen(major)/(major-1)
      tickname = plusminus_labels(tickvalues,format='i')
      clr = colorbar(title = "Power [dB]", $
                     target = img, $

@@ -1,6 +1,7 @@
 ;+
-; Routines for producing graphics of data from a project dictionary.
-; Originally created for EPPIC simulation data.
+; Routines for producing graphics of spatial data 
+; from a project dictionary. Originally created for 
+; EPPIC simulation data.
 ;
 ; TO DO
 ;-
@@ -22,6 +23,7 @@ pro project_spatial_graphics, context
                         1]
 
   ;;==Loop over all data quantities
+  graphics_class = 'space'
   for ik=0,context.data.count()-1 do begin
 
      ;;==Set up data for graphics routines
@@ -37,11 +39,13 @@ pro project_spatial_graphics, context
                       plot_index = context.plot_index, $
                       plot_layout = context.plot_layout, $
                       rgb_table = context.rgb_table[name[ik]], $
+                      xtitle = "Zonal [m]", $
+                      ytitle = "Vertical [m]", $
                       colorbar_type = context.colorbar_type, $
                       colorbar_title = colorbar_title)
      if context.haskey('img_desc') && ~strcmp(context.img_desc,'') then $
-        filename = name[ik]+'-'+context.img_desc+context.img_type $
-     else filename = name[ik]+context.img_type
+        filename = name[ik]+'_'+graphics_class+'-'+context.img_desc+context.img_type $
+     else filename = name[ik]+'_'+graphics_class+context.img_type
      image_save, img,filename = context.path+path_sep()+filename,/landscape
 
      ;;==Create movies (if requested)
@@ -51,8 +55,8 @@ pro project_spatial_graphics, context
                              lindgen(context.params.nt_max), format='(f7.2)')
         string_time = strcompress(string_time,/remove_all)+" ms"
         if context.haskey('mov_desc') && ~strcmp(context.mov_desc,'') then $
-           filename = name[ik]+'-'+context.mov_desc+context.mov_type $
-        else filename = name[ik]+context.mov_type
+           filename = name[ik]+'_'+graphics_class+'-'+context.mov_desc+context.mov_type $
+        else filename = name[ik]+'_'+graphics_class+context.mov_type
         data_movie, imgdata,xdata,ydata, $
                     filename = context.path+path_sep()+filename, $
                     title = string_time, $

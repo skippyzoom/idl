@@ -65,10 +65,13 @@ pro analyze_project, path, $
   set_data_units, context,context.params.units
   context['data_label'] = set_data_labels(context.data_name.toarray())
 
-  ;;==Images of raw data
-  project_spatial_graphics, context
+  ;; ;;==Images of raw data
+  ;; project_spatial_graphics, context
 
-  ;;==Images of spectrally transformed data
-  project_spectral_graphics, context
+  ;; ;;==Images of spectrally transformed data
+  ;; project_spectral_graphics, context
+
+  ;;==All images
+  project_graphics, context
 
 end
