@@ -9,7 +9,7 @@
 ; TO DO
 ; -- Set up panel-specific colorbars. May require 
 ;    making img an array of object references.
-; -- Check for consistency between plot_layout and plot_index.
+; -- Check for consistency between panel_layout and panel_index.
 ; -- Allow user to set middle of colorbar to zero? Some data
 ;    ranges cause the middle to be a very small +/- number,
 ;    which causes plusminus_labels to add a sign even though
@@ -17,8 +17,8 @@
 ;    work-around in place, so this isn't urgent.
 ;-
 function data_image, imgdata,xdata,ydata, $
-                     plot_index=plot_index, $
-                     plot_layout=plot_layout, $
+                     panel_index=panel_index, $
+                     panel_layout=panel_layout, $
                      rgb_table=rgb_table, $
                      min_value=min_value, $
                      max_value=max_value, $
@@ -43,9 +43,9 @@ function data_image, imgdata,xdata,ydata, $
      if n_elements(ydata) eq 0 then ydata = indgen(ysize)
 
      ;;==Defaults and guards
-     if n_elements(plot_index) eq 0 then plot_index = 0
-     np = n_elements(plot_index)
-     if n_elements(plot_layout) eq 0 then plot_layout = [1,np]
+     if n_elements(panel_index) eq 0 then panel_index = 0
+     np = n_elements(panel_index)
+     if n_elements(panel_layout) eq 0 then panel_layout = [1,np]
      if n_elements(rgb_table) eq 0 then rgb_table = 0
      if n_elements(min_value) eq 0 then min_value = !NULL
      if n_elements(max_value) eq 0 then max_value = !NULL
@@ -55,7 +55,7 @@ function data_image, imgdata,xdata,ydata, $
      if n_elements(colorbar_title) eq 0 then colorbar_title = ''
 
      ;;==Set up graphics parameters
-     position = multi_position(plot_layout, $
+     position = multi_position(panel_layout, $
                                edges=[0.12,0.10,0.80,0.80], $
                                buffers=[0.00,0.10])
 
@@ -93,7 +93,7 @@ function data_image, imgdata,xdata,ydata, $
 
      ;;==Create image panel(s)
      for ip=0,np-1 do begin
-        img = image(imgdata[*,*,plot_index[ip]],xdata,ydata, $
+        img = image(imgdata[*,*,panel_index[ip]],xdata,ydata, $
                     position = position[*,ip], $
                     min_value = min_value, $
                     max_value = max_value, $

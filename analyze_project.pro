@@ -3,7 +3,7 @@
 ; the specified path.
 ;
 ; TO DO
-; -- Check for consistency between plot_layout and plot_index?
+; -- Check for consistency between panel_layout and panel_index?
 ;    May be better to do that in graphics routines.
 ; -- Allow for single- or multi-plot images in plot_<index,layout>
 ;    defaults.
@@ -24,8 +24,8 @@ pro analyze_project, path, $
   if ~context.haskey('movie_expand') then context.movie_expand = 1.0
   if ~context.haskey('movie_rescale') then context.movie_rescale = 1.0
   if ~context.haskey('colorbar_type') then context.colorbar_type = 'global'
-  if ~context.haskey('plot_index') then context.plot_index = [0,1]
-  if ~context.haskey('plot_layout') then context.plot_layout = [1,2]
+  if ~context.haskey('panel_index') then context.panel_index = [0,1]
+  if ~context.haskey('panel_layout') then context.panel_layout = [1,2]
   if ~context.haskey('rgb_table') then $
      context.rgb_table = dictionary(context.data_name.toarray(),make_array(nNames,value=0))
 
@@ -44,10 +44,10 @@ pro analyze_project, path, $
   context.params['nt_max'] = nt_max
 
   ;;==Set up graphics output steps
-  temp = floor(context.plot_index*nt_max)
+  temp = floor(context.panel_index*nt_max)
   ge_max = where(temp ge nt_max,count)
   if count gt 0 then temp[ge_max] = nt_max-1
-  context['plot_index'] = temp
+  context['panel_index'] = temp
 
   ;;==Load simulation data
   data = load_eppic_data(context.data_name.toarray(), $

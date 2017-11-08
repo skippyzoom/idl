@@ -81,24 +81,7 @@ pro data_movie, movdata,xdata,ydata, $
      if n_elements(expand) eq 0 then expand = 1.0
 
      ;;==Set up graphics parameters
-     ;; max_abs = max(abs(movdata))
-     ;; min_value = -max_abs
-     ;; max_value = max_abs
 
-     ;; xmajor = 5
-     ;; xminor = 1
-     ;; xsize = n_elements(xdata)
-     ;; xtickvalues = xdata[0] + $
-     ;;               (1+xdata[xsize-1]-xdata[1])*indgen(xmajor)/(xmajor-1)
-     ;; xtickname = strcompress(fix(xtickvalues),/remove_all)
-     ;; xrange = [xtickvalues[0],xtickvalues[xmajor-1]]
-     ;; ymajor = 5
-     ;; yminor = 1
-     ;; ysize = n_elements(ydata)
-     ;; ytickvalues = ydata[0] + $
-     ;;               (1+ydata[ysize-1]-ydata[1])*indgen(ymajor)/(ymajor-1)
-     ;; ytickname = strcompress(fix(ytickvalues),/remove_all)
-     ;; yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
      if keyword_set(xrange) then begin
         xtickvalues = [xrange[0],0.5*xrange[0],0,0.5*xrange[1],xrange[1]]
         xmajor = n_elements(xtickvalues)
@@ -152,8 +135,6 @@ pro data_movie, movdata,xdata,ydata, $
                     ystyle = 1, $
                     xtitle = xtitle, $
                     ytitle = ytitle, $
-                    ;; xtitle = "Zonal [m]", $
-                    ;; ytitle = "Vertical [m]", $
                     xmajor = xmajor, $
                     xminor = xminor, $
                     ymajor = ymajor, $
@@ -219,7 +200,6 @@ pro data_movie, movdata,xdata,ydata, $
 
      ;;==Close video stream
      video.cleanup
-     ;; print, "DATA_MOVIE: Created ",filename
      print, "DATA_MOVIE: Finished"
 
   endelse

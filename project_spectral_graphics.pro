@@ -44,8 +44,8 @@ pro project_spectral_graphics, context
      img = kxyzt_images(fftdata, $
                         dx = context.params.dx, $
                         dy = context.params.dy, $
-                        plot_index = context.plot_index, $
-                        plot_layout = context.plot_layout, $
+                        panel_index = context.panel_index, $
+                        panel_layout = context.panel_layout, $
                         colorbar_type = context.colorbar_type)
      ;; filename = name[ik]+'-kxyzt'+context.img_type
      if context.haskey('img_desc') && ~strcmp(context.img_desc,'') then $

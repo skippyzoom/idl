@@ -36,8 +36,8 @@ pro project_spatial_graphics, context
 
      ;;==Create single- or multi-panel images
      img = data_image(imgdata,xdata,ydata, $
-                      plot_index = context.plot_index, $
-                      plot_layout = context.plot_layout, $
+                      panel_index = context.panel_index, $
+                      panel_layout = context.panel_layout, $
                       rgb_table = context.rgb_table[name[ik]], $
                       min_value = -max(abs(imgdata)), $
                       max_value = max(abs(imgdata)), $
