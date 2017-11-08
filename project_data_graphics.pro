@@ -55,7 +55,6 @@ pro project_data_graphics, target
         else filename = name[ik]+target.mov_type
         data_movie, imgdata,xdata,ydata, $
                     filename = target.path+path_sep()+filename, $
-                    ;; timestamps = target.movie_timestamps, $
                     title = string_time, $
                     rgb_table = target.rgb_table[name[ik]], $
                     dimensions = target.dimensions[0:1], $

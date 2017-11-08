@@ -62,8 +62,8 @@ function kxyzt_images, data, $
      imgdata = 10*alog10(imgdata^2)
      img = image(imgdata,xdata,ydata, $
                  position = position[*,ip], $
-                 min_value = min_value, $
-                 max_value = max_value, $
+                 ;; min_value = min_value, $
+                 ;; max_value = max_value, $
                  rgb_table = 39, $
                  axis_style = 1, $
                  aspect_ratio = aspect_ratio, $
@@ -108,8 +108,10 @@ function kxyzt_images, data, $
      x1 = x0+width
      y0 = 0.50*(1-height)
      y1 = 0.50*(1+height)
-     tickvalues = min_value + $
-                  (max_value-min_value)*findgen(major)/(major-1)
+     ;; tickvalues = min_value + $
+     ;;              (max_value-min_value)*findgen(major)/(major-1)
+     tickvalues = img.min_value + $
+                  (img.max_value-img.min_value)*findgen(major)/(major-1)
      tickname = plusminus_labels(tickvalues,format='i')
      clr = colorbar(title = "Power [dB]", $
                     target = img, $

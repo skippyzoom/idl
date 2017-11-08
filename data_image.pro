@@ -122,8 +122,10 @@ function data_image, imgdata,xdata,ydata, $
         x1 = x0+width
         y0 = 0.50*(1-height)
         y1 = 0.50*(1+height)
-        tickvalues = min_value + $
-                     (max_value-min_value)*findgen(major)/(major-1)
+        ;; tickvalues = min_value + $
+        ;;              (max_value-min_value)*findgen(major)/(major-1)
+        tickvalues = img.min_value + $
+                     (img.max_value-img.min_value)*findgen(major)/(major-1)
         ;;-->This is kind of a hack
         if (major mod 2) ne 0 && (min_value+max_value eq 0) then $
            tickvalues[major/2] = 0.0

@@ -28,14 +28,14 @@ function set_project_data, data,grid,target=target
   ;;==Set up untransposed vecs
   if n_elements(target) ne 0 && target.haskey('ranges') then begin
      ranges = {x: [target.ranges[0,0]*grid.nx,target.ranges[1,0]*grid.nx-1], $
-             y: [target.ranges[0,1]*grid.ny,target.ranges[1,1]*grid.ny-1], $
-             z: [target.ranges[0,2]*grid.nz,target.ranges[1,2]*grid.nz-1]}
+               y: [target.ranges[0,1]*grid.ny,target.ranges[1,1]*grid.ny-1], $
+               z: [target.ranges[0,2]*grid.nz,target.ranges[1,2]*grid.nz-1]}
      target.remove, 'ranges'
   endif $
   else begin
      ranges = {x: [0,grid.nx-1], $
-             y: [0,grid.ny-1], $
-             z: [0,grid.nz-1]}
+               y: [0,grid.ny-1], $
+               z: [0,grid.nz-1]}
   endelse
   vecs = {x: grid.x, $
           y: grid.y, $
@@ -81,7 +81,7 @@ function set_project_data, data,grid,target=target
 
   ;;==Calculate the aspect ratio (useful for images)
   target['aspect_ratio'] = (1 + float(target.yrng[1]) - float(target.yrng[0]))/ $
-                        (1 + float(target.xrng[1]) - float(target.xrng[0])) 
+                           (1 + float(target.xrng[1]) - float(target.xrng[0])) 
 
   ;;==Transpose data, if applicable
   for ik=0,n_data-1 do begin

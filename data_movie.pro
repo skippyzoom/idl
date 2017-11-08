@@ -24,6 +24,7 @@
 ; -- Use different image scale factors for movies with 
 ;    and without colorbar.
 ; -- Allow different values of rescale for x and y.
+; -- Improve or remove timestamps option.
 ;-
 pro data_movie, movdata,xdata,ydata, $
                 filename=filename, $
