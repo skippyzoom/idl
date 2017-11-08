@@ -3,9 +3,9 @@
 ; the specified path.
 ;
 ; TO DO
-; -- Check for consistency between panel_layout and panel_index?
+; -- Check for consistency between panel.layout and panel.index?
 ;    May be better to do that in graphics routines.
-; -- Allow for single- or multi-plot images in plot_<index,layout>
+; -- Allow for single- or multi-plot images in panel.<index,layout>
 ;    defaults.
 ;-
 pro analyze_project, path, $
@@ -24,8 +24,11 @@ pro analyze_project, path, $
   if ~context.haskey('movie_expand') then context.movie_expand = 1.0
   if ~context.haskey('movie_rescale') then context.movie_rescale = 1.0
   if ~context.haskey('colorbar_type') then context.colorbar_type = 'global'
-  if ~context.haskey('panel_index') then context.panel_index = [0,1]
-  if ~context.haskey('panel_layout') then context.panel_layout = [1,2]
+  if ~context.haskey('panel') then $
+     context.panel = dictionary('index', [0,1], 'layout', [1,2], 'show', 1B)
+  if ~context.panel.haskey('index') then context.panel.index = [0,1]
+  if ~context.panel.haskey('layout') then context.panel.layout = [1,2]
+  if ~context.panel.haskey('show') then context.panel.show = 0B
   if ~context.haskey('rgb_table') then $
      context.rgb_table = dictionary(context.data_name.toarray(),make_array(nNames,value=0))
 
@@ -44,10 +47,10 @@ pro analyze_project, path, $
   context.params['nt_max'] = nt_max
 
   ;;==Set up graphics output steps
-  temp = floor(context.panel_index*nt_max)
+  temp = floor(context.panel.index*nt_max)
   ge_max = where(temp ge nt_max,count)
   if count gt 0 then temp[ge_max] = nt_max-1
-  context['panel_index'] = temp
+  context.panel['index'] = temp
 
   ;;==Load simulation data
   data = load_eppic_data(context.data_name.toarray(), $
@@ -70,7 +73,7 @@ pro analyze_project, path, $
 
   ;; ;;==Images of spectrally transformed data
   ;; project_spectral_graphics, context
-
+STOP
   ;;==All images
   project_graphics, context
 
