@@ -4,7 +4,7 @@
 ;
 ; TO DO
 ;-
-pro project_data_graphics, context
+pro project_spatial_graphics, context
 
   ;;==Get data names
   name = context.data.keys()

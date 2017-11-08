@@ -66,7 +66,7 @@ pro analyze_project, path, $
   context['data_label'] = set_data_labels(context.data_name.toarray())
 
   ;;==Images of raw data
-  project_data_graphics, context
+  project_spatial_graphics, context
 
   ;;==Images of spectrally transformed data
   project_spectral_graphics, context
