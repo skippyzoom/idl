@@ -17,13 +17,32 @@ pro analyze_project, path, $
   if ~context.haskey('data_name') then context.data_name = list('den1','phi')
   nNames = context.data_name.count()
   if ~context.haskey('data_type') then context.data_type = ['ph5','ph5']
-  if ~context.haskey('img_type') then context.img_type = '.png'
-  if ~context.haskey('mov_type') then context.mov_type = '.mp4'
-  if ~context.haskey('make_movies') then context.make_movies = 0B
-  if ~context.haskey('movie_timestamps') then context.movie_timestamps = 0B
-  if ~context.haskey('movie_expand') then context.movie_expand = 1.0
-  if ~context.haskey('movie_rescale') then context.movie_rescale = 1.0
-  if ~context.haskey('colorbar_type') then context.colorbar_type = 'global'
+  ;; if ~context.haskey('img_type') then context.img_type = '.png'
+  ;; if ~context.haskey('mov_type') then context.mov_type = '.mp4'
+  ;; if ~context.haskey('make_movies') then context.make_movies = 0B
+  ;; if ~context.haskey('movie_timestamps') then context.movie_timestamps = 0B
+  ;; if ~context.haskey('movie_expand') then context.movie_expand = 1.0
+  ;; if ~context.haskey('movie_rescale') then context.movie_rescale = 1.0
+  ;; if ~context.haskey('colorbar_type') then context.colorbar_type = 'global'
+  if ~context.haskey('image') then $
+     context.image = dictionary('type', '.png', $
+                                'desc', '')
+  if ~context.image.haskey('type') then context.image.type = '.png'
+  if ~context.haskey('movie') then $
+     context.movie = dictionary('type', '.mp4', $
+                                'desc', '', $
+                                'make', 0B, $
+                                'timestamps', 0B, $
+                                'expand', 1.0, $
+                                'rescale', 1.0)
+  if ~context.movie.haskey('type') then context.movie.type = '.mp4'
+  if ~context.movie.haskey('desc') then context.movie.desc = ''
+  if ~context.movie.haskey('make') then context.movie.make = 0B
+  if ~context.movie.haskey('timestamps') then context.movie.timestamps = 0B
+  if ~context.movie.haskey('expand') then context.movie.expand = 1.0
+  if ~context.movie.haskey('rescale') then context.movie.rescale = 1.0
+  if ~context.haskey('colorbar') then $
+     context.colorbar = dictionary('type', 'global')
   if ~context.haskey('panel') then $
      context.panel = dictionary('index', [0,1], 'layout', [1,2], 'show', 1B)
   if ~context.panel.haskey('index') then context.panel.index = [0,1]
