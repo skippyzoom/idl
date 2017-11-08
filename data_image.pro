@@ -23,6 +23,8 @@ function data_image, imgdata,xdata,ydata, $
                      plot_index=plot_index, $
                      plot_layout=plot_layout, $
                      rgb_table=rgb_table, $
+                     min_value=min_value, $
+                     max_value=max_value, $
                      xtitle=xtitle, $
                      ytitle=ytitle, $
                      xrange=xrange, $
@@ -48,6 +50,8 @@ function data_image, imgdata,xdata,ydata, $
      np = n_elements(plot_index)
      if n_elements(plot_layout) eq 0 then plot_layout = [1,np]
      if n_elements(rgb_table) eq 0 then rgb_table = 0
+     if n_elements(min_value) eq 0 then min_value = !NULL
+     if n_elements(max_value) eq 0 then max_value = !NULL
      if n_elements(xtitle) eq 0 then xtitle = ''
      if n_elements(ytitle) eq 0 then ytitle = ''
      if n_elements(colorbar_type) eq 0 then colorbar_type = 'global'
@@ -57,24 +61,40 @@ function data_image, imgdata,xdata,ydata, $
      position = multi_position(plot_layout, $
                                edges=[0.12,0.10,0.80,0.80], $
                                buffers=[0.00,0.10])
-     max_abs = max(abs(imgdata))
-     min_value = -max_abs
-     max_value = max_abs
 
-     xmajor = 5
-     xminor = 1
-     xsize = n_elements(xdata)
-     xtickvalues = xdata[0] + $
-                   (1+xdata[xsize-1]-xdata[1])*indgen(xmajor)/(xmajor-1)
-     xtickname = strcompress(fix(xtickvalues),/remove_all)
-     xrange = [xtickvalues[0],xtickvalues[xmajor-1]]
-     ymajor = 5
-     yminor = 1
-     ysize = n_elements(ydata)
-     ytickvalues = ydata[0] + $
-                   (1+ydata[ysize-1]-ydata[1])*indgen(ymajor)/(ymajor-1)
-     ytickname = strcompress(fix(ytickvalues),/remove_all)
-     yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
+     ;; max_abs = max(abs(imgdata))
+     ;; min_value = -max_abs
+     ;; max_value = max_abs
+
+     if keyword_set(xrange) then begin
+        xtickvalues = [xrange[0],0.5*xrange[0],0,0.5*xrange[1],xrange[1]]
+        xmajor = n_elements(xtickvalues)
+        xminor = 1
+        xtickname = plusminus_labels(xtickvalues/!pi,format='i')
+     endif else begin
+        xmajor = 5
+        xminor = 1
+        xsize = n_elements(xdata)
+        xtickvalues = xdata[0] + $
+                      (1+xdata[xsize-1]-xdata[1])*indgen(xmajor)/(xmajor-1)
+        xtickname = strcompress(fix(xtickvalues),/remove_all)
+        xrange = [xtickvalues[0],xtickvalues[xmajor-1]]
+     endelse
+
+     if keyword_set(yrange) then begin
+        ytickvalues = [yrange[0],0.5*yrange[0],0,0.5*yrange[1],yrange[1]]
+        ymajor = n_elements(ytickvalues)
+        yminor = 1
+        ytickname = plusminus_labels(ytickvalues/!pi,format='i')
+     endif else begin
+        ymajor = 5
+        yminor = 1
+        ysize = n_elements(ydata)
+        ytickvalues = ydata[0] + $
+                      (1+ydata[ysize-1]-ydata[1])*indgen(ymajor)/(ymajor-1)
+        ytickname = strcompress(fix(ytickvalues),/remove_all)
+        yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
+     endelse
 
      aspect_ratio = 1.0
 
@@ -107,9 +127,9 @@ function data_image, imgdata,xdata,ydata, $
                     ysubticklen = 0.5, $
                     xtickdir = 1, $
                     ytickdir = 1, $
-                    xtickfont_size = 14.0, $
-                    ytickfont_size = 14.0, $
-                    font_size = 16.0, $
+                    xtickfont_size = 10.0, $
+                    ytickfont_size = 10.0, $
+                    font_size = 11.0, $
                     font_name = "Times", $
                     current = (ip gt 0), $
                     /buffer)
@@ -147,7 +167,7 @@ function data_image, imgdata,xdata,ydata, $
                        ticklen = 0.2, $
                        major = major, $
                        font_name = "Times", $
-                       font_size = 10.0)
+                       font_size = 8.0)
      endif
 
      return, img

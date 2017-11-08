@@ -1,11 +1,11 @@
 ;+
-; Routines for producing graphics of spatial data 
-; from a project dictionary. Originally created for 
+; Routines for producing graphics of data from 
+; a project dictionary. Originally created for 
 ; EPPIC simulation data.
 ;
 ; TO DO
 ;-
-pro project_spatial_graphics, context
+pro project_graphics, context
 
   ;;==Get data names
   name = context.data.keys()
@@ -13,18 +13,11 @@ pro project_spatial_graphics, context
   ;;==Build colorbar titles
   colorbar_title = context.data_label
 
-  ;;==Set up data smoothing
-  if context.params.ndim_space eq 2 then smooth_widths = [0.1/context.params.dx, $
-                                                          0.1/context.params.dy, $
-                                                          1] $
-  else smooth_widths = [0.1/context.params.dx, $
-                        0.1/context.params.dy, $
-                        0.1/context.params.dz, $
-                        1]
-
   ;;==Loop over all data quantities
-  graphics_class = 'space'
   for ik=0,context.data.count()-1 do begin
+
+     ;;==Create spatial graphics
+     graphics_class = 'space'
 
      ;;==Set up data for graphics routines
      imgdata = (context.data[name[ik]])[context.xrng[0]:context.xrng[1], $
@@ -69,37 +62,40 @@ pro project_spatial_graphics, context
                     colorbar_title = colorbar_title
      endif
 
+     ;;==Create spectral graphics without time transform
+     graphics_class = 'kxyzt'
+
+     datadims = size(context.data[name[ik]],/dim)
+     tsize = datadims[context.params.ndim_space]
+     wsize = next_power2(tsize)
+     fftdata = complexarr(context.grid.nx,context.grid.ny,wsize)*0.0
+     fftdata[*,*,0:tsize-1] = complex(context.data[name[ik]])
+     for iw=0,wsize-1 do fftdata[*,*,iw] = fft(fftdata[*,*,iw],/center)
+     imgdata = abs(fftdata)
+     for it=0,tsize-1 do imgdata[*,*,it] /= max(imgdata[*,*,it])
+     where_ne0 = where(imgdata ne float(0))
+     imgdata[where_ne0] = 10*alog10(imgdata[where_ne0]^2)
+     xdata = (2*!pi/(context.grid.nx*context.grid.dx))* $
+             (findgen(context.grid.nx) - 0.5*context.grid.nx)
+     ydata = (2*!pi/(context.grid.ny*context.grid.dy))* $
+             (findgen(context.grid.ny) - 0.5*context.grid.ny)
+     img = data_image(imgdata,xdata,ydata, $
+                      plot_index = context.plot_index, $
+                      plot_layout = context.plot_layout, $
+                      rgb_table = context.rgb_table[name[ik]], $
+                      min_value = -30, $
+                      max_value = 0, $
+                      xtitle = "$k_{zon}/\pi$ [m$^{-1}$]", $
+                      ytitle = "$k_{ver}/\pi$ [m$^{-1}$]", $
+                      xrange = [-4*!pi,4*!pi], $
+                      yrange = [-4*!pi,4*!pi], $
+                      colorbar_type = context.colorbar_type, $
+                      colorbar_title = colorbar_title)
+     if context.haskey('img_desc') && ~strcmp(context.img_desc,'') then $
+        filename = name[ik]+'_'+graphics_class+'-'+context.img_desc+context.img_type $
+     else filename = name[ik]+'_'+graphics_class+context.img_type
+     image_save, img,filename = context.path+path_sep()+filename,/landscape
+
   endfor
-
-  ;; case size(context.data.phi,/n_dim) of
-  ;;    3: begin
-  ;;       sw = max([floor(0.25/dx),1])
-  ;;       smooth_widths = [sw,sw,1]
-  ;;       efield = calc_efield(smooth(context.data.phi,smooth_widths,/edge_wrap), $
-  ;;                            dx = dx, $
-  ;;                            dy = dy, $
-  ;;                            /verbose)
-  ;;    end
-  ;;    4: begin
-  ;;       sw = max([floor(0.25/dx),1])
-  ;;       smooth_widths = [sw,sw,sw,1]
-  ;;       efield = calc_efield(smooth(context.data.phi,smooth_widths,/edge_wrap), $
-  ;;                            dx = dx, $
-  ;;                            dy = dy, $
-  ;;                            dz = dz, $
-  ;;                            /verbose)
-  ;;    end
-  ;; endcase
-
-  ;; efield = grad_scalar_xyzt(context.data.phi, $
-  ;;                           dx = context.grid.dx, $
-  ;;                           dy = context.grid.dy, $
-  ;;                           dz = context.grid.dz, $
-  ;;                           scale = -1.0, $
-  ;;                           /verbose)
-  ;; efield.x += context.params.Ex0_external
-  ;; efield.y += context.params.Ey0_external
-  ;; if context.params.ndim_space eq 3 then efield.z += context.params.Ez0_external
-  ;; efield = vector_transform(efield,['x','y'],['r','t'],/verbose)
 
 end
