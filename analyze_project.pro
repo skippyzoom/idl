@@ -13,39 +13,46 @@ pro analyze_project, path, $
                      verbose=verbose
 
   ;;==Defaults and guards
+  ;;--data
   if n_elements(context) eq 0 then context = dictionary('data',dictionary())
-  ;; if ~context.haskey('data_name') then context.data_name = list('den1','phi')
-  ;; n_names = context.data_name.count()
-  ;; if ~context.haskey('data_type') then context.data_type = ['ph5','ph5']
   if ~context.data.haskey('name') then context.data.name = list('den1','phi')
   n_names = context.data.name.count()
   if ~context.data.haskey('type') then context.data.type = ['ph5','ph5']
-  if ~context.haskey('image') then $
-     context.image = dictionary('type', '.png', $
-                                'desc', '')
-  if ~context.image.haskey('type') then context.image.type = '.png'
-  if ~context.haskey('movie') then $
-     context.movie = dictionary('type', '.mp4', $
-                                'desc', '', $
-                                'make', 0B, $
-                                'timestamps', 0B, $
-                                'expand', 1.0, $
-                                'rescale', 1.0)
-  if ~context.movie.haskey('type') then context.movie.type = '.mp4'
-  if ~context.movie.haskey('desc') then context.movie.desc = ''
-  if ~context.movie.haskey('make') then context.movie.make = 0B
-  if ~context.movie.haskey('timestamps') then context.movie.timestamps = 0B
-  if ~context.movie.haskey('expand') then context.movie.expand = 1.0
-  if ~context.movie.haskey('rescale') then context.movie.rescale = 1.0
-  if ~context.haskey('colorbar') then $
+  ;;--graphics
+  if ~context.haskey('graphics') then $
+     context.graphics = dictionary('image', dictionary(), $
+                                   'movie', dictionary(), $
+                                   'colorbar', dictionary())
+  if ~context.graphics.haskey('desc') then context.graphics.desc = ''
+  if ~context.graphics.haskey('rgb_table') then $
+     context.graphics.rgb_table = dictionary(context.data.name.toarray(), $
+                                             make_array(n_names,value=0))
+  ;;--graphics/image
+  if ~context.graphics.haskey('image') then $
+     context.graphics.image = dictionary('type', '.png')
+  if ~context.graphics.image.haskey('type') then context.graphics.image.type = '.png'
+  ;;--graphics/movie
+  if ~context.graphics.haskey('movie') then $
+     context.graphics.movie = dictionary('type', '.mp4', $
+                                         'make', 0B, $
+                                         'timestamps', 0B, $
+                                         'expand', 1.0, $
+                                         'rescale', 1.0)
+  if ~context.graphics.movie.haskey('type') then context.graphics.movie.type = '.mp4'
+  if ~context.graphics.movie.haskey('make') then context.graphics.movie.make = 0B
+  if ~context.graphics.movie.haskey('timestamps') then context.graphics.movie.timestamps = 0B
+  if ~context.graphics.movie.haskey('expand') then context.graphics.movie.expand = 1.0
+  if ~context.graphics.movie.haskey('rescale') then context.graphics.movie.rescale = 1.0
+  ;;--graphics/colorbar
+  if ~context.graphics.haskey('colorbar') then $
      context.colorbar = dictionary('type', 'global')
+  if ~context.graphics.colorbar.haskey('type') then context.graphics.colorbar.type = 'global'
+  ;;--panel
   if ~context.haskey('panel') then $
      context.panel = dictionary('index', [0,1], 'layout', [1,2], 'show', 1B)
   if ~context.panel.haskey('index') then context.panel.index = [0,1]
   if ~context.panel.haskey('layout') then context.panel.layout = [1,2]
   if ~context.panel.haskey('show') then context.panel.show = 0B
-  if ~context.image.haskey('rgb_table') then $
-     context.image.rgb_table = dictionary(context.data.name.toarray(),make_array(n_names,value=0))
 
   ;;==Echo working path and store in project dictionary
   print, "ANALYZE_PROJECT: In ",path
