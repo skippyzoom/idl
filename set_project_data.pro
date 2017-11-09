@@ -98,8 +98,8 @@ function set_project_data, data,grid,context=context
      context.data['yvec'] = vecs.(context.data.transpose[1])
      context.data['zvec'] = vecs.(context.data.transpose[2])
      if ~context.data.haskey('scale') then $
-        context.name['scale'] = dictionary(context.data.name.toarray(), $
-                                           make_array(context.data.count(),value=1.0)) $
+        context.data['scale'] = dictionary(context.data.name.toarray(), $
+                                           make_array(context.data.name.count(),value=1.0)) $
      else begin
         missing = where(context.data.scale.haskey(d_keys) eq 0,count)
         if count ne 0 then context.data.scale[d_keys[missing]] = 1.0  

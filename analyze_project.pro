@@ -13,12 +13,12 @@ pro analyze_project, path, $
                      verbose=verbose
 
   ;;==Defaults and guards
-  if n_elements(context) eq 0 then context = dictionary('data')
+  if n_elements(context) eq 0 then context = dictionary('data',dictionary())
   ;; if ~context.haskey('data_name') then context.data_name = list('den1','phi')
   ;; n_names = context.data_name.count()
   ;; if ~context.haskey('data_type') then context.data_type = ['ph5','ph5']
-  n_names = context.data.name.count()
   if ~context.data.haskey('name') then context.data.name = list('den1','phi')
+  n_names = context.data.name.count()
   if ~context.data.haskey('type') then context.data.type = ['ph5','ph5']
   if ~context.haskey('image') then $
      context.image = dictionary('type', '.png', $
