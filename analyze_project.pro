@@ -70,12 +70,6 @@ pro analyze_project, path, $
   nt_max = calc_timesteps(path,context.grid)
   context.params['nt_max'] = nt_max
 
-  ;;==Set up graphics output steps
-  temp = floor(context.panel.index*nt_max)
-  ge_max = where(temp ge nt_max,count)
-  if count gt 0 then temp[ge_max] = nt_max-1
-  context.panel['index'] = temp
-
   ;;==Load simulation data
   data = load_eppic_data(context.data.name.toarray(), $
                          context.data.type, $

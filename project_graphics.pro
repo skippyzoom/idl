@@ -13,6 +13,12 @@ pro project_graphics, context
   ;;==Build colorbar titles
   colorbar_title = context.data.label
 
+  ;;==Scale normalized panel indices
+  temp = floor(context.panel.index*context.params.nt_max)
+  ge_max = where(temp ge context.params.nt_max,count)
+  if count gt 0 then temp[ge_max] = context.params.nt_max-1
+  scaled_index = temp
+
   ;;==Loop over all data quantities
   for ik=0,context.data.array.count()-1 do begin
 
@@ -29,7 +35,7 @@ pro project_graphics, context
 
      ;;==Create single- or multi-panel images
      img = data_image(imgdata,xdata,ydata, $
-                      panel_index = context.panel.index, $
+                      panel_index = scaled_index, $
                       panel_layout = context.panel.layout, $
                       rgb_table = context.graphics.rgb_table[name[ik]], $
                       min_value = -max(abs(imgdata)), $
@@ -82,7 +88,7 @@ pro project_graphics, context
      ydata = (2*!pi/(context.grid.ny*context.grid.dy))* $
              (findgen(context.grid.ny) - 0.5*context.grid.ny)
      img = data_image(imgdata,xdata,ydata, $
-                      panel_index = context.panel.index, $
+                      panel_index = scaled_index, $
                       panel_layout = context.panel.layout, $
                       rgb_table = context.graphics.rgb_table[name[ik]], $
                       min_value = -30, $

@@ -39,6 +39,7 @@ function data_image, imgdata,xdata,ydata, $
      imgsize = size(imgdata)
      xsize = imgsize[1]
      ysize = imgsize[2]
+     tsize = imgsize[imgsize[0]]
      if n_elements(xdata) eq 0 then xdata = indgen(xsize)
      if n_elements(ydata) eq 0 then ydata = indgen(ysize)
 
@@ -93,7 +94,8 @@ function data_image, imgdata,xdata,ydata, $
 
      ;;==Create image panel(s)
      for ip=0,np-1 do begin
-        img = image(imgdata[*,*,panel_index[ip]],xdata,ydata, $
+        timestep = (panel_index[ip] le tsize-1) ? panel_index[ip] : tsize-1
+        img = image(imgdata[*,*,timestep],xdata,ydata, $
                     position = position[*,ip], $
                     min_value = min_value, $
                     max_value = max_value, $
