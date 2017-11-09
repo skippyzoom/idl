@@ -27,6 +27,8 @@ pro analyze_project, path, $
   if ~context.graphics.haskey('rgb_table') then $
      context.graphics.rgb_table = dictionary(context.data.name.toarray(), $
                                              make_array(n_names,value=0))
+  if ~context.graphics.haskey('class') then $
+     context.graphics.class = dictionary()
   ;;--graphics/image
   if ~context.graphics.haskey('image') then $
      context.graphics.image = dictionary('type', '.png')
