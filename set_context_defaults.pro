@@ -39,6 +39,8 @@ pro set_context_defaults, context
               context.graphics.rgb_table[name[id]] = 0
         endfor
      endelse
+     if ~context.graphics.rgb_table.haskey('fft') then $
+        context.graphics.rgb_table.fft = 0
      ;;==graphics/IMAGE
      if ~context.graphics.haskey('image') then $
         context.graphics.image = dictionary()
