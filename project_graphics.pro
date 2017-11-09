@@ -83,10 +83,14 @@ pro project_graphics, context
      for it=0,tsize-1 do imgdata[*,*,it] /= max(imgdata[*,*,it])
      where_ne0 = where(imgdata ne float(0))
      imgdata[where_ne0] = 10*alog10(imgdata[where_ne0]^2)
-     xdata = (2*!pi/(context.grid.nx*context.grid.dx))* $
-             (findgen(context.grid.nx) - 0.5*context.grid.nx)
-     ydata = (2*!pi/(context.grid.ny*context.grid.dy))* $
-             (findgen(context.grid.ny) - 0.5*context.grid.ny)
+     ;; xdata = (2*!pi/(context.grid.nx*context.grid.dx))* $
+     ;;         (findgen(context.grid.nx) - 0.5*context.grid.nx)
+     ;; ydata = (2*!pi/(context.grid.ny*context.grid.dy))* $
+     ;;         (findgen(context.grid.ny) - 0.5*context.grid.ny)
+     xlen = context.grid.nx*context.params.nout_avg*context.grid.dx
+     ylen = context.grid.ny*context.params.nout_avg*context.grid.dy
+     xdata = (2*!pi/xlen)*(findgen(context.grid.nx) - 0.5*context.grid.nx)
+     ydata = (2*!pi/ylen)*(findgen(context.grid.ny) - 0.5*context.grid.ny)
      img = data_image(imgdata,xdata,ydata, $
                       panel_index = scaled_index, $
                       panel_layout = context.panel.layout, $
