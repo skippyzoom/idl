@@ -28,7 +28,13 @@ pro set_context_defaults, context
      if ~context.haskey('graphics') then context.graphics = dictionary()
      if ~context.graphics.haskey('desc') then context.graphics.desc = ''
      if ~context.graphics.haskey('class') then $
-        context.graphics.class = dictionary()
+        context.graphics.class = list('space','kxyzt')
+     ;;==graphics/AXES
+     if ~context.graphics.haskey('axes') then context.graphics.axes = dictionary()
+     if ~context.graphics.axes.haskey('xtitle') then $
+        context.graphics.axes.xtitle = dictionary(context.graphics.class.toarray(), ['x','$k_x$'])
+     if ~context.graphics.axes.haskey('ytitle') then $
+        context.graphics.axes.ytitle = dictionary(context.graphics.class.toarray(), ['y','$k_y$'])
      ;;==graphics/RGB_TABLE
      if ~context.graphics.haskey('rgb_table') then $
         context.graphics.rgb_table = dictionary(context.data.name.toarray(), $

@@ -13,9 +13,11 @@ pro analyze_project, path, $
                      verbose=verbose
 
   ;;==Defaults and guards
+  spawn, 'pwd',wd
+  if n_elements(path) eq 0 then path = wd
   if n_elements(context) eq 0 then context = load_default_context() $
   else set_context_defaults, context
-
+STOP
   ;;==Echo working path and store in project dictionary
   print, "ANALYZE_PROJECT: In ",path
   context['path'] = path

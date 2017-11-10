@@ -24,7 +24,13 @@ function load_default_context
   ;;==GRAPHICS
   context['graphics'] = dictionary()
   context.graphics['desc'] = ''
-  context.graphics['class'] = list()
+  context.graphics['class'] = list('space','kxyzt')
+  ;;==graphics/AXES
+  context.graphics['axes'] = dictionary()
+  context.graphics.axes['xtitle'] = $
+     dictionary(context.graphics.class.toarray(), ['x','$k_x$'])
+  context.graphics.axes['ytitle'] = $
+     dictionary(context.graphics.class.toarray(), ['y','$k_y$'])
   ;;==graphics/RGB_TABLE
   context.graphics['rgb_table'] = dictionary(context.data.name.toarray(), $
                                              make_array(n_names,value=0))
