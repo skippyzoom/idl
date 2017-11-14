@@ -49,6 +49,20 @@ pro set_context_defaults, context
      ;;==graphics/SMOOTH
      if ~context.graphics.haskey('smooth') then $
         context.graphics.smooth = [1,1,1,1]
+     case n_elements(context.graphics.smooth) of 
+        1: begin
+           temp = context.graphics.smooth
+           context.graphics.remove, 'smooth'
+           context.graphics['smooth'] = make_array(context.params.ndim_space,value=temp)
+        end
+        4: ;Do nothing
+        else: begin 
+           print, "SET_CONTEXT_DEFAULTS: Smoothing width may be a scalar value or 4-D array"
+           print, "                      with a smoothing width for each of x, y, z, and t."
+           print, "                      Setting context.graphics.smooth = [1,1,1,1]"
+           context.graphics.smooth = [1,1,1,1]
+        end
+     endcase
      ;;==graphics/IMAGE
      if ~context.graphics.haskey('image') then $
         context.graphics.image = dictionary()

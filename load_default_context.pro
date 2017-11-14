@@ -2,6 +2,11 @@
 ; Load a context dictionary with default values.
 ; The user can call this within a batch script, then
 ; pass the context to analyze_project.pro
+;
+; TO DO
+; -- Allow user to query a particular parameter. That
+;    option would allow set_context_default.pro to
+;    remain consisent with this function.
 ;-
 function load_default_context
 
@@ -35,6 +40,8 @@ function load_default_context
   context.graphics['rgb_table'] = dictionary(context.data.name.toarray(), $
                                              make_array(n_names,value=0))
   context.graphics.rgb_table['fft'] = 0
+  ;;==graphics/SMOOTH
+  context.graphics.smooth = [1,1,1,1]
   ;;==graphics/IMAGE
   context.graphics['image'] = dictionary('type', '.png')
   ;;==graphics/MOVIE
