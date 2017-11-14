@@ -1,7 +1,6 @@
 ;+
-; Check for necessary fields in a user-supplied
-; project context and set default values where
-; necessary.
+; Provide default values for missing parameters in
+; a user-supplied project context.
 ;-
 pro set_context_defaults, context
 
@@ -47,6 +46,9 @@ pro set_context_defaults, context
      endelse
      if ~context.graphics.rgb_table.haskey('fft') then $
         context.graphics.rgb_table.fft = 0
+     ;;==graphics/SMOOTH
+     if ~context.graphics.haskey('smooth') then $
+        context.graphics.smooth = [1,1,1,1]
      ;;==graphics/IMAGE
      if ~context.graphics.haskey('image') then $
         context.graphics.image = dictionary()
