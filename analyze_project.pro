@@ -19,27 +19,12 @@ pro analyze_project, path, $
   spawn, 'pwd',wd
   if n_elements(path) eq 0 then path = wd
   if n_elements(context) eq 0 then begin
-     context = load_default_context()
-     ;; context['path'] = path
-     ;; context['params'] = set_eppic_params(path)
-     ;; context['grid'] = set_grid(path)
-     ;; nt_max = calc_timesteps(path,context.grid)
-     ;; context.params['nt_max'] = nt_max
+     context = load_default_context(path=path)
   endif $
   else begin
      context['path'] = path
      set_context_defaults, context
   endelse
-
-  ;;==Read the input file
-  ;; context['params'] = set_eppic_params(path)
-
-  ;;==Assign grid to project
-  ;; context['grid'] = set_grid(path)
-
-  ;;==Calculate max number of time steps available
-  ;; nt_max = calc_timesteps(path,context.grid)
-  ;; context.params['nt_max'] = nt_max
 
   ;;==Load simulation data
   data = load_eppic_data(context.data.name.toarray(), $
@@ -47,13 +32,13 @@ pro analyze_project, path, $
                          path = context.path, $
                          timestep = context.params.nout*lindgen(context.params.nt_max))
 
-  ;;==Pack up the project dictionary
+  ;;==Set up data for graphics
   d_keys = data.keys()
   d_size = size(data[d_keys[0]])
   if context.haskey('transpose') then context['transpose'] = context.transpose[0:d_size[0]-1]
   context = set_project_data(data,context.grid,context=context[*])
 
-  ;;==Set up appropriate units for graphics, based on context.scale
+  ;;==Set appropriate units for graphics
   set_data_units, context,context.params.units
   context.data['label'] = set_data_labels(context.data.name.toarray())
 
