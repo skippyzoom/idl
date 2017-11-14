@@ -33,10 +33,12 @@ pro project_graphics, context
      ;;                                          context.data.yrng[0]:context.data.yrng[1], $
      ;;                                          *]*context.data.scale[name[ik]]
      imgdata = context.data.array[name[ik]]
-     imgdata = smooth(imgdata,[context.data.smooth,context.data.smooth,1],/edge_wrap)
-     imgdata = (imgdata)[context.data.xrng[0]:context.data.xrng[1], $
-                         context.data.yrng[0]:context.data.yrng[1], $
-                         *]*context.data.scale[name[ik]]
+     imgdata = smooth(imgdata, $
+                      [context.graphics.smooth[0],context.graphics.smooth[1],1], $
+                      /edge_wrap)
+     imgdata = imgdata[context.data.xrng[0]:context.data.xrng[1], $
+                       context.data.yrng[0]:context.data.yrng[1], $
+                       *]*context.data.scale[name[ik]]
      xdata = context.data.xvec[context.data.xrng[0]:context.data.xrng[1]]
      ydata = context.data.yvec[context.data.yrng[0]:context.data.yrng[1]]
      colorbar_title = context.data.label[name[ik]]+" "+context.data.units[name[ik]]

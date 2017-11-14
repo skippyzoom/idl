@@ -12,18 +12,18 @@ pro analyze_project, path, $
                      context, $
                      verbose=verbose
 
-  ;;==Defaults and guards
+  ;;==Echo working path and store in project dictionary
+  print, "ANALYZE_PROJECT: In ",path
+  context['path'] = path
+
+  ;;==Set up defaults
   spawn, 'pwd',wd
   if n_elements(path) eq 0 then path = wd
   if n_elements(context) eq 0 then context = load_default_context() $
   else set_context_defaults, context
 
-  ;;==Echo working path and store in project dictionary
-  print, "ANALYZE_PROJECT: In ",path
-  context['path'] = path
-
   ;;==Read the input file
-  context['params'] = set_eppic_params(path)
+  ;; context['params'] = set_eppic_params(path)
 
   ;;==Assign grid to project
   context['grid'] = set_grid(path)

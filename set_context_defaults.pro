@@ -14,6 +14,10 @@ pro set_context_defaults, context
      ;;==GENERAL
      if ~context.haskey('description') then $
         context.description = ''
+     spawn, 'pwd',wd
+     if ~context.haskey('path') then context.path = wd
+     if ~context.haskey('params') then $
+        context['params'] = set_eppic_params(context.path)
 
      ;;==DATA
      if ~context.haskey('data') then context.data = dictionary()
