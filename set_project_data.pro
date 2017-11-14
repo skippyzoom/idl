@@ -37,6 +37,7 @@ function set_project_data, data,grid,context=context
   ;;              y: [0,grid.ny-1], $
   ;;              z: [0,grid.nz-1]}
   ;; endelse
+
   if (n_elements(context) ne 0) && $
      (context.haskey('data') && context.data.haskey('ranges')) then begin
      ranges = {x: [context.data.ranges[0,0]*grid.nx, $

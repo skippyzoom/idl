@@ -4,6 +4,9 @@
 ; EPPIC simulation data.
 ;
 ; TO DO
+; -- Handle 3-D data. The imgdata array will 
+;    still be logically (2+1)-D but there 
+;    could be a loop over 2-D planes.
 ;-
 pro project_graphics, context
 
@@ -26,12 +29,23 @@ pro project_graphics, context
      graphics_class = 'space'
 
      ;;==Set up data for graphics routines
-     imgdata = (context.data.array[name[ik]])[context.data.xrng[0]:context.data.xrng[1], $
-                                              context.data.yrng[0]:context.data.yrng[1], $
-                                              *]*context.data.scale[name[ik]]
+     ;; imgdata = (context.data.array[name[ik]])[context.data.xrng[0]:context.data.xrng[1], $
+     ;;                                          context.data.yrng[0]:context.data.yrng[1], $
+     ;;                                          *]*context.data.scale[name[ik]]
+     imgdata = context.data.array[name[ik]]
+     imgdata = smooth(imgdata,[context.data.smooth,context.data.smooth,1],/edge_wrap)
+     imgdata = (imgdata)[context.data.xrng[0]:context.data.xrng[1], $
+                         context.data.yrng[0]:context.data.yrng[1], $
+                         *]*context.data.scale[name[ik]]
      xdata = context.data.xvec[context.data.xrng[0]:context.data.xrng[1]]
      ydata = context.data.yvec[context.data.yrng[0]:context.data.yrng[1]]
      colorbar_title = context.data.label[name[ik]]+" "+context.data.units[name[ik]]
+
+     ;-->TEMP
+     print, "***WARNING*** Test code in project_graphics.pro"
+     background = rms(imgdata[*,*,0:3],dim=3)
+     for it=0,context.params.nt_max-1 do imgdata[*,*,it] -= background
+     ;<--
 
      ;;==Create single- or multi-panel images
      img = data_image(imgdata,xdata,ydata, $
