@@ -14,29 +14,38 @@ pro analyze_project, path, $
 
   ;;==Echo working path and store in project dictionary
   print, "ANALYZE_PROJECT: In ",path
-  context['path'] = path
 
-  ;;==Set up defaults
+  ;;==Set up an appropriate context dictionary
   spawn, 'pwd',wd
   if n_elements(path) eq 0 then path = wd
-  if n_elements(context) eq 0 then context = load_default_context() $
-  else set_context_defaults, context
+  if n_elements(context) eq 0 then begin
+     context = load_default_context()
+     ;; context['path'] = path
+     ;; context['params'] = set_eppic_params(path)
+     ;; context['grid'] = set_grid(path)
+     ;; nt_max = calc_timesteps(path,context.grid)
+     ;; context.params['nt_max'] = nt_max
+  endif $
+  else begin
+     context['path'] = path
+     set_context_defaults, context
+  endelse
 
   ;;==Read the input file
   ;; context['params'] = set_eppic_params(path)
 
   ;;==Assign grid to project
-  context['grid'] = set_grid(path)
+  ;; context['grid'] = set_grid(path)
 
   ;;==Calculate max number of time steps available
-  nt_max = calc_timesteps(path,context.grid)
-  context.params['nt_max'] = nt_max
+  ;; nt_max = calc_timesteps(path,context.grid)
+  ;; context.params['nt_max'] = nt_max
 
   ;;==Load simulation data
   data = load_eppic_data(context.data.name.toarray(), $
                          context.data.type, $
                          path = context.path, $
-                         timestep = context.params.nout*lindgen(nt_max))
+                         timestep = context.params.nout*lindgen(context.params.nt_max))
 
   ;;==Pack up the project dictionary
   d_keys = data.keys()

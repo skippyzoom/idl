@@ -18,6 +18,12 @@ pro set_context_defaults, context
      if ~context.haskey('path') then context.path = wd
      if ~context.haskey('params') then $
         context['params'] = set_eppic_params(context.path)
+     if ~context.haskey('grid') then $
+        context['grid'] = set_grid(context.path)
+     if ~context.params.haskey('nt_max') then begin
+        nt_max = calc_timesteps(context.path,context.grid)
+        context.params['nt_max'] = nt_max
+     endif
 
      ;;==DATA
      if ~context.haskey('data') then context.data = dictionary()
@@ -32,13 +38,11 @@ pro set_context_defaults, context
      if ~context.graphics.haskey('desc') then context.graphics.desc = ''
      if ~context.graphics.haskey('class') then $
         context.graphics.class = list('space','kxyzt')
-     ;;==graphics/AXES
      if ~context.graphics.haskey('axes') then context.graphics.axes = dictionary()
      if ~context.graphics.axes.haskey('xtitle') then $
         context.graphics.axes.xtitle = dictionary(context.graphics.class.toarray(), ['x','$k_x$'])
      if ~context.graphics.axes.haskey('ytitle') then $
         context.graphics.axes.ytitle = dictionary(context.graphics.class.toarray(), ['y','$k_y$'])
-     ;;==graphics/RGB_TABLE
      if ~context.graphics.haskey('rgb_table') then $
         context.graphics.rgb_table = dictionary(context.data.name.toarray(), $
                                                 make_array(n_names,value=0)) $
@@ -50,7 +54,6 @@ pro set_context_defaults, context
      endelse
      if ~context.graphics.rgb_table.haskey('fft') then $
         context.graphics.rgb_table.fft = 0
-     ;;==graphics/SMOOTH
      if ~context.graphics.haskey('smooth') then $
         context.graphics.smooth = [1,1,1,1]
      case n_elements(context.graphics.smooth) of 
@@ -67,11 +70,9 @@ pro set_context_defaults, context
            context.graphics.smooth = [1,1,1,1]
         end
      endcase
-     ;;==graphics/IMAGE
      if ~context.graphics.haskey('image') then $
         context.graphics.image = dictionary()
      if ~context.graphics.image.haskey('type') then context.graphics.image.type = '.png'
-     ;;==graphics/MOVIE
      if ~context.graphics.haskey('movie') then $
         context.graphics.movie = dictionary()
      if ~context.graphics.movie.haskey('type') then context.graphics.movie.type = '.mp4'
@@ -79,7 +80,6 @@ pro set_context_defaults, context
      if ~context.graphics.movie.haskey('timestamps') then context.graphics.movie.timestamps = 0B
      if ~context.graphics.movie.haskey('expand') then context.graphics.movie.expand = 1.0
      if ~context.graphics.movie.haskey('rescale') then context.graphics.movie.rescale = 1.0
-     ;;==graphics/COLORBAR
      if ~context.graphics.haskey('colorbar') then $
         context.colorbar = dictionary()
      if ~context.graphics.colorbar.haskey('type') then context.graphics.colorbar.type = 'global'

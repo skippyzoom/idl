@@ -8,13 +8,20 @@
 ;    option would allow set_context_default.pro to
 ;    remain consisent with this function.
 ;-
-function load_default_context
+function load_default_context, path=path
 
   ;;==Create the dictionary
   context = dictionary()
 
   ;;==GENERAL
   context['description'] = ''
+  if keyword_set(path) then begin
+     context['path'] = path
+     context['params'] = set_eppic_params(path)
+     context['grid'] = set_grid(path)
+     nt_max = calc_timesteps(path,context.grid)
+     context.params['nt_max'] = nt_max
+  endif
 
   ;;==DATA
   context['data'] = dictionary('name', list('den1','phi'), $
