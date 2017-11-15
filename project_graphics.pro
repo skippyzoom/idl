@@ -29,9 +29,6 @@ pro project_graphics, context
      graphics_class = 'space'
 
      ;;==Set up data for graphics routines
-     ;; imgdata = (context.data.array[name[ik]])[context.data.xrng[0]:context.data.xrng[1], $
-     ;;                                          context.data.yrng[0]:context.data.yrng[1], $
-     ;;                                          *]*context.data.scale[name[ik]]
      imgdata = context.data.array[name[ik]]
      imgdata = smooth(imgdata, $
                       [context.graphics.smooth[0],context.graphics.smooth[1],1], $
@@ -43,10 +40,10 @@ pro project_graphics, context
      ydata = context.data.yvec[context.data.yrng[0]:context.data.yrng[1]]
      colorbar_title = context.data.label[name[ik]]+" "+context.data.units[name[ik]]
 
-     ;-->TEMP
-     print, "***WARNING*** Test code in project_graphics.pro"
-     background = rms(imgdata[*,*,0:3],dim=3)
-     for it=0,context.params.nt_max-1 do imgdata[*,*,it] -= background
+     ;-->TO DO: Make this its own graphics output option
+     ;; print, "***WARNING*** Test code in project_graphics.pro"
+     ;; background = rms(imgdata[*,*,0:3],dim=3)
+     ;; for it=0,context.params.nt_max-1 do imgdata[*,*,it] -= background
      ;<--
 
      ;;==Create single- or multi-panel images

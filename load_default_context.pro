@@ -36,13 +36,23 @@ function load_default_context, path=path
   ;;==GRAPHICS
   context['graphics'] = dictionary()
   context.graphics['desc'] = ''
-  context.graphics['class'] = list('space','kxyzt')
+  ;; context.graphics['class'] = dictionary(['space','kxyzt'])
+  graphics_classes = ['space','kxyzt']
+  context.graphics['name'] = dictionary(context.data.name.toarray())
+  for ik=0,context.graphics.name.count()-1 do $
+     context.graphics.name[ik] = list(graphics_classes)
   ;;==graphics/AXES
-  context.graphics['axes'] = dictionary()
-  context.graphics.axes['xtitle'] = $
-     dictionary(context.graphics.class.toarray(), ['x','$k_x$'])
-  context.graphics.axes['ytitle'] = $
-     dictionary(context.graphics.class.toarray(), ['y','$k_y$'])
+  context.graphics['axes'] = dictionary(['x','y','z'])
+  ;; context.graphics.axes['xtitle'] = $
+  ;;    dictionary(context.graphics.class.toarray(), ['x','$k_x$'])
+  ;; context.graphics.axes['ytitle'] = $
+  ;;    dictionary(context.graphics.class.toarray(), ['y','$k_y$'])
+  context.graphics.axes.x['title'] = $
+     dictionary(graphics_classes, ['x','$k_x$'])
+  context.graphics.axes.y['title'] = $
+     dictionary(graphics_classes, ['y','$k_y$'])
+  context.graphics.axes.z['title'] = $
+     dictionary(graphics_classes, ['z','$k_z$'])
   ;;==graphics/RGB_TABLE
   context.graphics['rgb_table'] = dictionary(context.data.name.toarray(), $
                                              make_array(n_names,value=0))
