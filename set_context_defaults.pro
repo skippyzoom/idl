@@ -29,25 +29,38 @@ pro set_context_defaults, context
      if ~context.haskey('data') then context.data = dictionary()
      if ~context.data.haskey('name') then $
         context.data.name = list('den1','phi')
-     n_names = context.data.name.count()
      if ~context.data.haskey('type') then $
         context.data.type = ['ph5','ph5']
+     d_array = context.data.name.toarray()
+     d_count = context.data.name.count()
 
      ;;==GRAPHICS
+     graphics_classes = ['space','kxyzt']
      if ~context.haskey('graphics') then context.graphics = dictionary()
      if ~context.graphics.haskey('desc') then context.graphics.desc = ''
-     if ~context.graphics.haskey('class') then $
-        context.graphics.class = list('space','kxyzt')
-     if ~context.graphics.haskey('axes') then context.graphics.axes = dictionary()
-     if ~context.graphics.axes.haskey('xtitle') then $
-        context.graphics.axes.xtitle = dictionary(context.graphics.class.toarray(), ['x','$k_x$'])
-     if ~context.graphics.axes.haskey('ytitle') then $
-        context.graphics.axes.ytitle = dictionary(context.graphics.class.toarray(), ['y','$k_y$'])
+     ;; if ~context.graphics.haskey('name') then begin
+     ;;    context.graphics.name = dictionary(context.data.name.toarray())
+     ;;    name_list = context.graphics.name.keys()
+     ;;    for ik=0,context.graphics.name.count()-1 do $
+     ;;       context.graphics.name[name_list[ik]] = list(graphics_classes)
+     ;; endif
+     if ~context.graphics.haskey('class') then begin
+        context.graphics.class = dictionary(d_array)
+        for id=0,d_count-1 do $
+           context.graphics.class[d_array[id]] = graphics_classes
+     endif
+     if ~context.graphics.haskey('axes') then $
+        context.graphics.axes = dictionary('x', dictionary(), $
+                                           'y', dictionary(), $
+                                           'z', dictionary())
+     ;; if ~context.graphics.axes.y['title'] then $
+     ;;    context.graphics.axes.y.title = dictionary(graphics_classes, ['y','$k_y$'])
+
+
      if ~context.graphics.haskey('rgb_table') then $
-        context.graphics.rgb_table = dictionary(context.data.name.toarray(), $
-                                                make_array(n_names,value=0)) $
+        context.graphics.rgb_table = dictionary(d_array, make_array(d_count,value=0)) $
      else begin
-        for id=0,n_names-1 do begin
+        for id=0,d_count-1 do begin
            if ~context.graphics.rgb_table.haskey(context.data.name[id]) then $
               context.graphics.rgb_table[name[id]] = 0
         endfor
