@@ -23,7 +23,10 @@ run = list()
 ;; run.add, 'test028'
 ;; run.add, 'test029'
 ;; run.add, 'test030'
-run.add, 'test031'
+;; run.add, 'test031'
+;; run.add, 'test032'
+run.add, 'test033'
+run.add, 'test034'
 
 ;;==Set project data path(s)
 path = set_project_path(get_base_dir(), $
