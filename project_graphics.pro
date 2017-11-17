@@ -27,9 +27,9 @@ pro project_graphics, context
      n_classes = n_elements(class)
      for ic=0,n_classes-1 do begin
         case 1B of 
-           strcmp(class[ic],'space'): project_graphics_space, context
-           strcmp(class[ic],'space-diff'): project_graphics_space_diff, context
-           strcmp(class[ic],'kxyzt'): project_graphics_kxyzt, context
+           strcmp(class[ic],'space'): project_graphics_space, context,name,class[ic]
+           strcmp(class[ic],'space-diff'): project_graphics_space_diff, context,name,class[ic]
+           strcmp(class[ic],'kxyzt'): project_graphics_kxyzt, context,name,class[ic]
            else: print, "PROJECT_GRAPHICS: Did not recognize graphics class (",class[ic],")"
         endcase
      endfor

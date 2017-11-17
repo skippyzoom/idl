@@ -1,7 +1,7 @@
 ;+
 ; Create spectral graphics without time transform from project context
 ;-
-pro project_graphics_kxyzt, context
+pro project_graphics_kxyzt, context,name,class
   datadims = size(context.data.array[name],/dim)
   tsize = datadims[context.params.ndim_space]
   wsize = next_power2(tsize)
@@ -29,8 +29,8 @@ pro project_graphics_kxyzt, context
                    colorbar_type = context.graphics.colorbar.type, $
                    colorbar_title = colorbar_title)
   if context.graphics.haskey('note') && ~strcmp(context.graphics.note,'') then $
-     filename = name+'_'+class[ic]+'-'+context.graphics.note+ $
+     filename = name+'_'+class+'-'+context.graphics.note+ $
                 context.graphics.image.type $
-  else filename = name+'_'+class[ic]+context.graphics.image.type
+  else filename = name+'_'+class+context.graphics.image.type
   image_save, img,filename = context.path+path_sep()+filename,/landscape
 end

@@ -1,7 +1,7 @@
 ;+
 ; Create spatial graphics from project context
 ;-
-pro project_graphics_space, context
+pro project_graphics_space, context,name,class
 
   ;;==Build colorbar titles
   colorbar_title = context.data.label
@@ -14,10 +14,16 @@ pro project_graphics_space, context
 
   ;;==Set up data for graphics routines
   imgdata = context.data.array[name]
+  ;; smooth_widths = intarr(context.params.ndim_space+1)
+  ;; smooth_widths[context.params.ndim_space] = context.graphics.smooth[context.params.ndim_space]
+  ;; for id=0,context.params.ndim_space-1 do $
+  ;;    smooth_widths[id] = 
+  smooth_widths = [context.graphics.smooth[0],context.graphics.smooth[1],1] ;For x-y plane
   imgdata = smooth(imgdata, $
-                   [context.graphics.smooth[0], $
-                    context.graphics.smooth[1], $
-                    context.graphics.smooth[2], 1], $
+                   ;; [context.graphics.smooth[0], $
+                   ;;  context.graphics.smooth[1], $
+                   ;;  context.graphics.smooth[2], 1], $
+                   smooth_widths, $
                    /edge_wrap)
   imgdata = imgdata[context.data.xrng[0]:context.data.xrng[1], $
                     context.data.yrng[0]:context.data.yrng[1], $
@@ -38,9 +44,9 @@ pro project_graphics_space, context
                    colorbar_type = context.graphics.colorbar.type, $
                    colorbar_title = colorbar_title)
   if context.graphics.haskey('note') && ~strcmp(context.graphics.note,'') then $
-     filename = name+'_'+class[ic]+'-'+context.graphics.note+ $
+     filename = name+'_'+class+'-'+context.graphics.note+ $
                 context.graphics.image.type $
-  else filename = name+'_'+class[ic]+context.graphics.image.type
+  else filename = name+'_'+class+context.graphics.image.type
   image_save, img,filename = context.path+path_sep()+filename,/landscape
 
   ;;==Create movies (if requested)
@@ -50,9 +56,9 @@ pro project_graphics_space, context
                           lindgen(context.params.nt_max), format='(f7.2)')
      string_time = strcompress(string_time,/remove_all)+" ms"
      if context.graphics.haskey('note') && ~strcmp(context.graphics.note,'') then $
-        filename = name+'_'+class[ic]+'-'+context.graphics.note+ $
+        filename = name+'_'+class+'-'+context.graphics.note+ $
                    context.graphics.movie.type $
-     else filename = name+'_'+class[ic]+context.graphics.movie.type
+     else filename = name+'_'+class+context.graphics.movie.type
      data_movie, imgdata,xdata,ydata, $
                  filename = context.path+path_sep()+filename, $
                  title = string_time, $
