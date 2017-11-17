@@ -64,6 +64,14 @@ ct = get_custom_ct(1)
 ;; prj.graphics['colorbar'] = dictionary('type', 'global')
 prj = load_default_context()
 prj['description'] = description
+prj.graphics.note = 'code_dev'
+prj.panel['index'] = [0,1]
+prj.panel['layout'] = [1,2]
+prj.graphics['rgb_table'] = dictionary('den1', 5, $
+                                       'phi', [[ct.r],[ct.g],[ct.b]], $
+                                       'emag', 3, $
+                                       'fft', 39)
+
 
 ;;==Run analysis routines
 for id=0,n_elements(path)-1 do analyze_project, path[id],prj[*]
