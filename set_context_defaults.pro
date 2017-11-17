@@ -38,25 +38,29 @@ pro set_context_defaults, context
      graphics_classes = ['space','kxyzt']
      if ~context.haskey('graphics') then context.graphics = dictionary()
      if ~context.graphics.haskey('note') then context.graphics.note = ''
-     ;; if ~context.graphics.haskey('name') then begin
-     ;;    context.graphics.name = dictionary(context.data.name.toarray())
-     ;;    name_list = context.graphics.name.keys()
-     ;;    for ik=0,context.graphics.name.count()-1 do $
-     ;;       context.graphics.name[name_list[ik]] = list(graphics_classes)
-     ;; endif
      if ~context.graphics.haskey('class') then begin
         context.graphics.class = dictionary(d_array)
         for id=0,d_count-1 do $
            context.graphics.class[d_array[id]] = graphics_classes
      endif
      if ~context.graphics.haskey('axes') then $
-        context.graphics.axes = dictionary('x', dictionary(), $
-                                           'y', dictionary(), $
-                                           'z', dictionary())
-     ;; if ~context.graphics.axes.y['title'] then $
-     ;;    context.graphics.axes.y.title = dictionary(graphics_classes, ['y','$k_y$'])
-
-
+        context.graphics.axes = dictionary()
+     if ~context.graphics.axes.haskey('x') then $
+        context.graphics.axes.x = dictionary('title', dictionary(graphics_classes, ['x','$k_x$']), $
+                                             'show', 0B)
+     if ~context.graphics.axes.haskey('y') then $
+        context.graphics.axes.y = dictionary('title', dictionary(graphics_classes, ['x','$k_x$']), $
+                                             'show', 0B)
+     if ~context.graphics.axes.haskey('z') then $
+        context.graphics.axes.z = dictionary('title', dictionary(graphics_classes, ['x','$k_x$']), $
+                                             'show', 0B)
+     if ~context.graphics.axes.haskey('plane') then begin
+        context.graphics.axes.plane = list('xy')
+        if context.params.ndim_space eq 3 then begin
+           context.graphics.axes.plane.add, 'xz'
+           context.graphics.axes.plane.add, 'yz'
+        endif
+     endif
      if ~context.graphics.haskey('rgb_table') then $
         context.graphics.rgb_table = dictionary(d_array, make_array(d_count,value=0)) $
      else begin

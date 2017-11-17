@@ -14,10 +14,6 @@ pro project_graphics_space, context,name,class
 
   ;;==Set up data for graphics routines
   imgdata = context.data.array[name]
-  ;; smooth_widths = intarr(context.params.ndim_space+1)
-  ;; smooth_widths[context.params.ndim_space] = context.graphics.smooth[context.params.ndim_space]
-  ;; for id=0,context.params.ndim_space-1 do $
-  ;;    smooth_widths[id] = 
   smooth_widths = [context.graphics.smooth[0],context.graphics.smooth[1],1] ;For x-y plane
   imgdata = smooth(imgdata, $
                    ;; [context.graphics.smooth[0], $

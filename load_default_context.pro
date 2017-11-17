@@ -47,15 +47,23 @@ function load_default_context, path=path
   for ik=0,d_count-1 do $
      context.graphics.class[d_array[ik]] = graphics_classes
   ;;==graphics/AXES
-  context.graphics['axes'] = dictionary('x', dictionary(), $
-                                        'y', dictionary(), $
-                                        'z', dictionary())
-  ;; context.graphics.axes.x['title'] = $
-  ;;    dictionary(graphics_classes, ['x','$k_x$'])
-  ;; context.graphics.axes.y['title'] = $
-  ;;    dictionary(graphics_classes, ['y','$k_y$'])
-  ;; context.graphics.axes.z['title'] = $
-  ;;    dictionary(graphics_classes, ['z','$k_z$'])
+  ;; context.graphics['axes'] = dictionary('x', dictionary(), $
+  ;;                                       'y', dictionary(), $
+  ;;                                       'z', dictionary())
+  context.graphics['axes'] = dictionary()
+  context.graphics.axes['x'] = dictionary('title', dictionary(), 'show', 0B)
+  context.graphics.axes.x['title'] = dictionary(graphics_classes, ['x','$k_x$'])
+  context.graphics.axes['y'] = dictionary('title', dictionary(), 'show', 0B)
+  context.graphics.axes.y['title'] = dictionary(graphics_classes, ['y','$k_y$'])
+  context.graphics.axes['z'] = dictionary('title', dictionary(), 'show', 0B)
+  context.graphics.axes.z['title'] = dictionary(graphics_classes, ['z','$k_z$'])
+  if context.haskey('params') then begin
+     context.graphics.axes['plane'] = list('xy')
+     if context.params.ndim_space eq 3 then begin
+        context.graphics.axes.plane.add, 'xz'
+        context.graphics.axes.plane.add, 'yz'
+     endif
+  endif
   ;;==graphics/RGB_TABLE
   context.graphics['rgb_table'] = dictionary(context.data.name.toarray(), $
                                              make_array(d_count,value=0))
