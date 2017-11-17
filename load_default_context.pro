@@ -37,7 +37,7 @@ function load_default_context, path=path
   ;;==GRAPHICS
   graphics_classes = ['space','kxyzt']
   context['graphics'] = dictionary()
-  context.graphics['desc'] = ''
+  context.graphics['note'] = ''
   ;; context.graphics['class'] = dictionary(['space','kxyzt'])
   ;; context.graphics['name'] = dictionary(context.data.name.toarray())
   ;; name_list = context.graphics.name.keys()

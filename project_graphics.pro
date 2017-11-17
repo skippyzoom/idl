@@ -10,9 +10,6 @@
 ;-
 pro project_graphics, context
 
-  ;;==Get data names
-  ;; name = context.data.array.keys()
-
   ;;==Build colorbar titles
   colorbar_title = context.data.label
 
@@ -38,7 +35,9 @@ pro project_graphics, context
               ;;==Set up data for graphics routines
               imgdata = context.data.array[name]
               imgdata = smooth(imgdata, $
-                               [context.graphics.smooth[0],context.graphics.smooth[1],1], $
+                               [context.graphics.smooth[0], $
+                                context.graphics.smooth[1], $
+                                context.graphics.smooth[2], 1], $
                                /edge_wrap)
               imgdata = imgdata[context.data.xrng[0]:context.data.xrng[1], $
                                 context.data.yrng[0]:context.data.yrng[1], $
@@ -46,12 +45,6 @@ pro project_graphics, context
               xdata = context.data.xvec[context.data.xrng[0]:context.data.xrng[1]]
               ydata = context.data.yvec[context.data.yrng[0]:context.data.yrng[1]]
               colorbar_title = context.data.label[name]+" "+context.data.units[name]
-
-                                ;-->TO DO: Make this its own graphics output option
-              ;; print, "***WARNING*** Test code in project_graphics.pro"
-              ;; background = rms(imgdata[*,*,0:3],dim=3)
-              ;; for it=0,context.params.nt_max-1 do imgdata[*,*,it] -= background
-                                ;<--
 
               ;;==Create single- or multi-panel images
               img = data_image(imgdata,xdata,ydata, $
@@ -64,8 +57,8 @@ pro project_graphics, context
                                ytitle = "Vertical [m]", $
                                colorbar_type = context.graphics.colorbar.type, $
                                colorbar_title = colorbar_title)
-              if context.graphics.haskey('desc') && ~strcmp(context.graphics.desc,'') then $
-                 filename = name+'_'+class[ic]+'-'+context.graphics.desc+ $
+              if context.graphics.haskey('note') && ~strcmp(context.graphics.note,'') then $
+                 filename = name+'_'+class[ic]+'-'+context.graphics.note+ $
                             context.graphics.image.type $
               else filename = name+'_'+class[ic]+context.graphics.image.type
               image_save, img,filename = context.path+path_sep()+filename,/landscape
@@ -76,8 +69,8 @@ pro project_graphics, context
                                       1e3* $
                                       lindgen(context.params.nt_max), format='(f7.2)')
                  string_time = strcompress(string_time,/remove_all)+" ms"
-                 if context.graphics.haskey('desc') && ~strcmp(context.graphics.desc,'') then $
-                    filename = name+'_'+class[ic]+'-'+context.graphics.desc+ $
+                 if context.graphics.haskey('note') && ~strcmp(context.graphics.note,'') then $
+                    filename = name+'_'+class[ic]+'-'+context.graphics.note+ $
                                context.graphics.movie.type $
                  else filename = name+'_'+class[ic]+context.graphics.movie.type
                  data_movie, imgdata,xdata,ydata, $
@@ -90,6 +83,13 @@ pro project_graphics, context
                              colorbar_title = colorbar_title
               endif
            end
+
+           strcmp(class[ic],'space-diff'): begin
+              print, "PROJECT_GRAPHICS: No routine yet for graphics class (",class[ic],")"
+              ;; background = rms(imgdata[*,*,0:3],dim=3)
+              ;; for it=0,context.params.nt_max-1 do imgdata[*,*,it] -= background
+           end
+
            strcmp(class[ic],'kxyzt'): begin
               ;;------------------------------------------;;
               ;; Spectral graphics without time transform ;;
@@ -121,8 +121,8 @@ pro project_graphics, context
                                yrange = [-4*!pi,4*!pi], $
                                colorbar_type = context.graphics.colorbar.type, $
                                colorbar_title = colorbar_title)
-              if context.graphics.haskey('desc') && ~strcmp(context.graphics.desc,'') then $
-                 filename = name+'_'+class[ic]+'-'+context.graphics.desc+ $
+              if context.graphics.haskey('note') && ~strcmp(context.graphics.note,'') then $
+                 filename = name+'_'+class[ic]+'-'+context.graphics.note+ $
                             context.graphics.image.type $
               else filename = name+'_'+class[ic]+context.graphics.image.type
               image_save, img,filename = context.path+path_sep()+filename,/landscape

@@ -37,7 +37,7 @@ pro set_context_defaults, context
      ;;==GRAPHICS
      graphics_classes = ['space','kxyzt']
      if ~context.haskey('graphics') then context.graphics = dictionary()
-     if ~context.graphics.haskey('desc') then context.graphics.desc = ''
+     if ~context.graphics.haskey('note') then context.graphics.note = ''
      ;; if ~context.graphics.haskey('name') then begin
      ;;    context.graphics.name = dictionary(context.data.name.toarray())
      ;;    name_list = context.graphics.name.keys()

@@ -8,13 +8,17 @@ description = 'Farley-Buneman flow angle in 2D or 3D.'
 
 ;;==Declare name(s) of data directory/ies
 run = list()
-run.add, 'alt0'
+;; run.add, 'alt0'
 ;; run.add, 'alt1'
 ;; run.add, 'alt2'
+run.add, 'test000'
+;; run.add, 'test001'
 
 ;;==Set project data path(s)
 path = set_project_path(get_base_dir(), $
-                        'fb_flow_angle/2D', $
+                        ;; 'fb_flow_angle/2D', $
+                        'fb_flow_angle'+path_sep()+ $
+                        'tests', $
                         run)
 
 ;;==Get custom color table(s)
@@ -25,7 +29,7 @@ prj = load_default_context()
 prj['description'] = description
 prj.panel['index'] = [0.25,0.50,0.75,1.0]
 prj.panel['layout'] = [2,2]
-prj.graphics.desc = 'test'
+prj.graphics.note = 'test'
 prj.graphics['rgb_table'] = dictionary('den1', 5, $
                                        'phi', [[ct.r],[ct.g],[ct.b]], $
                                        'emag', 3, $
