@@ -54,11 +54,11 @@ pro set_context_defaults, context
      if ~context.graphics.axes.haskey('z') then $
         context.graphics.axes.z = dictionary('title', dictionary(graphics_classes, ['x','$k_x$']), $
                                              'show', 0B)
-     if ~context.graphics.axes.haskey('plane') then begin
-        context.graphics.axes.plane = list('xy')
+     if ~context.graphics.haskey('plane') then begin
+        context.graphics.plane = list('xy')
         if context.params.ndim_space eq 3 then begin
-           context.graphics.axes.plane.add, 'xz'
-           context.graphics.axes.plane.add, 'yz'
+           context.graphics.plane.add, 'xz'
+           context.graphics.plane.add, 'yz'
         endif
      endif
      if ~context.graphics.haskey('rgb_table') then $

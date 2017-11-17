@@ -58,10 +58,10 @@ function load_default_context, path=path
   context.graphics.axes['z'] = dictionary('title', dictionary(), 'show', 0B)
   context.graphics.axes.z['title'] = dictionary(graphics_classes, ['z','$k_z$'])
   if context.haskey('params') then begin
-     context.graphics.axes['plane'] = list('xy')
+     context.graphics['plane'] = list('xy')
      if context.params.ndim_space eq 3 then begin
-        context.graphics.axes.plane.add, 'xz'
-        context.graphics.axes.plane.add, 'yz'
+        context.graphics.plane.add, 'xz'
+        context.graphics.plane.add, 'yz'
      endif
   endif
   ;;==graphics/RGB_TABLE
