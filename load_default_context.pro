@@ -1,14 +1,49 @@
 ;+
 ; Load a context dictionary with default values.
 ; The user can call this within a batch script, then
-; pass the context to analyze_project.pro
+; pass the context to analyze_project.pro.
+;
+; This function has two modes:
+; 1) If the user does not supply request, this function will
+;    return the default context dictionary.
+; 2) If the user supplies request, this function will return
+;    only the value of the requested parameter.
+;
+;
+; Usage:
+; Result = load_default_context([request[,pattern]][,path=path])
+; Where
+;   REQUEST is a string indicating the full "path" to a valid
+;     key in the default context dictionary.
+;   PATTERN is a string indicating the separator for levels in
+;     the default context dictionary. See the IDL man page for 
+;     strsplit.pro for further documentation.
+;   PATH is a fully qualified path to the directory containing 
+;     simulation run parameters. If the user doesn't supply a
+;     path, the returned context will not contain fields that
+;     require knowledge of run parameters.
+;
+; Examples:
+; IDL> ctx = load_default_context()
+;   Returns the default context dictionary, without run 
+;   parameters.
+; IDL> ctx = load_default_context(path='/path/to/params/')
+;   Returns the default context dictionary, including 
+;   parameters and parameter-dependent fields based on
+;   the parameter file located in the directory 
+;   '/path/to/params/'
+; IDL> rgb = load_default_context('graphics.rgb_table','.')
+;   Returns the dictionary of color table values contained
+;   in the field context.graphics.rgb_table. Note that the
+;   pattern '.' indicates that the user requested the value
+;   of rgb_table, which is an element of the graphics 
+;   dictionary.
+;    
+;    
 ;
 ; TO DO
-; -- Allow user to query a particular parameter. That
-;    option would allow set_context_default.pro to
-;    remain consisent with this function.
 ;-
-function load_default_context, path=path
+function load_default_context, request,pattern,path=path
 
   ;;==Create the dictionary
   context = dictionary()
@@ -84,5 +119,14 @@ function load_default_context, path=path
      endif
   endif
 
-  return, context
+  if n_elements(request) eq 0 then return, context $
+  else begin
+     if n_elements(pattern) eq 0 then $
+        reqkeys = strsplit(request,/extract,count=nk) $
+     else $
+        reqkeys = strsplit(request,pattern,/extract,count=nk)
+     target = context[reqkeys[0]]
+     for ik=1,nk-1 do target = target[reqkeys[ik]]
+     return, target
+  endelse
 end
