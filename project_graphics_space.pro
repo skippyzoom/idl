@@ -7,52 +7,76 @@ pro project_graphics_space, context,name,class
   colorbar_title = context.data.label
 
   ;;==Scale normalized panel indices
-  temp = floor(context.panel.index*context.params.nt_max)
-  ge_max = where(temp ge context.params.nt_max,count)
-  if count gt 0 then temp[ge_max] = context.params.nt_max-1
-  scaled_index = temp
+  if strcmp(context.panel.index.type,'rel',3) then begin
+     temp = floor(context.panel.index.value*context.params.nt_max)
+     ge_max = where(temp ge context.params.nt_max,count)
+     if count gt 0 then temp[ge_max] = context.params.nt_max-1
+     panel_index = temp
+  endif $
+  else panel_index = context.panel.index.value
 
   ;;==Set up data for graphics routines
   n_planes = context.graphics.plane.count()
-  imgdata = context.data.array[name]
+  ;; imgdata = context.data.array[name]
+  ;; imgdata = smooth(imgdata,context.graphics.smooth,/edge_wrap)
 
   for ip=0,n_planes-1 do begin
+     cur_plane = context.graphics.plane[ip]
      case 1B of
-        strcmp(context.graphics.plane[ip],'xy'): begin
+        strcmp(cur_plane,'xy'): begin
            smooth_widths = [context.graphics.smooth[0],context.graphics.smooth[1],1]
-           imgdata = smooth(imgdata, smooth_widths, /edge_wrap)
-           imgdata = imgdata[context.data.xrng[0]:context.data.xrng[1], $
-                             context.data.yrng[0]:context.data.yrng[1], $
-                             *]*context.data.scale[name]
+           imgdata = (context.data.array[name])[context.data.xrng[0]:context.data.xrng[1], $
+                                                context.data.yrng[0]:context.data.yrng[1], $
+                                                context.data.zrng[0], $
+                                                *]
+           ;; imgdata = smooth(imgdata, smooth_widths, /edge_wrap)
+           ;; imgdata = smooth(context.data.array[name], $
+           ;;                  context.graphics.smooth,/edge_wrap)
+           ;; imgdata = imgdata[context.data.xrng[0]:context.data.xrng[1], $
+           ;;                   context.data.yrng[0]:context.data.yrng[1], $
+           ;;                   *]*context.data.scale[name]
            xdata = context.data.xvec[context.data.xrng[0]:context.data.xrng[1]]
            ydata = context.data.yvec[context.data.yrng[0]:context.data.yrng[1]]
         end
-        strcmp(context.graphics.plane[ip],'xz'): begin
+        strcmp(cur_plane,'xz'): begin
            smooth_widths = [context.graphics.smooth[0],context.graphics.smooth[2],1]
-           imgdata = smooth(imgdata, smooth_widths, /edge_wrap)
-           imgdata = imgdata[context.data.xrng[0]:context.data.xrng[1], $
-                             context.data.zrng[0]:context.data.zrng[1], $
-                             *]*context.data.scale[name]
+           imgdata = (context.data.array[name])[context.data.xrng[0]:context.data.xrng[1], $
+                                                context.data.yrng[0], $
+                                                context.data.zrng[0]:context.data.zrng[1], $
+                                                *]
+           ;; imgdata = smooth(imgdata, smooth_widths, /edge_wrap)
+           ;; imgdata = smooth(context.data.array[name], $
+           ;;                  context.graphics.smooth,/edge_wrap)
+           ;; imgdata = imgdata[context.data.xrng[0]:context.data.xrng[1], $
+           ;;                   context.data.zrng[0]:context.data.zrng[1], $
+           ;;                   *]*context.data.scale[name]
            xdata = context.data.xvec[context.data.xrng[0]:context.data.xrng[1]]
            ydata = context.data.zvec[context.data.zrng[0]:context.data.zrng[1]]
         end
-        strcmp(context.graphics.plane[ip],'yz'): begin
+        strcmp(cur_plane,'yz'): begin
            smooth_widths = [context.graphics.smooth[1],context.graphics.smooth[2],1]
-           imgdata = smooth(imgdata, smooth_widths, /edge_wrap)
-           imgdata = imgdata[context.data.yrng[0]:context.data.yrng[1], $
-                             context.data.zrng[0]:context.data.zrng[1], $
-                             *]*context.data.scale[name]
+           imgdata = (context.data.array[name])[context.data.xrng[0], $
+                                                context.data.yrng[0]:context.data.yrng[1], $
+                                                context.data.zrng[0]:context.data.zrng[1], $
+                                                *]
+           ;; imgdata = smooth(imgdata, smooth_widths, /edge_wrap)
+           ;; imgdata = smooth(context.data.array[name], $
+           ;;                  context.graphics.smooth,/edge_wrap)
+           ;; imgdata = imgdata[context.data.yrng[0]:context.data.yrng[1], $
+           ;;                   context.data.zrng[0]:context.data.zrng[1], $
+           ;;                   *]*context.data.scale[name]
            xdata = context.data.yvec[context.data.yrng[0]:context.data.yrng[1]]
            ydata = context.data.zvec[context.data.zrng[0]:context.data.zrng[1]]
         end
-        else: message, "Did not recognize plane ("+context.graphics.plane[ip]+")"
+        else: message, "Did not recognize plane ("+cur_plane+")"
      endcase
+     imgdata = smooth(reform(imgdata),smooth_widths,/edge_wrap)*context.data.scale[name]
      colorbar_title = context.data.label[name]+" "+context.data.units[name]
 
      ;;==Create single- or multi-panel images
      img = data_image(imgdata,xdata,ydata, $
-                      panel_index = scaled_index, $
-                      panel_layout = context.panel.layout, $
+                      panel_index = panel_index, $
+                      panel_layout = context.panel.layout[cur_plane], $
                       rgb_table = context.graphics.rgb_table[name], $
                       min_value = -max(abs(imgdata)), $
                       max_value = max(abs(imgdata)), $
@@ -61,10 +85,10 @@ pro project_graphics_space, context,name,class
                       colorbar_type = context.graphics.colorbar.type, $
                       colorbar_title = colorbar_title)
      if context.graphics.haskey('note') && ~strcmp(context.graphics.note,'') then $
-        filename = name+context.graphics.plane[ip]+'_'+ $
+        filename = name+cur_plane+'_'+ $
                    class+'-'+context.graphics.note+ $
                    context.graphics.image.type $
-     else filename = name+context.graphics.plane[ip]+'_'+ $
+     else filename = name+cur_plane+'_'+ $
                      class+context.graphics.image.type
      image_save, img,filename = context.path+path_sep()+filename,/landscape
 
@@ -75,10 +99,10 @@ pro project_graphics_space, context,name,class
                              lindgen(context.params.nt_max), format='(f7.2)')
         string_time = strcompress(string_time,/remove_all)+" ms"
         if context.graphics.haskey('note') && ~strcmp(context.graphics.note,'') then $
-           filename = name+context.graphics.plane[ip]+'_'+ $
+           filename = name+cur_plane+'_'+ $
                       class+'-'+context.graphics.note+ $
                       context.graphics.movie.type $
-        else filename = name+context.graphics.plane[ip]+'_'+ $
+        else filename = name+cur_plane+'_'+ $
                         class+context.graphics.movie.type
         data_movie, imgdata,xdata,ydata, $
                     filename = context.path+path_sep()+filename, $

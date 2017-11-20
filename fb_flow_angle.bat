@@ -16,8 +16,8 @@ run.add, 'test000'
 
 ;;==Set project data path(s)
 path = set_project_path(get_base_dir(), $
-                        ;; 'fb_flow_angle/2D', $
                         'fb_flow_angle'+path_sep()+ $
+                        ;; '2D', $
                         'tests', $
                         run)
 
