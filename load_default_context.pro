@@ -38,18 +38,10 @@ function load_default_context, path=path
   graphics_classes = ['space','kxyzt']
   context['graphics'] = dictionary()
   context.graphics['note'] = ''
-  ;; context.graphics['class'] = dictionary(['space','kxyzt'])
-  ;; context.graphics['name'] = dictionary(context.data.name.toarray())
-  ;; name_list = context.graphics.name.keys()
-  ;; for ik=0,context.graphics.name.count()-1 do $
-  ;;    context.graphics.name[name_list[ik]] = list(graphics_classes)
   context.graphics['class'] = dictionary(d_array)
   for ik=0,d_count-1 do $
      context.graphics.class[d_array[ik]] = graphics_classes
   ;;==graphics/AXES
-  ;; context.graphics['axes'] = dictionary('x', dictionary(), $
-  ;;                                       'y', dictionary(), $
-  ;;                                       'z', dictionary())
   context.graphics['axes'] = dictionary()
   context.graphics.axes['x'] = dictionary('title', dictionary(), 'show', 0B)
   context.graphics.axes.x['title'] = dictionary(graphics_classes, ['x','$k_x$'])
@@ -82,9 +74,6 @@ function load_default_context, path=path
   context.graphics['colorbar'] = dictionary('type', 'global')
 
   ;;==PANEL
-  ;; context['panel'] = dictionary('index', [0,1], $
-  ;;                               'layout', [1,2], $
-  ;;                               'show', 1B)
   context['panel'] = dictionary()
   context.panel['index'] = dictionary('value', [0,1], 'type', 'rel')
   if context.haskey('params') then begin
@@ -94,7 +83,6 @@ function load_default_context, path=path
         context.panel.layout['yz'] = [2,1]
      endif
   endif
-  context.panel['show'] = 1B
 
   return, context
 end
