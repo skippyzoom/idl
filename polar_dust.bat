@@ -9,7 +9,8 @@ description = 'Electron bite-outs (various geometries) at high/polar latitudes.'
 ;;==Declare name(s) of data directory/ies
 run = list()
 ;; run.add, 'run005'
-run.add, 'run006'
+;; run.add, 'run006'
+run.add, 'run007'
 
 ;;==Set project data path(s)
 path = set_project_path(get_base_dir(), $
