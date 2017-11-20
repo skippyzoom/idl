@@ -10,15 +10,6 @@
 ;-
 pro project_graphics, context
 
-  ;; ;;==Build colorbar titles
-  ;; colorbar_title = context.data.label
-
-  ;; ;;==Scale normalized panel indices
-  ;; temp = floor(context.panel.index*context.params.nt_max)
-  ;; ge_max = where(temp ge context.params.nt_max,count)
-  ;; if count gt 0 then temp[ge_max] = context.params.nt_max-1
-  ;; scaled_index = temp
-
   ;;==Loop over all data quantities
   c_keys = context.graphics.class.keys()
   for ik=0,context.graphics.class.count()-1 do begin

@@ -27,9 +27,9 @@ ct = get_custom_ct(1)
 ;;==Create project dictionary
 prj = load_default_context()
 prj['description'] = description
-prj.panel['index'] = [0.25,0.50,0.75,1.0]
-prj.panel['layout'] = [2,2]
-prj.graphics.note = 'test'
+;; prj.panel['index'] = [0.25,0.50,0.75,1.0]
+;; prj.panel['layout'] = [2,2]
+prj.graphics.note = 'code_dev'
 prj.graphics['rgb_table'] = dictionary('den1', 5, $
                                        'phi', [[ct.r],[ct.g],[ct.b]], $
                                        'emag', 3, $

@@ -82,9 +82,19 @@ function load_default_context, path=path
   context.graphics['colorbar'] = dictionary('type', 'global')
 
   ;;==PANEL
-  context['panel'] = dictionary('index', [0,1], $
-                                'layout', [2,2], $
-                                'show', 1B)
+  ;; context['panel'] = dictionary('index', [0,1], $
+  ;;                               'layout', [1,2], $
+  ;;                               'show', 1B)
+  context['panel'] = dictionary()
+  context.panel['index'] = dictionary('value', [0,1], 'type', 'rel')
+  if context.haskey('params') then begin
+     context.panel['layout'] = dictionary('xy', [2,1])
+     if context.params.ndim_space eq 3 then begin
+        context.panel.layout['xz'] = [2,1]
+        context.panel.layout['yz'] = [2,1]
+     endif
+  endif
+  context.panel['show'] = 1B
 
   return, context
 end
