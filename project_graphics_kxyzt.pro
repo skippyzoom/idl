@@ -1,5 +1,5 @@
 ;+
-; Create spectral graphics without time transform from project context
+; Create spectral graphics, without time transform, from project context
 ;-
 pro project_graphics_kxyzt, context,name,class
 

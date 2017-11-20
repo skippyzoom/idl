@@ -12,7 +12,7 @@ run = list()
 ;; run.add, 'alt1'
 ;; run.add, 'alt2'
 run.add, 'test000'
-;; run.add, 'test001'
+run.add, 'test001'
 
 ;;==Set project data path(s)
 path = set_project_path(get_base_dir(), $
