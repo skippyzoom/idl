@@ -104,10 +104,20 @@ pro set_context_defaults, context
      ;;==PANEL
      if ~context.haskey('panel') then $
         context.panel = dictionary()
-     if ~context.panel.haskey('index') then context.panel.index = [0,1]
-     if ~context.panel.haskey('layout') then context.panel.layout = [1,2]
-     if ~context.panel.haskey('show') then context.panel.show = 0B
-     
+     ;; if ~context.panel.haskey('index') then context.panel.index = [0,1]
+     ;; if ~context.panel.haskey('layout') then context.panel.layout = [1,2]
+     ;; if ~context.panel.haskey('show') then context.panel.show = 0B
+     if ~context.panel.haskey('index') then $
+        context.panel.index = dictionary('value', [0,1], 'type', 'rel')
+     if ~context.panel.haskey('layout') then begin
+        context.panel.layout = dictionary('xy', [2,1])
+        if context.params.ndim_space eq 3 then begin
+           context.panel.layout['xz'] = [2,1]
+           context.panel.layout['yz'] = [2,1]
+        endif
+     endif
+     if ~context.panel.haskey('show') then $
+        context.panel.show = 1B
   endelse
 
 end
