@@ -28,9 +28,9 @@ function load_default_context, path=path
                                'type', ['ph5','ph5'], $
                                'transpose', [0,1,2,3], $
                                'ranges', [[0,1],[0,1],[0,1]], $
-                               'scale', dictionary('den1', 1e2, $
-                                                   'phi', 1e3, $
-                                                   'emag', 1e3))
+                               'scale', dictionary('den1', 1.0, $
+                                                   'phi', 1.0, $
+                                                   'emag', 1.0))
   d_array = context.data.name.toarray()
   d_count = context.data.name.count()
 
