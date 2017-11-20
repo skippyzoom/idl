@@ -11,7 +11,7 @@
 ;
 ;
 ; Usage:
-; Result = load_default_context([request[,pattern]][,path=path])
+; Result = get_context_defaults([request[,pattern]][,path=path])
 ; Where
 ;   REQUEST is a string indicating the full "path" to a valid
 ;     key in the default context dictionary.
@@ -24,15 +24,15 @@
 ;     require knowledge of run parameters.
 ;
 ; Examples:
-; IDL> ctx = load_default_context()
+; IDL> ctx = get_context_defaults()
 ;   Returns the default context dictionary, without run 
 ;   parameters.
-; IDL> ctx = load_default_context(path='/path/to/params/')
+; IDL> ctx = get_context_defaults(path='/path/to/params/')
 ;   Returns the default context dictionary, including 
 ;   parameters and parameter-dependent fields based on
 ;   the parameter file located in the directory 
 ;   '/path/to/params/'
-; IDL> rgb = load_default_context('graphics.rgb_table','.')
+; IDL> rgb = get_context_defaults('graphics.rgb_table','.')
 ;   Returns the dictionary of color table values contained
 ;   in the field context.graphics.rgb_table. Note that the
 ;   pattern '.' indicates that the user requested the value
@@ -43,7 +43,7 @@
 ;
 ; TO DO
 ;-
-function load_default_context, request,pattern,path=path
+function get_context_defaults, request,pattern,path=path
 
   ;;==Create the dictionary
   context = dictionary()
@@ -76,14 +76,7 @@ function load_default_context, request,pattern,path=path
   context.graphics['class'] = dictionary(d_array)
   for ik=0,d_count-1 do $
      context.graphics.class[d_array[ik]] = graphics_classes
-  ;;==graphics/AXES
   context.graphics['axes'] = dictionary()
-  context.graphics.axes['x'] = dictionary('title', dictionary(), 'show', 0B)
-  context.graphics.axes.x['title'] = dictionary(graphics_classes, ['x','$k_x$'])
-  context.graphics.axes['y'] = dictionary('title', dictionary(), 'show', 0B)
-  context.graphics.axes.y['title'] = dictionary(graphics_classes, ['y','$k_y$'])
-  context.graphics.axes['z'] = dictionary('title', dictionary(), 'show', 0B)
-  context.graphics.axes.z['title'] = dictionary(graphics_classes, ['z','$k_z$'])
   if context.haskey('params') then begin
      context.graphics['plane'] = list('xy')
      if context.params.ndim_space eq 3 then begin
@@ -91,12 +84,20 @@ function load_default_context, request,pattern,path=path
         context.graphics.plane.add, 'yz'
      endif
   endif
-  ;;==graphics/RGB_TABLE
   context.graphics['rgb_table'] = dictionary(context.data.name.toarray(), $
                                              make_array(d_count,value=0))
+  context.graphics.smooth = [1,1,1,1]
+  ;;==graphics/AXES
+  context.graphics.axes['x'] = dictionary('title', dictionary(), 'show', 0B)
+  context.graphics.axes['y'] = dictionary('title', dictionary(), 'show', 0B)
+  context.graphics.axes['z'] = dictionary('title', dictionary(), 'show', 0B)
+  ;;==graphics/axes/[X,Y,Z]
+  context.graphics.axes.x['title'] = dictionary(graphics_classes, ['x','$k_x$'])
+  context.graphics.axes.y['title'] = dictionary(graphics_classes, ['y','$k_y$'])
+  context.graphics.axes.z['title'] = dictionary(graphics_classes, ['z','$k_z$'])
+  ;;==graphics/RGB_TABLE
   context.graphics.rgb_table['fft'] = 0
   ;;==graphics/SMOOTH
-  context.graphics.smooth = [1,1,1,1]
   ;;==graphics/IMAGE
   context.graphics['image'] = dictionary('type', '.png')
   ;;==graphics/MOVIE

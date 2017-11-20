@@ -19,13 +19,13 @@ pro analyze_project, path, $
   spawn, 'pwd',wd
   if n_elements(path) eq 0 then path = wd
   if n_elements(context) eq 0 then begin
-     context = load_default_context(path=path)
+     context = get_context_defaults(path=path)
   endif $
   else begin
      context['path'] = path
      set_context_defaults, context
   endelse
-
+STOP
   ;;==Load simulation data
   data = load_eppic_data(context.data.name.toarray(), $
                          context.data.type, $

@@ -62,7 +62,7 @@ ct = get_custom_ct(1)
 ;;                                    'expand', 3.0, $
 ;;                                    'rescale', 0.8)
 ;; prj.graphics['colorbar'] = dictionary('type', 'global')
-prj = load_default_context()
+prj = get_context_defaults()
 prj['description'] = description
 prj.graphics.note = 'code_dev'
 prj.panel['index'] = [0,1]

@@ -21,7 +21,7 @@ path = set_project_path(get_base_dir(), $
 ct = get_custom_ct(1)
 
 ;;==Create project dictionary
-prj = load_default_context()
+prj = get_context_defaults()
 prj['description'] = description
 prj.data['ranges'] = [[0.5-1./8,0.5+1./8],[0.5-1./4,0.5+1./4],[0,1]]
 ;; prj.data['ranges'] = [[0,1],[0,1],[0,1]]
