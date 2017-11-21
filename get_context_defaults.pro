@@ -95,6 +95,9 @@ function get_context_defaults, request,pattern,path=path
   context.graphics.axes.x['title'] = dictionary(graphics_classes, ['x','$k_x$'])
   context.graphics.axes.y['title'] = dictionary(graphics_classes, ['y','$k_y$'])
   context.graphics.axes.z['title'] = dictionary(graphics_classes, ['z','$k_z$'])
+  context.graphics.axes.x['show'] = 0B
+  context.graphics.axes.y['show'] = 0B
+  context.graphics.axes.z['show'] = 0B
   ;;==graphics/RGB_TABLE
   context.graphics.rgb_table['fft'] = 0
   ;;==graphics/SMOOTH

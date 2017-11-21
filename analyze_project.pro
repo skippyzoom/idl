@@ -25,7 +25,7 @@ pro analyze_project, path, $
      context['path'] = path
      set_context_defaults, context
   endelse
-STOP
+
   ;;==Load simulation data
   data = load_eppic_data(context.data.name.toarray(), $
                          context.data.type, $

@@ -47,7 +47,7 @@ pro set_context_defaults, context
         context.graphics.class = get_context_defaults('graphics.class','.')
      if ~context.graphics.haskey('plane') || $
         n_elements(context.graphics.plane) eq 0 then $
-        context.graphics.plane = get_context_defaults('graphics.plane','.')
+        context.graphics.plane = get_context_defaults('graphics.plane','.',path=context.path)
      if ~context.graphics.haskey('image') || $
         n_elements(context.graphics.image) eq 0 then $
         context.graphics.image = get_context_defaults('graphics.image','.')
@@ -82,6 +82,12 @@ pro set_context_defaults, context
         context.graphics.axes.y.title = get_context_defaults('graphics.axes.y.title','.')
      if ~context.graphics.axes.z.haskey('title') then $
         context.graphics.axes.z.title = get_context_defaults('graphics.axes.z.title','.')
+     if ~context.graphics.axes.x.haskey('show') then $    
+        context.graphics.axes.x.show = get_context_defaults('graphics.axes.x.show','.')
+     if ~context.graphics.axes.y.haskey('show') then $
+        context.graphics.axes.y.show = get_context_defaults('graphics.axes.y.show','.')
+     if ~context.graphics.axes.z.haskey('show') then $
+        context.graphics.axes.z.show = get_context_defaults('graphics.axes.z.show','.')
      ;;==graphics/SMOOTH
      case n_elements(context.graphics.smooth) of 
         1: begin
@@ -97,7 +103,6 @@ pro set_context_defaults, context
            context.graphics.smooth = [1,1,1,1]
         end
      endcase
-STOP
      ;;==graphics/IMAGE
      if ~context.graphics.image.haskey('type') then context.graphics.image.type = '.png'
      ;;==graphics/MOVIE
@@ -110,22 +115,16 @@ STOP
      if ~context.graphics.colorbar.haskey('type') then context.graphics.colorbar.type = 'global'
 
      ;;==PANEL
-     if ~context.haskey('panel') then $
-        context.panel = dictionary()
-     ;; if ~context.panel.haskey('index') then context.panel.index = [0,1]
-     ;; if ~context.panel.haskey('layout') then context.panel.layout = [1,2]
-     ;; if ~context.panel.haskey('show') then context.panel.show = 0B
-     if ~context.panel.haskey('index') then $
-        context.panel.index = dictionary('value', [0,1], 'type', 'rel')
-     if ~context.panel.haskey('layout') then begin
-        context.panel.layout = dictionary('xy', [2,1])
-        if context.params.ndim_space eq 3 then begin
-           context.panel.layout['xz'] = [2,1]
-           context.panel.layout['yz'] = [2,1]
-        endif
+     if ~context.haskey('panel') || $
+        n_elements(context.panel) eq 0 then $
+        context.panel = get_context_defaults('panel')
+     if ~context.panel.haskey('index') || $
+        n_elements(context.panel.index) eq 0 then $
+        context.panel.index = get_context_defaults('panel.index','.')
+     if ~context.panel.haskey('layout') || $
+        n_elements(context.panel.layout) eq 0 then begin
+        context.panel.layout = get_context_defaults('panel.layout','.',path=context.path)
      endif
-     if ~context.panel.haskey('show') then $
-        context.panel.show = 1B
   endelse
 
 end
