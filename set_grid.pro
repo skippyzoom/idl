@@ -36,7 +36,7 @@ function set_grid, path
            sizepertime = long64(nxg)*long64(nyg)*long64(nzg)
            nout_avg = params.nout_avg
            nsubdomains = params.nsubdomains
-           print, "SET_GRID: Swapped X and Z for 3D PHDF"
+           print, "[SET_GRID] Swapped X and Z for 3D PHDF"
         end
      endcase
   endif else begin
