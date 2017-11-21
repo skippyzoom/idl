@@ -70,13 +70,6 @@ pro project_graphics_space, context,name,class
      img = data_image(imgdata,xdata,ydata, $
                       panel_index = panel_index, $
                       panel_layout = context.panel.layout[cur_plane], $
-                      rgb_table = context.graphics.rgb_table[name], $
-                      min_value = -max(abs(imgdata)), $
-                      max_value = max(abs(imgdata)), $
-                      xtitle = xtitle, $
-                      ytitle = ytitle, $
-                      xshow = xshow, $
-                      yshow = yshow, $
                       colorbar_type = context.graphics.colorbar.type, $
                       colorbar_title = colorbar_title)
      n_panels = n_elements(panel_index)
