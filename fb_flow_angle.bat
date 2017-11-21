@@ -7,7 +7,7 @@
 description = 'Farley-Buneman flow angle in 2D or 3D.'
 
 ;;==Declare name(s) of data directory/ies
-run = build_run_list(expand_path('~/idl/dev/fb_flow_angle.lst'))
+run = build_run_list(expand_path('~/idl/batch/fb_flow_angle.lst'))
 
 ;;==Set project data path(s)
 path = set_project_path(get_base_dir(), $

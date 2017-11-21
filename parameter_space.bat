@@ -7,26 +7,7 @@
 description = 'Parameter-space study of cell size.'
 
 ;;==Declare name(s) of data directory/ies
-run = list()
-;; run.add, 'test012'
-;; run.add, 'test013'
-;; run.add, 'test018'
-;; run.add, 'test019'
-;; run.add, 'test020'
-;; run.add, 'test021'
-;; run.add, 'test022'
-;; run.add, 'test023'
-;; run.add, 'test024'
-;; run.add, 'test025'
-;; run.add, 'test026'
-;; run.add, 'test027'
-;; run.add, 'test028'
-;; run.add, 'test029'
-;; run.add, 'test030'
-;; run.add, 'test031'
-;; run.add, 'test032'
-;; run.add, 'test033'
-run.add, 'test034'
+run = build_run_list(expand_path('~/idl/batch/parameter_space.lst'))
 
 ;;==Set project data path(s)
 path = set_project_path(get_base_dir(), $

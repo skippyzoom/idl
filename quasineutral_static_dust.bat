@@ -9,11 +9,7 @@
 description = 'Turbulence from dust-layer electron gradients.'
 
 ;;==Declare name(s) of data directory/ies
-run = list()
-run.add, 'run009'
-;; run.add, 'run010'
-;; run.add, 'run011'
-run.add, 'run013'
+run = build_run_list(expand_path('~/idl/batch/quasineutral_static_dust.lst'))
 
 ;;==Set project data path(s)
 path = set_project_path(get_base_dir(), $

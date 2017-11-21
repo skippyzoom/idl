@@ -10,8 +10,6 @@ description = 'FBI generated from GDI via parametric instability.'
 
 ;;==Declare name(s) of data directory/ies
 run = list()
-run.add, 'run000'
-run.add, 'run001'
 
 ;;==Set project data path(s)
 path = set_project_path(get_base_dir(), $
