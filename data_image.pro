@@ -32,7 +32,7 @@ function data_image, imgdata,xdata,ydata, $
                      colorbar_title=colorbar_title
 
   if n_elements(imgdata) eq 0 then begin
-     print, "DATA_IMAGE: Please supply image array. No graphics produced."
+     print, "[DATA_IMAGE] Please supply image array. No graphics produced."
      return, !NULL
   endif $
   else begin
@@ -139,7 +139,7 @@ function data_image, imgdata,xdata,ydata, $
         ax[1].show = yshow        
         
         if strcmp(colorbar_type,'panel',5) then begin
-           print, "DATA_IMAGE: Panel-specific colorbar not implemented"
+           print, "[DATA_IMAGE] Panel-specific colorbar not implemented"
         endif
      endfor
 

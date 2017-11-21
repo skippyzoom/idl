@@ -63,7 +63,7 @@ function read_ph5_data, dataName, $
   nt = n_elements(h5File)
   data = make_array(nx,ny,nz,nt,type=type)
 
-  if keyword_set(verbose) then print,"READ_PH5_DATA: Reading ",dataName,"..."
+  if keyword_set(verbose) then print,"[READ_PH5_DATA] Reading ",dataName,"..."
   nullCount = 0L
   for it=0,nt-1 do begin
      temp = get_h5_data(h5File[it],dataName)
@@ -77,7 +77,7 @@ function read_ph5_data, dataName, $
      endif else nullCount++
   endfor
   if nullCount gt 0 then $
-     print, "READ_PH5_DATA: Warning: Did not find '", $
+     print, "[READ_PH5_DATA] Warning: Did not find '", $
             dataName+"' in ", $
             strcompress(nullCount,/remove_all),"/", $
             strcompress(nt,/remove_all)," files."

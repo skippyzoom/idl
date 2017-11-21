@@ -43,7 +43,7 @@ function load_eppic_data, data_name,data_type, $
 
      data = dictionary()
      for id=0,n_data-1 do begin
-        print, "LOAD_EPPIC_DATA: Loading ",data_name[id],"..."
+        print, "[LOAD_EPPIC_DATA] Loading ",data_name[id],"..."
         data[data_name[id]] = read_xxx_data(data_name[id], $
                                             data_type[id], $
                                             nx = grid.nx, $
@@ -62,7 +62,7 @@ function load_eppic_data, data_name,data_type, $
      endfor
      return, data
   endif else begin
-     print, "LOAD_EPPIC_DATA: No data loaded"
+     print, "[LOAD_EPPIC_DATA] No data loaded"
      return, !NULL
   endelse
 

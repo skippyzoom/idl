@@ -34,7 +34,7 @@ function read_bin_data, inName, $
 
   ;;==Read binary data
   binName = dataName+'.bin'
-  if keyword_set(verbose) then print,"READ_BIN_DATA: Reading ",dataName,"..."
+  if keyword_set(verbose) then print,"[READ_BIN_DATA] Reading ",dataName,"..."
   if decomposed then begin
      data = read_domains(binName,[nx/nsubdomains,ny,nz],ndomains=nsubdomains, $
                          order=order,/binary,skip=iskip, $

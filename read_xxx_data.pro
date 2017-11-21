@@ -22,7 +22,7 @@ function read_xxx_data, dataName, $
      strcmp(dataType,'bin',/fold_case): data = read_bin_data(dataName,_EXTRA=ex)
      strcmp(dataType,'ph5',/fold_case): data = read_ph5_data(dataName,_EXTRA=ex)
      else: begin 
-        print, "READ_XXX_DATA: Currently supported data types are [bin,ph5]"
+        print, "[READ_XXX_DATA] Currently supported data types are [bin,ph5]"
         data = 0.0
      end
   endcase

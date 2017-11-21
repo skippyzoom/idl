@@ -49,6 +49,6 @@ pro set_data_units, context,units, $
         context.data.units[d_keys[ik]] = "["+context.data.units[d_keys[ik]]+"]"        
      endfor
   endif $
-  else print, "SET_DATA_UNITS: Needs to know project data names."
+  else print, "[SET_DATA_UNITS] Needs to know project data names."
 
 end

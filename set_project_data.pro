@@ -26,18 +26,6 @@ function set_project_data, data,grid,context=context
      message, "Parameter 'grid' must be a struct"
 
   ;;==Set up untransposed vecs
-  ;; if n_elements(context) ne 0 && context.haskey('ranges') then begin
-  ;;    ranges = {x: [context.ranges[0,0]*grid.nx,context.ranges[1,0]*grid.nx-1], $
-  ;;              y: [context.ranges[0,1]*grid.ny,context.ranges[1,1]*grid.ny-1], $
-  ;;              z: [context.ranges[0,2]*grid.nz,context.ranges[1,2]*grid.nz-1]}
-  ;;    context.remove, 'ranges'
-  ;; endif $
-  ;; else begin
-  ;;    ranges = {x: [0,grid.nx-1], $
-  ;;              y: [0,grid.ny-1], $
-  ;;              z: [0,grid.nz-1]}
-  ;; endelse
-
   if (n_elements(context) ne 0) && $
      (context.haskey('data') && context.data.haskey('ranges')) then begin
      ranges = {x: [context.data.ranges[0,0]*grid.nx, $
@@ -57,19 +45,9 @@ function set_project_data, data,grid,context=context
           y: grid.y, $
           z: grid.z} 
 
-  ;;==Create or update project dictionary
+  ;;==Create or update project context dictionary
   if n_elements(context) eq 0 then begin
      transpose = ([0,1,2,3])[0:d_size[0]-1]
-     ;; context = dictionary('data', data[*], $
-     ;;                      'grid', grid, $
-     ;;                      'xrng', ranges.(transpose[0]), $
-     ;;                      'yrng', ranges.(transpose[1]), $
-     ;;                      'zrng', ranges.(transpose[2]), $
-     ;;                      'xvec', vecs.(transpose[0]), $
-     ;;                      'yvec', vecs.(transpose[1]), $
-     ;;                      'zvec', vecs.(transpose[2]))
-     ;; context['scale'] = make_array(context.data.count(),value=1.0)
-     ;; context['transpose'] = transpose
      context = dictionary('data', dictionary(), $
                           'grid', grid)
      context.data['array'] = data[*]

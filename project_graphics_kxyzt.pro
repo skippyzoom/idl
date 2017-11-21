@@ -3,7 +3,7 @@
 ;-
 pro project_graphics_kxyzt, context,name,class
 
-  print, "PROJECT_GRAPHICS_KXYZT: Currently unavailable"
+  print, "[PROJECT_GRAPHICS_KXYZT] Currently unavailable"
 
   if 0 then begin
      ;;==Scale normalized panel indices

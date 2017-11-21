@@ -21,7 +21,7 @@ pro project_graphics, context
            strcmp(class[ic],'space'): project_graphics_space, context,name,class[ic]
            strcmp(class[ic],'space-diff'): project_graphics_space_diff, context,name,class[ic]
            strcmp(class[ic],'kxyzt'): project_graphics_kxyzt, context,name,class[ic]
-           else: print, "PROJECT_GRAPHICS: Did not recognize graphics class (",class[ic],")"
+           else: print, "[PROJECT_GRAPHICS] Did not recognize graphics class (",class[ic],")"
         endcase
      endfor
   endfor
