@@ -17,9 +17,8 @@ pro project_graphics_space, context,name,class
 
   ;;==Set up data for graphics routines
   n_planes = context.graphics.plane.count()
-  ;; imgdata = context.data.array[name]
-  ;; imgdata = smooth(imgdata,context.graphics.smooth,/edge_wrap)
 
+  ;;==Loop over all requested planes
   for ip=0,n_planes-1 do begin
      cur_plane = context.graphics.plane[ip]
      case 1B of
@@ -29,14 +28,12 @@ pro project_graphics_space, context,name,class
                                                 context.data.yrng[0]:context.data.yrng[1], $
                                                 context.data.zrng[0], $
                                                 *]
-           ;; imgdata = smooth(imgdata, smooth_widths, /edge_wrap)
-           ;; imgdata = smooth(context.data.array[name], $
-           ;;                  context.graphics.smooth,/edge_wrap)
-           ;; imgdata = imgdata[context.data.xrng[0]:context.data.xrng[1], $
-           ;;                   context.data.yrng[0]:context.data.yrng[1], $
-           ;;                   *]*context.data.scale[name]
            xdata = context.data.xvec[context.data.xrng[0]:context.data.xrng[1]]
            ydata = context.data.yvec[context.data.yrng[0]:context.data.yrng[1]]
+           xtitle = context.graphics.axes.x.title[class]
+           ytitle = context.graphics.axes.y.title[class]
+           xshow = context.graphics.axes.x.show
+           yshow = context.graphics.axes.y.show
         end
         strcmp(cur_plane,'xz'): begin
            smooth_widths = [context.graphics.smooth[0],context.graphics.smooth[2],1]
@@ -44,14 +41,12 @@ pro project_graphics_space, context,name,class
                                                 context.data.yrng[0], $
                                                 context.data.zrng[0]:context.data.zrng[1], $
                                                 *]
-           ;; imgdata = smooth(imgdata, smooth_widths, /edge_wrap)
-           ;; imgdata = smooth(context.data.array[name], $
-           ;;                  context.graphics.smooth,/edge_wrap)
-           ;; imgdata = imgdata[context.data.xrng[0]:context.data.xrng[1], $
-           ;;                   context.data.zrng[0]:context.data.zrng[1], $
-           ;;                   *]*context.data.scale[name]
            xdata = context.data.xvec[context.data.xrng[0]:context.data.xrng[1]]
            ydata = context.data.zvec[context.data.zrng[0]:context.data.zrng[1]]
+           xtitle = context.graphics.axes.x.title[class]
+           ytitle = context.graphics.axes.z.title[class]
+           xshow = context.graphics.axes.x.show
+           yshow = context.graphics.axes.z.show
         end
         strcmp(cur_plane,'yz'): begin
            smooth_widths = [context.graphics.smooth[1],context.graphics.smooth[2],1]
@@ -59,14 +54,12 @@ pro project_graphics_space, context,name,class
                                                 context.data.yrng[0]:context.data.yrng[1], $
                                                 context.data.zrng[0]:context.data.zrng[1], $
                                                 *]
-           ;; imgdata = smooth(imgdata, smooth_widths, /edge_wrap)
-           ;; imgdata = smooth(context.data.array[name], $
-           ;;                  context.graphics.smooth,/edge_wrap)
-           ;; imgdata = imgdata[context.data.yrng[0]:context.data.yrng[1], $
-           ;;                   context.data.zrng[0]:context.data.zrng[1], $
-           ;;                   *]*context.data.scale[name]
            xdata = context.data.yvec[context.data.yrng[0]:context.data.yrng[1]]
            ydata = context.data.zvec[context.data.zrng[0]:context.data.zrng[1]]
+           xtitle = context.graphics.axes.y.title[class]
+           ytitle = context.graphics.axes.z.title[class]
+           xshow = context.graphics.axes.y.show
+           yshow = context.graphics.axes.z.show
         end
         else: message, "Did not recognize plane ("+cur_plane+")"
      endcase
@@ -80,10 +73,20 @@ pro project_graphics_space, context,name,class
                       rgb_table = context.graphics.rgb_table[name], $
                       min_value = -max(abs(imgdata)), $
                       max_value = max(abs(imgdata)), $
-                      ;; xtitle = "Zonal [m]", $
-                      ;; ytitle = "Vertical [m]", $
+                      xtitle = xtitle, $
+                      ytitle = ytitle, $
+                      xshow = xshow, $
+                      yshow = yshow, $
                       colorbar_type = context.graphics.colorbar.type, $
                       colorbar_title = colorbar_title)
+     ;; img.rgb_table = context.graphics.rgb_table[name]
+     ;; img.min_value = -max(abs(imgdata))
+     ;; img.max_value = max(abs(imgdata))
+     ;; img.xtitle = xtitle
+     ;; img.ytitle = ytitle
+     ;; ax = img.axes
+     ;; ax[0].show = xshow
+     ;; ax[1].show = yshow
      if context.graphics.haskey('note') && ~strcmp(context.graphics.note,'') then $
         filename = name+cur_plane+'_'+ $
                    class+'-'+context.graphics.note+ $

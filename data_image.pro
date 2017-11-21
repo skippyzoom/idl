@@ -24,6 +24,8 @@ function data_image, imgdata,xdata,ydata, $
                      max_value=max_value, $
                      xtitle=xtitle, $
                      ytitle=ytitle, $
+                     xshow=xshow, $
+                     yshow=yshow, $
                      xrange=xrange, $
                      yrange=yrange, $
                      colorbar_type=colorbar_type, $
@@ -52,6 +54,8 @@ function data_image, imgdata,xdata,ydata, $
      if n_elements(max_value) eq 0 then max_value = !NULL
      if n_elements(xtitle) eq 0 then xtitle = ''
      if n_elements(ytitle) eq 0 then ytitle = ''
+     if n_elements(xshow) eq 0 then xshow = 0B
+     if n_elements(yshow) eq 0 then yshow = 0B
      if n_elements(colorbar_type) eq 0 then colorbar_type = 'global'
      if n_elements(colorbar_title) eq 0 then colorbar_title = ''
 
@@ -91,6 +95,7 @@ function data_image, imgdata,xdata,ydata, $
      endelse
 
      aspect_ratio = 1.0
+     xy_ratio = (yrange[1]-yrange[0])/(xrange[1]-xrange[0])
 
      ;;==Create image panel(s)
      for ip=0,np-1 do begin
@@ -117,7 +122,7 @@ function data_image, imgdata,xdata,ydata, $
                     xrange = xrange, $
                     yrange = yrange, $
                     xticklen = 0.02, $
-                    yticklen = 0.02*aspect_ratio, $
+                    yticklen = 0.02*xy_ratio, $
                     xsubticklen = 0.5, $
                     ysubticklen = 0.5, $
                     xtickdir = 1, $
@@ -129,6 +134,10 @@ function data_image, imgdata,xdata,ydata, $
                     current = (ip gt 0), $
                     /buffer)
 
+        ax = img.axes
+        ax[0].show = xshow
+        ax[1].show = yshow        
+        
         if strcmp(colorbar_type,'panel',5) then begin
            print, "DATA_IMAGE: Panel-specific colorbar not implemented"
         endif
