@@ -13,18 +13,15 @@ pro analyze_project, path, $
                      verbose=verbose
 
   ;;==Echo working path and store in project dictionary
-  print, "ANALYZE_PROJECT: In ",path
+  print, "[ANALYZE_PROJECT] Working in directory ",path
 
   ;;==Set up an appropriate context dictionary
   spawn, 'pwd',wd
   if n_elements(path) eq 0 then path = wd
-  if n_elements(context) eq 0 then begin
-     context = get_context_defaults(path=path)
-  endif $
-  else begin
-     context['path'] = path
-     set_context_defaults, context
-  endelse
+  if n_elements(context) eq 0 then $
+     context = load_empty_context()
+  context['path'] = path
+  set_context_defaults, context
 
   ;;==Load simulation data
   data = load_eppic_data(context.data.name.toarray(), $
