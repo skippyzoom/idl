@@ -1,7 +1,9 @@
 ;+
 ; A lightweight routine for checking EPPIC simulation output
-; prior to more intensive analysis. This routine should stay
-; independent of more so
+; prior to more intensive analysis. This routine should use
+; routines from the IDL distribution whenever possible (as
+; opposed to more sophisticated home-cooked routines) so it
+; will not be subject to the whims of development.
 ;-
 pro quick_look, path,directory=directory
 
@@ -27,25 +29,25 @@ pro quick_look, path,directory=directory
   ;;==Create images of electrostatic potential
   img = image(data.phi[*,*,0,0],/buffer,rgb_table=5)
   txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
-  image_save, img,filename=directory+"phi-t0.png"
+  image_save, img,filename=directory+path_sep()+"phi-t0.png"
   img = image(data.phi[*,*,0,nt_max-1],/buffer,rgb_table=5)
   txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
-  image_save, img,filename=directory+"phi-tf.png"
+  image_save, img,filename=directory+path_sep()+"phi-tf.png"
 
   ;;==Create images of ion density
   img = image(data.den1[*,*,0,0],/buffer,rgb_table=5)
   txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
-  image_save, img,filename=directory+"den1-t0.png"
+  image_save, img,filename=directory+path_sep()+"den1-t0.png"
   img = image(data.den1[*,*,0,nt_max-1],/buffer,rgb_table=5)
   txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
-  image_save, img,filename=directory+"den1-tf.png"
+  image_save, img,filename=directory+path_sep()+"den1-tf.png"
 
   ;;==Create images of smoothed ion density
   img = image(smooth(data.den1[*,*,0,0],2.0/grid.dx,/edge_wrap),/buffer,rgb_table=5)
   txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
-  image_save, img,filename=directory+"den1_sm-t0.png"
+  image_save, img,filename=directory+path_sep()+"den1_sm-t0.png"
   img = image(smooth(data.den1[*,*,0,nt_max-1],2.0/grid.dx,/edge_wrap),/buffer,rgb_table=5)
   txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
-  image_save, img,filename=directory+"den1_sm-tf.png"
+  image_save, img,filename=directory+path_sep()+"den1_sm-tf.png"
 
 end
