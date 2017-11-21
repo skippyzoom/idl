@@ -59,11 +59,12 @@ function data_image, imgdata,xdata,ydata, $
      if n_elements(colorbar_type) eq 0 then colorbar_type = 'global'
      if n_elements(colorbar_title) eq 0 then colorbar_title = ''
 
-     ;;==Set up graphics parameters
+     ;;==Calculate positions
      position = multi_position(panel_layout, $
                                edges=[0.12,0.10,0.80,0.80], $
                                buffers=[0.00,0.10])
 
+     ;;==Set up x-axis ticks
      if keyword_set(xrange) then begin
         xtickvalues = [xrange[0],0.5*xrange[0],0,0.5*xrange[1],xrange[1]]
         xmajor = n_elements(xtickvalues)
@@ -79,6 +80,7 @@ function data_image, imgdata,xdata,ydata, $
         xrange = [xtickvalues[0],xtickvalues[xmajor-1]]
      endelse
 
+     ;;==Set up y-axis ticks
      if keyword_set(yrange) then begin
         ytickvalues = [yrange[0],0.5*yrange[0],0,0.5*yrange[1],yrange[1]]
         ymajor = n_elements(ytickvalues)
@@ -94,49 +96,51 @@ function data_image, imgdata,xdata,ydata, $
         yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
      endelse
 
+     ;;==Calculate aspect ratios for panels and ticks
      aspect_ratio = 1.0
      xy_ratio = (yrange[1]-yrange[0])/(xrange[1]-xrange[0])
 
      ;;==Create image panel(s)
+     img = objarr(np)
      for ip=0,np-1 do begin
         timestep = (panel_index[ip] le tsize-1) ? panel_index[ip] : tsize-1
-        img = image(imgdata[*,*,timestep],xdata,ydata, $
-                    position = position[*,ip], $
-                    min_value = min_value, $
-                    max_value = max_value, $
-                    rgb_table = rgb_table, $
-                    axis_style = 1, $
-                    aspect_ratio = aspect_ratio, $
-                    xstyle = 1, $
-                    ystyle = 1, $
-                    xtitle = xtitle, $
-                    ytitle = ytitle, $
-                    xmajor = xmajor, $
-                    xminor = xminor, $
-                    ymajor = ymajor, $
-                    yminor = yminor, $
-                    xtickname = xtickname, $
-                    ytickname = ytickname, $
-                    xtickvalues = xtickvalues, $
-                    ytickvalues = ytickvalues, $
-                    xrange = xrange, $
-                    yrange = yrange, $
-                    xticklen = 0.02, $
-                    yticklen = 0.02*xy_ratio, $
-                    xsubticklen = 0.5, $
-                    ysubticklen = 0.5, $
-                    xtickdir = 1, $
-                    ytickdir = 1, $
-                    xtickfont_size = 10.0, $
-                    ytickfont_size = 10.0, $
-                    font_size = 11.0, $
-                    font_name = "Times", $
-                    current = (ip gt 0), $
-                    /buffer)
+        img[ip] = image(imgdata[*,*,timestep],xdata,ydata, $
+                        position = position[*,ip], $
+                        min_value = min_value, $
+                        max_value = max_value, $
+                        rgb_table = rgb_table, $
+                        axis_style = 1, $
+                        aspect_ratio = aspect_ratio, $
+                        xstyle = 1, $
+                        ystyle = 1, $
+                        xtitle = xtitle, $
+                        ytitle = ytitle, $
+                        xmajor = xmajor, $
+                        xminor = xminor, $
+                        ymajor = ymajor, $
+                        yminor = yminor, $
+                        xtickname = xtickname, $
+                        ytickname = ytickname, $
+                        xtickvalues = xtickvalues, $
+                        ytickvalues = ytickvalues, $
+                        xrange = xrange, $
+                        yrange = yrange, $
+                        xticklen = 0.02, $
+                        yticklen = 0.02*xy_ratio, $
+                        xsubticklen = 0.5, $
+                        ysubticklen = 0.5, $
+                        xtickdir = 1, $
+                        ytickdir = 1, $
+                        xtickfont_size = 10.0, $
+                        ytickfont_size = 10.0, $
+                        font_size = 11.0, $
+                        font_name = "Times", $
+                        current = (ip gt 0), $
+                        /buffer)
 
-        ax = img.axes
-        ax[0].show = xshow
-        ax[1].show = yshow        
+        ;; ax = img.axes
+        ;; ax[0].show = xshow
+        ;; ax[1].show = yshow        
         
         if strcmp(colorbar_type,'panel',5) then begin
            print, "[DATA_IMAGE] Panel-specific colorbar not implemented"
@@ -152,10 +156,11 @@ function data_image, imgdata,xdata,ydata, $
         x1 = x0+width
         y0 = 0.50*(1-height)
         y1 = 0.50*(1+height)
-        tickvalues = img.min_value[0] + $
-                     (img.max_value[0]-img.min_value[0])*findgen(major)/(major-1)
+        tickvalues = img[np-1].min_value[0] + $
+                     (img[np-1].max_value[0]-img[np-1].min_value[0])* $
+                     findgen(major)/(major-1)
         ;;-->This is kind of a hack
-        if (major mod 2) ne 0 && (img.min_value[0]+img.max_value[0] eq 0) then $
+        if (major mod 2) ne 0 && (img[np-1].min_value[0]+img[np-1].max_value[0] eq 0) then $
            tickvalues[major/2] = 0.0
         ;;<--
         tickname = plusminus_labels(tickvalues,format='f8.2')

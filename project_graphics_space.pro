@@ -79,21 +79,24 @@ pro project_graphics_space, context,name,class
                       yshow = yshow, $
                       colorbar_type = context.graphics.colorbar.type, $
                       colorbar_title = colorbar_title)
-     ;; img.rgb_table = context.graphics.rgb_table[name]
-     ;; img.min_value = -max(abs(imgdata))
-     ;; img.max_value = max(abs(imgdata))
-     ;; img.xtitle = xtitle
-     ;; img.ytitle = ytitle
-     ;; ax = img.axes
-     ;; ax[0].show = xshow
-     ;; ax[1].show = yshow
+     n_panels = n_elements(panel_index)
+     for id=0,n_panels-1 do begin
+        img[id].rgb_table = context.graphics.rgb_table[name]
+        img[id].min_value = -max(abs(imgdata))
+        img[id].max_value = max(abs(imgdata))
+        img[id].xtitle = xtitle
+        img[id].ytitle = ytitle
+        ax = img[id].axes
+        ax[0].show = xshow
+        ax[1].show = yshow
+     endfor
      if context.graphics.haskey('note') && ~strcmp(context.graphics.note,'') then $
         filename = name+cur_plane+'_'+ $
                    class+'-'+context.graphics.note+ $
                    context.graphics.image.type $
      else filename = name+cur_plane+'_'+ $
                      class+context.graphics.image.type
-     image_save, img,filename = context.path+path_sep()+filename,/landscape
+     image_save, img[0],filename = context.path+path_sep()+filename,/landscape
 
      ;;==Create movies (if requested)
      if context.graphics.movie.make then begin
@@ -115,6 +118,7 @@ pro project_graphics_space, context,name,class
                     expand = context.graphics.movie.expand, $
                     rescale = context.graphics.movie.rescale, $
                     colorbar_title = colorbar_title
-     endif
-  endfor
+     endif ;; Make movies
+  endfor ;; Loop over planes
+
 end
