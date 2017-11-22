@@ -12,15 +12,15 @@
 ;
 ;-
 
-function read_xxx_data, dataName, $
-                        dataType, $
+function read_xxx_data, data_name, $
+                        data_type, $
                         _EXTRA=ex
 
-  if size(dataType,/type) ne 7 then $
+  if size(data_type,/type) ne 7 then $
      message, "Please supply data type as a string"
   case 1 of
-     strcmp(dataType,'bin',/fold_case): data = read_bin_data(dataName,_EXTRA=ex)
-     strcmp(dataType,'ph5',/fold_case): data = read_ph5_data(dataName,_EXTRA=ex)
+     strcmp(data_type,'bin',/fold_case): data = read_bin_data(data_name,_EXTRA=ex)
+     strcmp(data_type,'ph5',/fold_case): data = read_ph5_data(data_name,_EXTRA=ex)
      else: begin 
         print, "[READ_XXX_DATA] Currently supported data types are [bin,ph5]"
         data = 0.0

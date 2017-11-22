@@ -18,7 +18,7 @@
 ;
 ; TO DO:
 ;-
-function read_ph5_data, dataName, $
+function read_ph5_data, data_name, $
                         verbose=verbose, $
                         ext=ext, $
                         timestep=timestep, $
@@ -32,26 +32,26 @@ function read_ph5_data, dataName, $
 
   if strcmp(strmid(ext,0,1),'.') then $
      ext = strmid(ext,1,strlen(ext))
-  h5File = file_search(path+'*.'+ext,count=count)
-  nFiles = n_elements(h5File)
+  h5_file = file_search(path+'*.'+ext,count=count)
+  n_files = n_elements(h5_file)
   if count ne 0 then begin
-     h5Base = file_basename(h5File)
-     all_timesteps = get_ph5timestep(h5Base)
-     nout = all_timesteps[nFiles-1]/nFiles + 1
+     h5_base = file_basename(h5_file)
+     all_timesteps = get_ph5timestep(h5_base)
+     nout = all_timesteps[n_files-1]/n_files + 1
   endif else begin
      errmsg = "Found no files with extension "+ext
      message, errmsg
   endelse
 
-  if n_elements(timestep) ne 0 then h5File = h5File(timestep/nout)
+  if n_elements(timestep) ne 0 then h5_file = h5_file(timestep/nout)
 
-  nt = n_elements(h5File)
-  data = make_array([size(get_h5_data(h5File[0],dataName),/dim),nt],type=type)
+  nt = n_elements(h5_file)
+  data = make_array([size(get_h5_data(h5_file[0],data_name),/dim),nt],type=type)
 
-  if keyword_set(verbose) then print,"[READ_PH5_DATA] Reading ",dataName,"..."
-  nullCount = 0L
+  if keyword_set(verbose) then print,"[READ_PH5_DATA] Reading ",data_name,"..."
+  null_count = 0L
   for it=0,nt-1 do begin
-     temp = get_h5_data(h5File[it],dataName)
+     temp = get_h5_data(h5_file[it],data_name)
      if n_elements(temp) ne 0 then begin
         case size(data,/n_dim) of
            2: data[*,it] = temp
@@ -62,12 +62,12 @@ function read_ph5_data, dataName, $
            7: data[*,*,*,*,*,*,it] = temp
            8: data[*,*,*,*,*,*,*,it] = temp
         endcase
-     endif else nullCount++
+     endif else null_count++
   endfor
-  if nullCount gt 0 then $
+  if null_count gt 0 then $
      print, "[READ_PH5_DATA] Warning: Did not find '", $
-            dataName+"' in ", $
-            strcompress(nullCount,/remove_all),"/", $
+            data_name+"' in ", $
+            strcompress(null_count,/remove_all),"/", $
             strcompress(nt,/remove_all)," files."
 
   return, data
