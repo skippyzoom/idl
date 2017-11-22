@@ -15,71 +15,59 @@
 ;    time steps for a single quantity.
 ;    This function is currently only set
 ;    up to do the latter.
-; -- By default, this function rotates
-;    data to correct for the way EPPIC
-;    outputs parallel HDF data. The user
-;    can request the raw orientation by
-;    calling the function with /NO_ROTATE
-;    or NO_ROTATE=1.
 ;
 ; TO DO:
-; -- Consider getting dimensions from one
-;    file, then defining ndim_space instead
-;    of using nz as a proxy for dimensionality.
 ;-
-function read_ph5_data, dataName, $
+function read_ph5_data, data_name, $
                         verbose=verbose, $
                         ext=ext, $
-                        nx=nx,ny=ny,nz=nz, $
                         timestep=timestep, $
-                        type=type,path=path, $
-                        no_rotate=no_rotate
+                        type=type, $
+                        path=path
 
   if n_elements(ext) eq 0 then ext = 'h5'
-  if n_elements(nx) eq 0 then nx = 1
-  if n_elements(ny) eq 0 then ny = 1
-  if n_elements(nz) eq 0 then nz = 1
   if n_elements(type) eq 0 then type = 4
   if n_elements(path) eq 0 then path = './'
   path = terminal_slash(path)
-  rotate_data = 1B
-  if keyword_set(no_rotate) then rotate_data = 0B
 
   if strcmp(strmid(ext,0,1),'.') then $
      ext = strmid(ext,1,strlen(ext))
-  h5File = file_search(path+'*.'+ext,count=count)
-  nFiles = n_elements(h5File)
+  h5_file = file_search(path+'*.'+ext,count=count)
+  n_files = n_elements(h5_file)
   if count ne 0 then begin
-     h5Base = file_basename(h5File)
-     all_timesteps = get_ph5timestep(h5Base)
-     nout = all_timesteps[nFiles-1]/nFiles + 1
+     h5_base = file_basename(h5_file)
+     all_timesteps = get_ph5timestep(h5_base)
+     nout = all_timesteps[n_files-1]/n_files + 1
   endif else begin
      errmsg = "Found no files with extension "+ext
      message, errmsg
   endelse
 
-  if n_elements(timestep) ne 0 then h5File = h5File(timestep/nout)
+  if n_elements(timestep) ne 0 then h5_file = h5_file(timestep/nout)
 
-  nt = n_elements(h5File)
-  data = make_array(nx,ny,nz,nt,type=type)
+  nt = n_elements(h5_file)
+  data = make_array([size(get_h5_data(h5_file[0],data_name),/dim),nt],type=type)
 
-  if keyword_set(verbose) then print,"[READ_PH5_DATA] Reading ",dataName,"..."
-  nullCount = 0L
+  if keyword_set(verbose) then print,"[READ_PH5_DATA] Reading ",data_name,"..."
+  null_count = 0L
   for it=0,nt-1 do begin
-     temp = get_h5_data(h5File[it],dataName)
+     temp = get_h5_data(h5_file[it],data_name)
      if n_elements(temp) ne 0 then begin
-        if rotate_data then begin
-           if nz eq 1 then temp = rotate(temp,4) $
-           else for iz=0,nz-1 do $
-              temp[*,*,iz] = rotate(temp[*,*,iz],5)
-        endif
-        data[*,*,*,it] = temp
-     endif else nullCount++
+        case size(data,/n_dim) of
+           2: data[*,it] = temp
+           3: data[*,*,it] = temp
+           4: data[*,*,*,it] = temp
+           5: data[*,*,*,*,it] = temp
+           6: data[*,*,*,*,*,it] = temp
+           7: data[*,*,*,*,*,*,it] = temp
+           8: data[*,*,*,*,*,*,*,it] = temp
+        endcase
+     endif else null_count++
   endfor
-  if nullCount gt 0 then $
+  if null_count gt 0 then $
      print, "[READ_PH5_DATA] Warning: Did not find '", $
-            dataName+"' in ", $
-            strcompress(nullCount,/remove_all),"/", $
+            data_name+"' in ", $
+            strcompress(null_count,/remove_all),"/", $
             strcompress(nt,/remove_all)," files."
 
   return, data
