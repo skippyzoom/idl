@@ -15,35 +15,20 @@
 ;    time steps for a single quantity.
 ;    This function is currently only set
 ;    up to do the latter.
-; -- By default, this function rotates
-;    data to correct for the way EPPIC
-;    outputs parallel HDF data. The user
-;    can request the raw orientation by
-;    calling the function with /NO_ROTATE
-;    or NO_ROTATE=1.
 ;
 ; TO DO:
-; -- Consider getting dimensions from one
-;    file, then defining ndim_space instead
-;    of using nz as a proxy for dimensionality.
 ;-
 function read_ph5_data, dataName, $
                         verbose=verbose, $
                         ext=ext, $
-                        nx=nx,ny=ny,nz=nz, $
                         timestep=timestep, $
-                        type=type,path=path, $
-                        no_rotate=no_rotate
+                        type=type, $
+                        path=path
 
   if n_elements(ext) eq 0 then ext = 'h5'
-  if n_elements(nx) eq 0 then nx = 1
-  if n_elements(ny) eq 0 then ny = 1
-  if n_elements(nz) eq 0 then nz = 1
   if n_elements(type) eq 0 then type = 4
   if n_elements(path) eq 0 then path = './'
   path = terminal_slash(path)
-  rotate_data = 1B
-  if keyword_set(no_rotate) then rotate_data = 0B
 
   if strcmp(strmid(ext,0,1),'.') then $
      ext = strmid(ext,1,strlen(ext))
@@ -61,19 +46,22 @@ function read_ph5_data, dataName, $
   if n_elements(timestep) ne 0 then h5File = h5File(timestep/nout)
 
   nt = n_elements(h5File)
-  data = make_array(nx,ny,nz,nt,type=type)
+  data = make_array([size(get_h5_data(h5File[0],dataName),/dim),nt],type=type)
 
   if keyword_set(verbose) then print,"[READ_PH5_DATA] Reading ",dataName,"..."
   nullCount = 0L
   for it=0,nt-1 do begin
      temp = get_h5_data(h5File[it],dataName)
      if n_elements(temp) ne 0 then begin
-        if rotate_data then begin
-           if nz eq 1 then temp = rotate(temp,4) $
-           else for iz=0,nz-1 do $
-              temp[*,*,iz] = rotate(temp[*,*,iz],5)
-        endif
-        data[*,*,*,it] = temp
+        case size(data,/n_dim) of
+           2: data[*,it] = temp
+           3: data[*,*,it] = temp
+           4: data[*,*,*,it] = temp
+           5: data[*,*,*,*,it] = temp
+           6: data[*,*,*,*,*,it] = temp
+           7: data[*,*,*,*,*,*,it] = temp
+           8: data[*,*,*,*,*,*,*,it] = temp
+        endcase
      endif else nullCount++
   endfor
   if nullCount gt 0 then $
