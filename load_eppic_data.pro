@@ -17,9 +17,6 @@
 ;    for kmag_interpolate-related routines.
 ;-
 
-;; function load_eppic_data, data_name,data_type,path, $
-;;                           timestep=timestep, $
-;;                           _EXTRA=ex
 function load_eppic_data, data_name,data_type, $
                           path=path, $
                           timestep=timestep, $

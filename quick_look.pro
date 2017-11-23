@@ -27,26 +27,26 @@ pro quick_look, path,directory=directory
   spawn, 'mkdir -p '+directory
 
   ;;==Create images of electrostatic potential
-  img = image(data.phi[*,*,0,0],/buffer,rgb_table=5)
+  img = image(data.phi[*,*,0],/buffer,rgb_table=5)
   txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
   image_save, img,filename=directory+path_sep()+"phi-t0.png"
-  img = image(data.phi[*,*,0,nt_max-1],/buffer,rgb_table=5)
+  img = image(data.phi[*,*,nt_max-1],/buffer,rgb_table=5)
   txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
   image_save, img,filename=directory+path_sep()+"phi-tf.png"
 
   ;;==Create images of ion density
-  img = image(data.den1[*,*,0,0],/buffer,rgb_table=5)
+  img = image(data.den1[*,*,0],/buffer,rgb_table=5)
   txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
   image_save, img,filename=directory+path_sep()+"den1-t0.png"
-  img = image(data.den1[*,*,0,nt_max-1],/buffer,rgb_table=5)
+  img = image(data.den1[*,*,nt_max-1],/buffer,rgb_table=5)
   txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
   image_save, img,filename=directory+path_sep()+"den1-tf.png"
 
   ;;==Create images of smoothed ion density
-  img = image(smooth(data.den1[*,*,0,0],2.0/grid.dx,/edge_wrap),/buffer,rgb_table=5)
+  img = image(smooth(data.den1[*,*,0],2.0/grid.dx,/edge_wrap),/buffer,rgb_table=5)
   txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
   image_save, img,filename=directory+path_sep()+"den1_sm-t0.png"
-  img = image(smooth(data.den1[*,*,0,nt_max-1],2.0/grid.dx,/edge_wrap),/buffer,rgb_table=5)
+  img = image(smooth(data.den1[*,*,nt_max-1],2.0/grid.dx,/edge_wrap),/buffer,rgb_table=5)
   txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
   image_save, img,filename=directory+path_sep()+"den1_sm-tf.png"
 
