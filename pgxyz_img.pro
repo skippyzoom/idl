@@ -1,7 +1,7 @@
-;+
-; Create spatial graphics from project context
-;-
-pro project_graphics_space, context,name,class
+pro pgxyz_img, context,name
+
+  ;;-->For now
+  class = 'xyz'
 
   ;;==Build colorbar titles
   colorbar_title = context.data.label

@@ -70,7 +70,11 @@ function get_context_defaults, request,pattern,path=path
   d_count = context.data.name.count()
 
   ;;==GRAPHICS
-  graphics_classes = ['space','kxyzt']
+  graphics_classes = ['xyz_img', $
+                      'xyz_rms', $
+                      'xyz_diff',$
+                      'fft_time', $
+                      'fft_freq']
   context['graphics'] = dictionary()
   context.graphics['note'] = ''
   context.graphics['class'] = dictionary(d_array)
