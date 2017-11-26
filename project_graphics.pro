@@ -23,6 +23,11 @@ pro project_graphics, context
   ;; endfor
 
   ;;-->Until I decide how graphics_class should work
-  project_graphics_xyz, context,name,'xyz'
-  project_graphics_fft, context,name,'fft'
+  ;; project_graphics_xyz, context,name,'xyz'
+  ;; project_graphics_fft, context,name,'fft'
+  pgxyz_img, context,name
+  pgxyz_rms, context,name
+  pgfft_time, context,name
+  pgfft_freq, context,name
+
 end

@@ -24,7 +24,7 @@ prj = load_empty_context()
 prj['description'] = description
 ;; prj.panel['index'] = [0.25,0.50,0.75,1.0]
 ;; prj.panel['layout'] = [2,2]
-prj.graphics.note = 'code_dev'
+prj.graphics['note'] = 'code_dev'
 prj.graphics['rgb_table'] = dictionary('den1', 5, $
                                        'phi', [[ct.r],[ct.g],[ct.b]], $
                                        'emag', 3, $

@@ -18,21 +18,15 @@ path = set_project_path(get_base_dir(), $
 ct = get_custom_ct(1)
 
 ;;==Create project dictionary
-prj = get_context_defaults()
+prj = load_empty_context()
 prj['description'] = description
-prj.data['ranges'] = [[0.5-1./8,0.5+1./8],[0.5-1./4,0.5+1./4],[0,1]]
-;; prj.data['ranges'] = [[0,1],[0,1],[0,1]]
-prj.graphics['smooth'] = 5
-;; prj.panel['index'] = [0.25,0.50,0.75,1.0]
-;; prj.panel['layout'] = [2,2]
-prj.panel['index'] = [0,1]
-prj.panel['layout'] = [1,2]
-prj.graphics['desc'] = 'zoom'
-prj.graphics['class'] = dictionary('den1', 'space', $
-                                   'phi', 'space')
-prj.graphics['rgb_table'] = dictionary('den1', 4, $
-                                       ;; 'phi', [[ct.r],[ct.g],[ct.b]], $
-                                       'phi', 4, $
+prj.data['ranges'] = [[0.25,0.75],[0,1],[0,1]]
+prj.data['transpose'] = [1,0,2,3]
+prj.panel['index'] = [0.25,0.50,0.75,1.0]
+prj.panel['layout'] = [2,2]
+prj.graphics['note'] = 'mid'
+prj.graphics['rgb_table'] = dictionary('den1', 5, $
+                                       'phi', [[ct.r],[ct.g],[ct.b]], $
                                        'emag', 3, $
                                        'fft', 39)
 
