@@ -20,10 +20,13 @@ ct = get_custom_ct(1)
 ;;==Create project dictionary
 prj = load_empty_context()
 prj['description'] = description
+;; prj.data['ranges'] = [[0,1],[0.25,0.75],[0,1]]
 prj.data['ranges'] = [[0.25,0.75],[0,1],[0,1]]
 prj.data['transpose'] = [1,0,2,3]
-prj.panel['index'] = [0.25,0.50,0.75,1.0]
-prj.panel['layout'] = [2,2]
+prj.panel.index['value'] = [0.25,0.50,0.75,1.0]
+prj.panel.index['type'] = 'rel'
+prj.panel.layout['xy'] = [2,2]
+prj.graphics.movie['make'] = 1B
 prj.graphics['note'] = 'mid'
 prj.graphics['rgb_table'] = dictionary('den1', 5, $
                                        'phi', [[ct.r],[ct.g],[ct.b]], $

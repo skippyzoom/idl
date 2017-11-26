@@ -1,7 +1,7 @@
 pro pgxyz_img, context,name
 
   ;;-->For now
-  class = 'xyz'
+  class = 'xyz_img'
 
   ;;==Build colorbar titles
   colorbar_title = context.data.label
@@ -26,7 +26,6 @@ pro pgxyz_img, context,name
            smooth_widths = [context.graphics.smooth[0],context.graphics.smooth[1],1]
            imgdata = (context.data.array[name])[context.data.xrng[0]:context.data.xrng[1], $
                                                 context.data.yrng[0]:context.data.yrng[1], $
-                                                context.data.zrng[0], $
                                                 *]
            xdata = context.data.xvec[context.data.xrng[0]:context.data.xrng[1]]
            ydata = context.data.yvec[context.data.yrng[0]:context.data.yrng[1]]
@@ -38,7 +37,6 @@ pro pgxyz_img, context,name
         strcmp(cur_plane,'xz'): begin
            smooth_widths = [context.graphics.smooth[0],context.graphics.smooth[2],1]
            imgdata = (context.data.array[name])[context.data.xrng[0]:context.data.xrng[1], $
-                                                context.data.yrng[0], $
                                                 context.data.zrng[0]:context.data.zrng[1], $
                                                 *]
            xdata = context.data.xvec[context.data.xrng[0]:context.data.xrng[1]]
@@ -50,8 +48,7 @@ pro pgxyz_img, context,name
         end
         strcmp(cur_plane,'yz'): begin
            smooth_widths = [context.graphics.smooth[1],context.graphics.smooth[2],1]
-           imgdata = (context.data.array[name])[context.data.xrng[0], $
-                                                context.data.yrng[0]:context.data.yrng[1], $
+           imgdata = (context.data.array[name])[context.data.yrng[0]:context.data.yrng[1], $
                                                 context.data.zrng[0]:context.data.zrng[1], $
                                                 *]
            xdata = context.data.yvec[context.data.yrng[0]:context.data.yrng[1]]
@@ -70,13 +67,15 @@ pro pgxyz_img, context,name
      img = data_image(imgdata,xdata,ydata, $
                       panel_index = panel_index, $
                       panel_layout = context.panel.layout[cur_plane], $
+                      min_value = -max(abs(imgdata)), $
+                      max_value = max(abs(imgdata)), $
                       colorbar_type = context.graphics.colorbar.type, $
                       colorbar_title = colorbar_title)
      n_panels = n_elements(panel_index)
      for id=0,n_panels-1 do begin
         img[id].rgb_table = context.graphics.rgb_table[name]
-        img[id].min_value = -max(abs(imgdata))
-        img[id].max_value = max(abs(imgdata))
+        ;; img[id].min_value = -max(abs(imgdata))
+        ;; img[id].max_value = max(abs(imgdata))
         img[id].xtitle = xtitle
         img[id].ytitle = ytitle
         ax = img[id].axes

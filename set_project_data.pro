@@ -92,7 +92,7 @@ function set_project_data, data,grid,context=context
   ;;==Transpose data, if applicable
   for ik=0,n_data-1 do begin
      if ~array_equal(context.data.transpose,([0,1,2,3])[0:d_size[0]-1]) then begin
-        context.data.array[d_keys[ik]] = transpose(data.array[d_keys[ik]], $
+        context.data.array[d_keys[ik]] = transpose(context.data.array[d_keys[ik]], $
                                                    context.data.transpose)
      endif
      context.data.array[d_keys[ik]] = reform(context.data.array[d_keys[ik]])

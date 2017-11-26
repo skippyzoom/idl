@@ -72,7 +72,6 @@ function get_context_defaults, request,pattern,path=path
   ;;==GRAPHICS
   graphics_classes = ['xyz_img', $
                       'xyz_rms', $
-                      'xyz_diff',$
                       'fft_time', $
                       'fft_freq']
   context['graphics'] = dictionary()
@@ -96,9 +95,9 @@ function get_context_defaults, request,pattern,path=path
   context.graphics.axes['y'] = dictionary('title', dictionary(), 'show', 0B)
   context.graphics.axes['z'] = dictionary('title', dictionary(), 'show', 0B)
   ;;==graphics/axes/[X,Y,Z]
-  context.graphics.axes.x['title'] = dictionary(graphics_classes, ['x','$k_x$'])
-  context.graphics.axes.y['title'] = dictionary(graphics_classes, ['y','$k_y$'])
-  context.graphics.axes.z['title'] = dictionary(graphics_classes, ['z','$k_z$'])
+  context.graphics.axes.x['title'] = dictionary(graphics_classes, ['x','x','$k_x$','$k_x$'])
+  context.graphics.axes.y['title'] = dictionary(graphics_classes, ['y','y','$k_y$','$k_y$'])
+  context.graphics.axes.z['title'] = dictionary(graphics_classes, ['z','z','$k_z$','$k_z$'])
   context.graphics.axes.x['show'] = 0B
   context.graphics.axes.y['show'] = 0B
   context.graphics.axes.z['show'] = 0B

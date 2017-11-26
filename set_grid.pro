@@ -16,15 +16,16 @@ function set_grid, path
   if params.hdf_output_arrays eq 2 then begin
      case params.ndim_space of
         2: begin
-           nxg = params.nx*params.nsubdomains/params.nout_avg
-           x = params.dx*params.nout_avg*findgen(nxg)
-           nyg = params.ny/params.nout_avg
-           y = params.dy*params.nout_avg*findgen(nyg)
+           nxg = params.ny/params.nout_avg
+           x = params.dy*params.nout_avg*findgen(nxg)
+           nyg = params.nx*params.nsubdomains/params.nout_avg
+           y = params.dx*params.nout_avg*findgen(nyg)
            nzg = 1
            z = findgen(nzg)
            sizepertime = long64(nxg)*long64(nyg)*long64(nzg)
            nout_avg = params.nout_avg
            nsubdomains = params.nsubdomains
+           print, "[SET_GRID] Swapped X and Y for 2-D PHDF"
         end
         3: begin
            nxg = params.nz/params.nout_avg
@@ -36,7 +37,7 @@ function set_grid, path
            sizepertime = long64(nxg)*long64(nyg)*long64(nzg)
            nout_avg = params.nout_avg
            nsubdomains = params.nsubdomains
-           print, "[SET_GRID] Swapped X and Z for 3D PHDF"
+           print, "[SET_GRID] Swapped X and Z for 3-D PHDF"
         end
      endcase
   endif else begin
