@@ -53,6 +53,7 @@ function load_eppic_data, data_name,data_type, $
                                             iend = params.iend, $
                                             sizepertime = grid.sizepertime, $
                                             timestep = timestep, $
+                                            variable = strmatch(data_name[id],'*ft*'), $
                                             path = path+path_sep()+'parallel', $
                                             /verbose, $
                                             _EXTRA = ex)
