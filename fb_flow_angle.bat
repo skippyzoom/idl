@@ -11,9 +11,7 @@ run = build_run_list(expand_path('~/idl/batch/fb_flow_angle.lst'))
 
 ;;==Set project data path(s)
 path = set_project_path(get_base_dir(), $
-                        'fb_flow_angle'+path_sep()+ $
-                        ;; '2D', $
-                        'tests', $
+                        'fb_flow_angle', $
                         run)
 
 ;;==Get custom color table(s)
