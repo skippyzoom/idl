@@ -10,6 +10,9 @@ pro quick_look, path,directory=directory
   ;;==Navigate to working directory
   cd, path
 
+  ;;==Echo working directory
+  print, "[QUICK_LOOK] In ",path
+
   ;;==Read in simulation parameters
   params = set_eppic_params(path)
   grid = set_grid(path)
