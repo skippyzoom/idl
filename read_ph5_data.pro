@@ -130,16 +130,54 @@ function read_ph5_data, data_name, $
         ;;    ft_array[full_size[1]-ft_size[1]:full_size[1]-1,0:ft_size[2]-1] = tmp
         ;;    ft_size = size(ft_array)
         ;; endif
-        if params.ndim_space eq 2 then begin
-           if ft_size[1] ne full_size[1] then begin
-              tmp = ft_array
-              ft_array = complexarr(full_size[1],ft_size[2])
-              ft_array[full_size[1]-ft_size[1]:full_size[1]-1,0:ft_size[2]-1] = tmp
-              ft_size = size(ft_array)
-           endif
-        endif $
-        else begin
-        endelse
+        case params.ndim_space of
+           2: begin
+              if ft_size[1] ne full_size[1] then begin
+                 tmp = ft_array
+                 ft_array = complexarr(full_size[1],ft_size[2])
+                 ft_array[full_size[1]-ft_size[1]:full_size[1]-1,0:ft_size[2]-1] = tmp
+                 ft_size = size(ft_array)
+                 tmp = !NULL
+              endif
+              tmp = complexarr(full_size[1],full_size[2])
+              tmp[*,0:ft_size[2]-1] = ft_array
+              mirror = reverse(reverse(ft_array,2))
+              mirror = conj(mirror)
+              tmp[1:full_size[1]-1,full_size[2]-ft_size[2]+1:full_size[2]-1] = $
+                 mirror[0:ft_size[1]-2,0:ft_size[2]-2]
+              tmp[0,full_size[2]-ft_size[2]+1:full_size[2]-1] = mirror[ft_size[1]-1,0:ft_size[2]-2]
+           end
+           3: begin
+              if ft_size[1] ne full_size[1] then begin
+                 tmp = ft_array
+                 ft_array = complexarr(full_size[1],ft_size[2],ft_size[3])
+                 ft_array[full_size[1]-ft_size[1]:full_size[1]-1,0:ft_size[2]-1,0:ft_size[3]-1] = tmp
+                 ft_size = size(ft_array)
+                 tmp = !NULL
+              endif
+              tmp = complexarr(full_size[1],full_size[2],full_size[3])
+              if ft_size[2] eq full_size[2] then tmp[*,*,0:ft_size[3]-1] = ft_array $
+              else begin
+                 tmp[*,0:ft_size[2]-1,0:ft_size[3]-1] = ft_array
+                 mirror = reverse(reverse(reverse(ft_array,3),2))
+                 tmp[1:full_size[1]-1,full_size[2]-ft_size[2]+1:full_size[1]-1,1:ft_size[3]-1] = $
+                    mirror[0:ft_size[1]-2,0:ft_size[2]-2,0:ft_size[3]-2]
+                 tmp[0,full_size[2]-ft_size[2]+1:full_size[1]-1,1:ft_size[3]-1] = $
+                    mirror[ft_size[1]-2,0:ft_size[2]-2,0:ft_size[3]-2]
+                 mirror = !NULL
+              endelse
+              mirror = reverse(reverse(reverse(tmp[*,*,0:full_size[3]-1],3),2))
+              mirror = conj(mirror)
+              tmp[1:full_size[1]-1,1:full_size[2]-1,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
+                 mirror[0:ft_size[1]-2,0:full_size[2]-2,0:ft_size[3]-2]
+              tmp[1:full_size[1]-1,0,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
+                 mirror[0:ft_size[1]-2,ft_size[2]-1,0:ft_size[3]-2]
+              tmp[0,1:full_size[2]-1,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
+                 mirror[ft_size[1]-1,0:full_size[2]-2,0:ft_size[3]-2]
+              mirror = !NULL
+           end
+        endcase
+        data = tmp
 STOP
         
      endfor
