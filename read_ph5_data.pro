@@ -10,8 +10,6 @@
 ; simulation time steps, not output steps.
 ; The user is responsible for knowing which
 ; time steps are available.
-;
-; TO DO:
 ;-
 function read_ph5_data, data_name, $
                         verbose=verbose, $
@@ -62,13 +60,40 @@ function read_ph5_data, data_name, $
      tmp = get_h5_data(h5_file[0],data_name+'_index')
      n_dim = (size(tmp))[1]
      case n_dim of
-        1: ft_template = {ikx:0, val:complex(0.0,0.0)}
-        2: ft_template = {ikx:0, iky:0, val:complex(0.0,0.0)}
-        3: ft_template = {ikx:0, iky:0, ikz:0, val:complex(0.0,0.0)}
+        1: begin
+           ft_template = {ikx:0, val:complex(0.0,0.0)}
+           data = make_array(params.nx*params.nsubdomains, $
+                             nt)
+        end
+        2: begin
+           ft_template = {ikx:0, iky:0, val:complex(0.0,0.0)}
+           data = make_array(params.nx*params.nsubdomains, $
+                             params.ny, $
+                             nt)
+        end
+        3: begin
+           ft_template = {ikx:0, iky:0, ikz:0, val:complex(0.0,0.0)}
+           data = make_array(params.nx*params.nsubdomains, $
+                             params.ny, $
+                             params.nz, $
+                             nt)
+        end           
      endcase     
   endif $
   else begin
-     data = make_array([size(get_h5_data(h5_file[0],data_name),/dim),nt],type=type)
+     tmp = get_h5_data(h5_file[0],data_name)
+     n_dim = (size(tmp))[0]
+     case n_dim of
+        1: data = make_array(params.nx*params.nsubdomains/params.nout_avg, $
+                             nt)
+        2: data = make_array(params.nx*params.nsubdomains/params.nout_avg, $
+                             params.ny/params.nout_avg, $
+                             nt)
+        3: data = make_array(params.nx*params.nsubdomains/params.nout_avg, $
+                             params.ny/params.nout_avg, $
+                             params.nz/params.nout_avg, $
+                             nt)
+     endcase     
   endelse
 
   ;;==Loop over all available time steps
@@ -79,33 +104,57 @@ function read_ph5_data, data_name, $
 
   ;;==Check if data is Fourier Transformed output
   if keyword_set(variable) then begin
-     for it=0,nt-1 do begin
+     ;;-->DEV
+     spawn, "mkdir -p "+run_dir+"timing"
+     openw, size_lun,run_dir+'timing/size.txt',/get_lun
+     openw, create_lun,run_dir+'timing/create.txt',/get_lun
+     openw, assign1_lun,run_dir+'timing/assign1.txt',/get_lun
+     openw, assign2_lun,run_dir+'timing/assign2.txt',/get_lun
+     openw, append_lun,run_dir+'timing/append.txt',/get_lun
+     openw, convert_lun,run_dir+'timing/convert.txt',/get_lun
+     ;;<--
+     ;; for it=0,nt-1 do begin
+     for it=0,9 do begin
         ;;==Read data set
         tmp_data = get_h5_data(h5_file[it],data_name)
         tmp_size = size(tmp_data)
         tmp_len = (tmp_size[0] eq 1) ? 1 : tmp_size[2]
+        printf, size_lun,tmp_len ;DEV
         tmp_cplx = complex(tmp_data[0,0:tmp_len-1],tmp_data[1,0:tmp_len-1])
         ;;==Read index set
         tmp_ind = get_h5_data(h5_file[it],data_name+'_index')
         ;;==Assign to intermediate struct
+        t0 = systime(1)         ;DEV
         tmp_struct = replicate(ft_template,tmp_len)
+        printf, create_lun,systime(1)-t0 ;DEV
+        t0 = systime(1)                  ;DEV
+        tmp_struct.val = reform(tmp_cplx)
+        switch n_dim of 
+           3: tmp_struct.ikz = reform(tmp_ind[2,*])
+           2: tmp_struct.iky = reform(tmp_ind[1,*])
+           1: tmp_struct.ikx = reform(tmp_ind[0,*])
+        endswitch
+        printf, assign1_lun,systime(1)-t0 ;DEV
+        t0 = systime(1)                  ;DEV
         for il=0L,tmp_len-1 do begin
-           tmp_struct.val = tmp_cplx[il]
-           switch n_dim of
-              3: tmp_struct[il].ikz = tmp_ind[2,il]
-              2: tmp_struct[il].iky = tmp_ind[1,il]
-              1: tmp_struct[il].ikx = tmp_ind[0,il]
-           endswitch
+           tmp_struct[il].ikx = tmp_ind[0,il]
+           if n_dim gt 1 then tmp_struct[il].iky = tmp_ind[1,il]
+           if n_dim eq 3 then tmp_struct[il].ikz = tmp_ind[2,il]
+           tmp_struct[il].val = tmp_cplx[il]           
         endfor
-        ;;==Reset temporary variables
-        tmp_data = 0.0
-        tmp_ind = 0.0
+        printf, assign2_lun,systime(1)-t0 ;DEV
+        ;;==Free temporary variables
+        tmp_data = !NULL
+        tmp_ind = !NULL
         ;;==Create global struct or append to existing one
+        t0 = systime(1)         ;DEV
         if n_elements(ft_struct) eq 0 then $
            ft_struct = tmp_struct $
         else $
            ft_struct = [ft_struct,tmp_struct]
+        printf, append_lun,systime(1)-t0 ;DEV
         ;;==Convert to output array
+        t0 = systime(1)         ;DEV
         tmp_range = intarr(n_dim,2)
         for id=0,n_dim-1 do begin
            tmp_range[id,0] = min(ft_struct.(id))
@@ -124,12 +173,6 @@ function read_ph5_data, data_name, $
                      params.ny, $
                      params.nz]
         ft_size = size(ft_array)
-        ;; if (ft_size[1] ne outsize[1]) && (params.ndim_space eq 2) then begin
-        ;;    tmp = ft_array
-        ;;    ft_array = complexarr(full_size[1],ft_size[2])
-        ;;    ft_array[full_size[1]-ft_size[1]:full_size[1]-1,0:ft_size[2]-1] = tmp
-        ;;    ft_size = size(ft_array)
-        ;; endif
         case params.ndim_space of
            2: begin
               if ft_size[1] ne full_size[1] then begin
@@ -146,6 +189,7 @@ function read_ph5_data, data_name, $
               tmp[1:full_size[1]-1,full_size[2]-ft_size[2]+1:full_size[2]-1] = $
                  mirror[0:ft_size[1]-2,0:ft_size[2]-2]
               tmp[0,full_size[2]-ft_size[2]+1:full_size[2]-1] = mirror[ft_size[1]-1,0:ft_size[2]-2]
+              data[*,*,it] = tmp
            end
            3: begin
               if ft_size[1] ne full_size[1] then begin
@@ -160,9 +204,9 @@ function read_ph5_data, data_name, $
               else begin
                  tmp[*,0:ft_size[2]-1,0:ft_size[3]-1] = ft_array
                  mirror = reverse(reverse(reverse(ft_array,3),2))
-                 tmp[1:full_size[1]-1,full_size[2]-ft_size[2]+1:full_size[1]-1,1:ft_size[3]-1] = $
+                 tmp[1:full_size[1]-1,full_size[2]-ft_size[2]+1:full_size[2]-1,1:ft_size[3]-1] = $
                     mirror[0:ft_size[1]-2,0:ft_size[2]-2,0:ft_size[3]-2]
-                 tmp[0,full_size[2]-ft_size[2]+1:full_size[1]-1,1:ft_size[3]-1] = $
+                 tmp[0,full_size[2]-ft_size[2]+1:full_size[2]-1,1:ft_size[3]-1] = $
                     mirror[ft_size[1]-2,0:ft_size[2]-2,0:ft_size[3]-2]
                  mirror = !NULL
               endelse
@@ -175,12 +219,25 @@ function read_ph5_data, data_name, $
               tmp[0,1:full_size[2]-1,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
                  mirror[ft_size[1]-1,0:full_size[2]-2,0:ft_size[3]-2]
               mirror = !NULL
+              data[*,*,*,it] = tmp
            end
         endcase
-        data = tmp
-STOP
-        
+        printf, convert_lun,systime(1)-t0 ;DEV
      endfor
+     ;;-->DEV
+     close, size_lun
+     free_lun, size_lun
+     close, create_lun
+     free_lun, create_lun
+     close, assign1_lun
+     free_lun, assign1_lun
+     close, assign2_lun
+     free_lun, assign2_lun
+     close, append_lun
+     free_lun, append_lun
+     close, convert_lun
+     free_lun, convert_lun
+     ;;<--
   endif $
   else begin
      for it=0,nt-1 do begin
@@ -190,12 +247,12 @@ STOP
         if n_elements(tmp) ne 0 then begin
            case size(data,/n_dim) of
               2: data[*,it] = tmp
-              3: data[*,*,it] = tmp
-              4: data[*,*,*,it] = tmp
-              5: data[*,*,*,*,it] = tmp
-              6: data[*,*,*,*,*,it] = tmp
-              7: data[*,*,*,*,*,*,it] = tmp
-              8: data[*,*,*,*,*,*,*,it] = tmp
+              3: data[*,*,it] = transpose(tmp,[1,0])
+              4: data[*,*,*,it] = transpose(tmp,[2,1,0])
+              5: data[*,*,*,*,it] = transpose(tmp,[3,2,1,0])
+              6: data[*,*,*,*,*,it] = transpose(tmp,[4,3,2,1,0])
+              7: data[*,*,*,*,*,*,it] = transpose(tmp,[5,4,3,2,1,0])
+              8: data[*,*,*,*,*,*,*,it] = transpose(tmp,[6,5,4,3,2,1,0])
            endcase
         endif else null_count++
      endfor
