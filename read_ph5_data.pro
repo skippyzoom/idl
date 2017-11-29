@@ -93,7 +93,8 @@ function read_ph5_data, data_name, $
                              params.ny/params.nout_avg, $
                              params.nz/params.nout_avg, $
                              nt)
-     endcase     
+     endcase
+     tmp = !NULL
   endelse
 
   ;;==Loop over all available time steps
@@ -104,9 +105,9 @@ function read_ph5_data, data_name, $
 
   ;;==Check if data is Fourier Transformed output
   if keyword_set(variable) then begin
-     for it=0,nt-1 do begin
-     ;; print, "[READ_PH5_DATA] Warning: truncated FT read-in"
-     ;; for it=0,9 do begin
+     ;; for it=0,nt-1 do begin
+     print, "[READ_PH5_DATA] Warning: truncated FT read-in"
+     for it=0,9 do begin
         ;;==Read data set
         tmp_data = get_h5_data(h5_file[it],data_name)
         tmp_size = size(tmp_data)
@@ -115,23 +116,17 @@ function read_ph5_data, data_name, $
         ;;==Read index set
         tmp_ind = get_h5_data(h5_file[it],data_name+'_index')
         ;;==Assign to intermediate struct
-        tmp_struct = replicate(ft_template,tmp_len)
-        tmp_struct.val = reform(tmp_cplx)
+        ft_struct = replicate(ft_template,tmp_len)
+        ft_struct.val = reform(tmp_cplx)
         switch n_dim of 
-           3: tmp_struct.ikz = reform(tmp_ind[2,*])
-           2: tmp_struct.iky = reform(tmp_ind[1,*])
-           1: tmp_struct.ikx = reform(tmp_ind[0,*])
+           3: ft_struct.ikz = reform(tmp_ind[2,*])
+           2: ft_struct.iky = reform(tmp_ind[1,*])
+           1: ft_struct.ikx = reform(tmp_ind[0,*])
         endswitch
+STOP
         ;;==Free temporary variables
         tmp_data = !NULL
         tmp_ind = !NULL
-        ;;==Create global struct or append to existing one
-        ;;->Not sure when this would ever append
-        ;; if n_elements(ft_struct) eq 0 then $
-        ;;    ft_struct = tmp_struct $
-        ;; else $
-        ;;    ft_struct = [ft_struct,tmp_struct]
-        ft_struct = tmp_struct
         ;;==Convert to output array
         ;;->Based on fill_k_array.pro
         tmp_range = intarr(n_dim,2)
@@ -148,6 +143,7 @@ function read_ph5_data, data_name, $
            1: ft_array[ft_struct.ikx] = ft_struct.val
         endcase
         ;;<-(fill_k_array)
+STOP
         ;;->Based on mirror_fft_eppic.pro
         full_size = [params.ndim_space, $
                      params.nx*params.nsubdomains, $
@@ -173,6 +169,25 @@ function read_ph5_data, data_name, $
               data[*,*,it] = tmp
            end
            3: begin
+              ;; if ft_size[1] ne full_size[1] then begin
+              ;;    tmp = ft_array
+              ;;    ft_array = complexarr(full_size[1],ft_size[2],ft_size[3])
+              ;;    ft_array[full_size[1]-ft_size[1]:full_size[1]-1,0:ft_size[2]-1,0:ft_size[3]-1] = tmp
+              ;;    ft_size = size(ft_array)
+              ;;    tmp = !NULL
+              ;; endif
+              ;; tmp = complexarr(full_size[1],full_size[2],full_size[3])
+              ;; if ft_size[2] eq full_size[2] then tmp[*,*,0:ft_size[3]-1] = ft_array $
+              ;; else begin
+              ;;    tmp[*,0:ft_size[2]-1,0:ft_size[3]-1] = ft_array
+              ;;    mirror = reverse(reverse(reverse(ft_array,3),2))
+              ;;    tmp[1:full_size[1]-1,full_size[2]-ft_size[2]+1:full_size[2]-1,1:ft_size[3]-1] = $
+              ;;       mirror[0:ft_size[1]-2,0:ft_size[2]-2,0:ft_size[3]-2]
+              ;;    tmp[0,full_size[2]-ft_size[2]+1:full_size[2]-1,1:ft_size[3]-1] = $
+              ;;       mirror[ft_size[1]-2,0:ft_size[2]-2,0:ft_size[3]-2]
+              ;;    mirror = !NULL
+              ;; endelse
+              full_array = complexarr(full_size[1],full_size[2],full_size[3])
               if ft_size[1] ne full_size[1] then begin
                  tmp = ft_array
                  ft_array = complexarr(full_size[1],ft_size[2],ft_size[3])
@@ -180,30 +195,28 @@ function read_ph5_data, data_name, $
                  ft_size = size(ft_array)
                  tmp = !NULL
               endif
-              tmp = complexarr(full_size[1],full_size[2],full_size[3])
-              if ft_size[2] eq full_size[2] then tmp[*,*,0:ft_size[3]-1] = ft_array $
-              else begin
-                 tmp[*,0:ft_size[2]-1,0:ft_size[3]-1] = ft_array
-                 mirror = reverse(reverse(reverse(ft_array,3),2))
-                 tmp[1:full_size[1]-1,full_size[2]-ft_size[2]+1:full_size[2]-1,1:ft_size[3]-1] = $
-                    mirror[0:ft_size[1]-2,0:ft_size[2]-2,0:ft_size[3]-2]
-                 tmp[0,full_size[2]-ft_size[2]+1:full_size[2]-1,1:ft_size[3]-1] = $
-                    mirror[ft_size[1]-2,0:ft_size[2]-2,0:ft_size[3]-2]
-                 mirror = !NULL
-              endelse
-              mirror = reverse(reverse(reverse(tmp,3),2))
-              mirror = conj(tmp)
-              tmp[1:full_size[1]-1,1:full_size[2]-1,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
+              if ft_size[2] ne full_size[2] then begin
+              endif $
+              else full_array[*,*,0:ft_size[3]-1] = ft_array
+STOP
+              mirror = reverse(reverse(reverse(full_array,3),2))
+              mirror = conj(full_array)
+
+              filename = run_dir+'mirror_dev/mirror_test-'+strcompress(it,/remove_all)+'.sav'
+              save, mirror,filename=filename
+              
+              full_array[1:full_size[1]-1,1:full_size[2]-1,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
                  mirror[0:ft_size[1]-2,0:full_size[2]-2,0:ft_size[3]-2]
-              tmp[1:full_size[1]-1,0,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
+              full_array[1:full_size[1]-1,0,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
                  mirror[0:ft_size[1]-2,ft_size[2]-1,0:ft_size[3]-2]
-              tmp[0,1:full_size[2]-1,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
+              full_array[0,1:full_size[2]-1,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
                  mirror[ft_size[1]-1,0:full_size[2]-2,0:ft_size[3]-2]
+STOP
               mirror = !NULL
               ;;<-(mirror_fft_eppic.pro)
               ft_array = !NULL
               ft_struct = !NULL
-              data[*,*,*,it] = tmp
+              data[*,*,*,it] = full_array
            end
         endcase
      endfor
@@ -224,6 +237,7 @@ function read_ph5_data, data_name, $
               8: data[*,*,*,*,*,*,*,it] = transpose(tmp,[6,5,4,3,2,1,0])
            endcase
         endif else null_count++
+        tmp = !NULL
      endfor
   endelse
 

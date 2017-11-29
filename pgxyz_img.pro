@@ -26,6 +26,7 @@ pro pgxyz_img, context,name
            smooth_widths = [context.graphics.smooth[0],context.graphics.smooth[1],1]
            imgdata = (context.data.array[name])[context.data.xrng[0]:context.data.xrng[1], $
                                                 context.data.yrng[0]:context.data.yrng[1], $
+                                                context.grid.nz/2, $
                                                 *]
            xdata = context.data.xvec[context.data.xrng[0]:context.data.xrng[1]]
            ydata = context.data.yvec[context.data.yrng[0]:context.data.yrng[1]]
@@ -37,6 +38,7 @@ pro pgxyz_img, context,name
         strcmp(cur_plane,'xz'): begin
            smooth_widths = [context.graphics.smooth[0],context.graphics.smooth[2],1]
            imgdata = (context.data.array[name])[context.data.xrng[0]:context.data.xrng[1], $
+                                                context.grid.ny/2, $
                                                 context.data.zrng[0]:context.data.zrng[1], $
                                                 *]
            xdata = context.data.xvec[context.data.xrng[0]:context.data.xrng[1]]
@@ -48,7 +50,8 @@ pro pgxyz_img, context,name
         end
         strcmp(cur_plane,'yz'): begin
            smooth_widths = [context.graphics.smooth[1],context.graphics.smooth[2],1]
-           imgdata = (context.data.array[name])[context.data.yrng[0]:context.data.yrng[1], $
+           imgdata = (context.data.array[name])[context.grid.nx/2, $
+                                                context.data.yrng[0]:context.data.yrng[1], $
                                                 context.data.zrng[0]:context.data.zrng[1], $
                                                 *]
            xdata = context.data.yvec[context.data.yrng[0]:context.data.yrng[1]]
@@ -84,7 +87,7 @@ pro pgxyz_img, context,name
      endfor
      img = multi_colorbar(img,context.graphics.colorbar.type, $
                           orientation = 1, $
-                          testpos = 1, $
+                          textpos = 1, $
                           tickdir = 1, $
                           ticklen = 0.2, $
                           major = 7, $
