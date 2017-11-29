@@ -64,24 +64,33 @@ pro pgxyz_img, context,name
      colorbar_title = context.data.label[name]+" "+context.data.units[name]
 
      ;;==Create single- or multi-panel images
-     img = data_image(imgdata,xdata,ydata, $
-                      panel_index = panel_index, $
-                      panel_layout = context.panel.layout[cur_plane], $
-                      min_value = -max(abs(imgdata)), $
-                      max_value = max(abs(imgdata)), $
-                      colorbar_type = context.graphics.colorbar.type, $
-                      colorbar_title = colorbar_title)
+     img = multi_image(imgdata,xdata,ydata, $
+                       panel_index = panel_index, $
+                       panel_layout = context.panel.layout[cur_plane], $
+                       ;; min_value = -max(abs(imgdata)), $
+                       ;; max_value = max(abs(imgdata)), $
+                       colorbar_type = context.graphics.colorbar.type, $
+                       colorbar_title = colorbar_title)
      n_panels = n_elements(panel_index)
      for id=0,n_panels-1 do begin
         img[id].rgb_table = context.graphics.rgb_table[name]
-        ;; img[id].min_value = -max(abs(imgdata))
-        ;; img[id].max_value = max(abs(imgdata))
+        img[id].min_value = -max(abs(imgdata))
+        img[id].max_value = max(abs(imgdata))
         img[id].xtitle = xtitle
         img[id].ytitle = ytitle
         ax = img[id].axes
         ax[0].show = xshow
         ax[1].show = yshow
      endfor
+     img = multi_colorbar(img,context.graphics.colorbar.type, $
+                          orientation = 1, $
+                          testpos = 1, $
+                          tickdir = 1, $
+                          ticklen = 0.2, $
+                          major = 7, $
+                          font_name = "Times", $
+                          font_size = 8.0)
+
      if context.graphics.haskey('note') && ~strcmp(context.graphics.note,'') then $
         filename = name+cur_plane+'_'+ $
                    class+'-'+context.graphics.note+ $

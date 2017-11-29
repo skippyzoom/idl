@@ -16,7 +16,7 @@
 ;    the tick name after formatting is '0.0'. There is a
 ;    work-around in place, so this isn't urgent.
 ;-
-function data_image, imgdata,xdata,ydata, $
+function multi_image, imgdata,xdata,ydata, $
                      panel_index=panel_index, $
                      panel_layout=panel_layout, $
                      rgb_table=rgb_table, $
@@ -32,7 +32,7 @@ function data_image, imgdata,xdata,ydata, $
                      colorbar_title=colorbar_title
 
   if n_elements(imgdata) eq 0 then begin
-     print, "[DATA_IMAGE] Please supply image array. No graphics produced."
+     print, "[MULTI_IMAGE] Please supply image array. No graphics produced."
      return, !NULL
   endif $
   else begin
@@ -138,44 +138,7 @@ function data_image, imgdata,xdata,ydata, $
                         current = (ip gt 0), $
                         /buffer)
 
-        ;; ax = img.axes
-        ;; ax[0].show = xshow
-        ;; ax[1].show = yshow        
-        
-        if strcmp(colorbar_type,'panel',5) then begin
-           print, "[DATA_IMAGE] Panel-specific colorbar not implemented"
-        endif
      endfor
-
-     if strcmp(colorbar_type,'global',6) then begin
-        major = 7
-        width = 0.0225
-        height = 0.20
-        buffer = 0.03
-        x0 = max(position[2,*])+buffer
-        x1 = x0+width
-        y0 = 0.50*(1-height)
-        y1 = 0.50*(1+height)
-        tickvalues = img[np-1].min_value[0] + $
-                     (img[np-1].max_value[0]-img[np-1].min_value[0])* $
-                     findgen(major)/(major-1)
-        ;;-->This is kind of a hack
-        if (major mod 2) ne 0 && (img[np-1].min_value[0]+img[np-1].max_value[0] eq 0) then $
-           tickvalues[major/2] = 0.0
-        ;;<--
-        tickname = plusminus_labels(tickvalues,format='f8.2')
-        clr = colorbar(position = [x0,y0,x1,y1], $
-                       title = colorbar_title, $
-                       orientation = 1, $
-                       tickvalues = tickvalues, $
-                       tickname = tickname, $
-                       textpos = 1, $
-                       tickdir = 1, $
-                       ticklen = 0.2, $
-                       major = major, $
-                       font_name = "Times", $
-                       font_size = 8.0)
-     endif
 
      return, img
   endelse

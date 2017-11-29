@@ -108,12 +108,17 @@ function read_ph5_data, data_name, $
      spawn, "mkdir -p "+run_dir+"timing"
      openw, size_lun,run_dir+'timing/size.txt',/get_lun
      openw, create_lun,run_dir+'timing/create.txt',/get_lun
-     openw, assign1_lun,run_dir+'timing/assign1.txt',/get_lun
-     openw, assign2_lun,run_dir+'timing/assign2.txt',/get_lun
-     openw, append_lun,run_dir+'timing/append.txt',/get_lun
-     openw, convert_lun,run_dir+'timing/convert.txt',/get_lun
+     openw, assign_lun,run_dir+'timing/assign.txt',/get_lun
+     openw, update_lun,run_dir+'timing/update.txt',/get_lun
+     openw, convert00_lun,run_dir+'timing/convert00.txt',/get_lun
+     openw, convert01_lun,run_dir+'timing/convert01.txt',/get_lun
+     openw, convert02_lun,run_dir+'timing/convert02.txt',/get_lun
+     openw, convert03_lun,run_dir+'timing/convert03.txt',/get_lun
+     openw, convert04_lun,run_dir+'timing/convert04.txt',/get_lun
+     openw, convert05_lun,run_dir+'timing/convert05.txt',/get_lun
      ;;<--
      ;; for it=0,nt-1 do begin
+     print, "[READ_PH5_DATA] Warning: truncated FT read-in"
      for it=0,9 do begin
         ;;==Read data set
         tmp_data = get_h5_data(h5_file[it],data_name)
@@ -134,15 +139,7 @@ function read_ph5_data, data_name, $
            2: tmp_struct.iky = reform(tmp_ind[1,*])
            1: tmp_struct.ikx = reform(tmp_ind[0,*])
         endswitch
-        printf, assign1_lun,systime(1)-t0 ;DEV
-        t0 = systime(1)                  ;DEV
-        for il=0L,tmp_len-1 do begin
-           tmp_struct[il].ikx = tmp_ind[0,il]
-           if n_dim gt 1 then tmp_struct[il].iky = tmp_ind[1,il]
-           if n_dim eq 3 then tmp_struct[il].ikz = tmp_ind[2,il]
-           tmp_struct[il].val = tmp_cplx[il]           
-        endfor
-        printf, assign2_lun,systime(1)-t0 ;DEV
+        printf, assign_lun,systime(1)-t0 ;DEV
         ;;==Free temporary variables
         tmp_data = !NULL
         tmp_ind = !NULL
@@ -152,9 +149,9 @@ function read_ph5_data, data_name, $
            ft_struct = tmp_struct $
         else $
            ft_struct = [ft_struct,tmp_struct]
-        printf, append_lun,systime(1)-t0 ;DEV
+        printf, update_lun,systime(1)-t0 ;DEV
         ;;==Convert to output array
-        t0 = systime(1)         ;DEV
+        t00 = systime(1)         ;DEV
         tmp_range = intarr(n_dim,2)
         for id=0,n_dim-1 do begin
            tmp_range[id,0] = min(ft_struct.(id))
@@ -192,6 +189,7 @@ function read_ph5_data, data_name, $
               data[*,*,it] = tmp
            end
            3: begin
+              t01 = systime(1)  ;DEV
               if ft_size[1] ne full_size[1] then begin
                  tmp = ft_array
                  ft_array = complexarr(full_size[1],ft_size[2],ft_size[3])
@@ -200,6 +198,8 @@ function read_ph5_data, data_name, $
                  tmp = !NULL
               endif
               tmp = complexarr(full_size[1],full_size[2],full_size[3])
+              printf, convert01_lun,systime(1)-t01 ;DEV
+              t02 = systime(1)  ;DEV
               if ft_size[2] eq full_size[2] then tmp[*,*,0:ft_size[3]-1] = ft_array $
               else begin
                  tmp[*,0:ft_size[2]-1,0:ft_size[3]-1] = ft_array
@@ -210,8 +210,14 @@ function read_ph5_data, data_name, $
                     mirror[ft_size[1]-2,0:ft_size[2]-2,0:ft_size[3]-2]
                  mirror = !NULL
               endelse
+              printf, convert02_lun,systime(1)-t02 ;DEV
+              t03 = systime(1)  ;DEV
               mirror = reverse(reverse(reverse(tmp[*,*,0:full_size[3]-1],3),2))
+              printf, convert03_lun,systime(1)-t03 ;DEV
+              t04 = systime(1)                     ;DEV
               mirror = conj(mirror)
+              printf, convert04_lun,systime(1)-t04 ;DEV
+              t05 = systime(1)                     ;DEV
               tmp[1:full_size[1]-1,1:full_size[2]-1,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
                  mirror[0:ft_size[1]-2,0:full_size[2]-2,0:ft_size[3]-2]
               tmp[1:full_size[1]-1,0,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
@@ -220,23 +226,32 @@ function read_ph5_data, data_name, $
                  mirror[ft_size[1]-1,0:full_size[2]-2,0:ft_size[3]-2]
               mirror = !NULL
               data[*,*,*,it] = tmp
+              printf, convert05_lun,systime(1)-t05 ;DEV
            end
         endcase
-        printf, convert_lun,systime(1)-t0 ;DEV
+        printf, convert00_lun,systime(1)-t00 ;DEV
      endfor
      ;;-->DEV
      close, size_lun
      free_lun, size_lun
      close, create_lun
      free_lun, create_lun
-     close, assign1_lun
-     free_lun, assign1_lun
-     close, assign2_lun
-     free_lun, assign2_lun
-     close, append_lun
-     free_lun, append_lun
-     close, convert_lun
-     free_lun, convert_lun
+     close, assign_lun
+     free_lun, assign_lun
+     close, update_lun
+     free_lun, update_lun
+     close, convert00_lun
+     free_lun, convert00_lun
+     close, convert01_lun
+     free_lun, convert01_lun
+     close, convert02_lun
+     free_lun, convert02_lun
+     close, convert03_lun
+     free_lun, convert03_lun
+     close, convert04_lun
+     free_lun, convert04_lun
+     close, convert05_lun
+     free_lun, convert05_lun
      ;;<--
   endif $
   else begin
