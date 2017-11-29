@@ -104,54 +104,36 @@ function read_ph5_data, data_name, $
 
   ;;==Check if data is Fourier Transformed output
   if keyword_set(variable) then begin
-     ;;-->DEV
-     spawn, "mkdir -p "+run_dir+"timing"
-     openw, size_lun,run_dir+'timing/size.txt',/get_lun
-     openw, create_lun,run_dir+'timing/create.txt',/get_lun
-     openw, assign_lun,run_dir+'timing/assign.txt',/get_lun
-     openw, update_lun,run_dir+'timing/update.txt',/get_lun
-     openw, convert00_lun,run_dir+'timing/convert00.txt',/get_lun
-     openw, convert01_lun,run_dir+'timing/convert01.txt',/get_lun
-     openw, convert02_lun,run_dir+'timing/convert02.txt',/get_lun
-     openw, convert03_lun,run_dir+'timing/convert03.txt',/get_lun
-     openw, convert04_lun,run_dir+'timing/convert04.txt',/get_lun
-     openw, convert05_lun,run_dir+'timing/convert05.txt',/get_lun
-     ;;<--
-     ;; for it=0,nt-1 do begin
-     print, "[READ_PH5_DATA] Warning: truncated FT read-in"
-     for it=0,9 do begin
+     for it=0,nt-1 do begin
+     ;; print, "[READ_PH5_DATA] Warning: truncated FT read-in"
+     ;; for it=0,9 do begin
         ;;==Read data set
         tmp_data = get_h5_data(h5_file[it],data_name)
         tmp_size = size(tmp_data)
         tmp_len = (tmp_size[0] eq 1) ? 1 : tmp_size[2]
-        printf, size_lun,tmp_len ;DEV
         tmp_cplx = complex(tmp_data[0,0:tmp_len-1],tmp_data[1,0:tmp_len-1])
         ;;==Read index set
         tmp_ind = get_h5_data(h5_file[it],data_name+'_index')
         ;;==Assign to intermediate struct
-        t0 = systime(1)         ;DEV
         tmp_struct = replicate(ft_template,tmp_len)
-        printf, create_lun,systime(1)-t0 ;DEV
-        t0 = systime(1)                  ;DEV
         tmp_struct.val = reform(tmp_cplx)
         switch n_dim of 
            3: tmp_struct.ikz = reform(tmp_ind[2,*])
            2: tmp_struct.iky = reform(tmp_ind[1,*])
            1: tmp_struct.ikx = reform(tmp_ind[0,*])
         endswitch
-        printf, assign_lun,systime(1)-t0 ;DEV
         ;;==Free temporary variables
         tmp_data = !NULL
         tmp_ind = !NULL
         ;;==Create global struct or append to existing one
-        t0 = systime(1)         ;DEV
-        if n_elements(ft_struct) eq 0 then $
-           ft_struct = tmp_struct $
-        else $
-           ft_struct = [ft_struct,tmp_struct]
-        printf, update_lun,systime(1)-t0 ;DEV
+        ;;->Not sure when this would ever append
+        ;; if n_elements(ft_struct) eq 0 then $
+        ;;    ft_struct = tmp_struct $
+        ;; else $
+        ;;    ft_struct = [ft_struct,tmp_struct]
+        ft_struct = tmp_struct
         ;;==Convert to output array
-        t00 = systime(1)         ;DEV
+        ;;->Based on fill_k_array.pro
         tmp_range = intarr(n_dim,2)
         for id=0,n_dim-1 do begin
            tmp_range[id,0] = min(ft_struct.(id))
@@ -165,6 +147,8 @@ function read_ph5_data, data_name, $
               ft_struct.val
            1: ft_array[ft_struct.ikx] = ft_struct.val
         endcase
+        ;;<-(fill_k_array)
+        ;;->Based on mirror_fft_eppic.pro
         full_size = [params.ndim_space, $
                      params.nx*params.nsubdomains, $
                      params.ny, $
@@ -189,7 +173,6 @@ function read_ph5_data, data_name, $
               data[*,*,it] = tmp
            end
            3: begin
-              t01 = systime(1)  ;DEV
               if ft_size[1] ne full_size[1] then begin
                  tmp = ft_array
                  ft_array = complexarr(full_size[1],ft_size[2],ft_size[3])
@@ -198,8 +181,6 @@ function read_ph5_data, data_name, $
                  tmp = !NULL
               endif
               tmp = complexarr(full_size[1],full_size[2],full_size[3])
-              printf, convert01_lun,systime(1)-t01 ;DEV
-              t02 = systime(1)  ;DEV
               if ft_size[2] eq full_size[2] then tmp[*,*,0:ft_size[3]-1] = ft_array $
               else begin
                  tmp[*,0:ft_size[2]-1,0:ft_size[3]-1] = ft_array
@@ -210,14 +191,8 @@ function read_ph5_data, data_name, $
                     mirror[ft_size[1]-2,0:ft_size[2]-2,0:ft_size[3]-2]
                  mirror = !NULL
               endelse
-              printf, convert02_lun,systime(1)-t02 ;DEV
-              t03 = systime(1)  ;DEV
-              mirror = reverse(reverse(reverse(tmp[*,*,0:full_size[3]-1],3),2))
-              printf, convert03_lun,systime(1)-t03 ;DEV
-              t04 = systime(1)                     ;DEV
-              mirror = conj(mirror)
-              printf, convert04_lun,systime(1)-t04 ;DEV
-              t05 = systime(1)                     ;DEV
+              mirror = reverse(reverse(reverse(tmp,3),2))
+              mirror = conj(tmp)
               tmp[1:full_size[1]-1,1:full_size[2]-1,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
                  mirror[0:ft_size[1]-2,0:full_size[2]-2,0:ft_size[3]-2]
               tmp[1:full_size[1]-1,0,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
@@ -225,34 +200,13 @@ function read_ph5_data, data_name, $
               tmp[0,1:full_size[2]-1,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
                  mirror[ft_size[1]-1,0:full_size[2]-2,0:ft_size[3]-2]
               mirror = !NULL
+              ;;<-(mirror_fft_eppic.pro)
+              ft_array = !NULL
+              ft_struct = !NULL
               data[*,*,*,it] = tmp
-              printf, convert05_lun,systime(1)-t05 ;DEV
            end
         endcase
-        printf, convert00_lun,systime(1)-t00 ;DEV
      endfor
-     ;;-->DEV
-     close, size_lun
-     free_lun, size_lun
-     close, create_lun
-     free_lun, create_lun
-     close, assign_lun
-     free_lun, assign_lun
-     close, update_lun
-     free_lun, update_lun
-     close, convert00_lun
-     free_lun, convert00_lun
-     close, convert01_lun
-     free_lun, convert01_lun
-     close, convert02_lun
-     free_lun, convert02_lun
-     close, convert03_lun
-     free_lun, convert03_lun
-     close, convert04_lun
-     free_lun, convert04_lun
-     close, convert05_lun
-     free_lun, convert05_lun
-     ;;<--
   endif $
   else begin
      for it=0,nt-1 do begin
