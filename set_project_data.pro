@@ -25,22 +25,38 @@ function set_project_data, data,grid,context=context
   else if size(grid,/type) ne 8 then $
      message, "Parameter 'grid' must be a struct"
 
-  ;;==Set up untransposed vecs
-  if (n_elements(context) ne 0) && $
-     (context.haskey('data') && context.data.haskey('ranges')) then begin
-     ranges = {x: [context.data.ranges[0,0]*grid.nx, $
-                   context.data.ranges[1,0]*grid.nx-1], $
-               y: [context.data.ranges[0,1]*grid.ny, $
-                   context.data.ranges[1,1]*grid.ny-1], $
-               z: [context.data.ranges[0,2]*grid.nz, $
-                   context.data.ranges[1,2]*grid.nz-1]}
-     context.data.remove, 'ranges'
-  endif $
-  else begin
-     ranges = {x: [0,grid.nx-1], $
-               y: [0,grid.ny-1], $
-               z: [0,grid.nz-1]}
-  endelse
+  ;;==Set up untransposed data ranges
+  if n_elements(context) ne 0 then begin
+     if context.haskey('data') then begin
+        if context.data.haskey('ranges') then begin
+           ranges = {x: [context.data.ranges[0,0]*grid.nx, $
+                         context.data.ranges[1,0]*grid.nx-1], $
+                     y: [context.data.ranges[0,1]*grid.ny, $
+                         context.data.ranges[1,1]*grid.ny-1], $
+                     z: [context.data.ranges[0,2]*grid.nz, $
+                         context.data.ranges[1,2]*grid.nz-1]}
+           context.data.remove, 'ranges'
+        endif $
+        else begin
+           ranges = {x: [0,grid.nx-1], $
+                     y: [0,grid.ny-1], $
+                     z: [0,grid.nz-1]}
+        endelse
+        if context.data.haskey('center') then begin
+           center = {x: context.data.center[0], $
+                     y: context.data.center[1], $
+                     z: context.data.center[2]}
+           context.data.remove, 'center'
+        endif $
+        else begin
+           center = {x: grid.nx/2, $
+                     y: grid.ny/2, $
+                     z: grid.nz/2}
+        endelse
+     endif ;(context.data exists)
+  endif    ;(context exists)
+
+  ;;==Declare untransposed vectors
   vecs = {x: grid.x, $
           y: grid.y, $
           z: grid.z} 
@@ -55,6 +71,9 @@ function set_project_data, data,grid,context=context
      context.data['xrng'] = ranges.(transpose[0])
      context.data['yrng'] = ranges.(transpose[1])
      context.data['zrng'] = ranges.(transpose[2])
+     context.data['xctr'] = center.(transpose[0])
+     context.data['yctr'] = center.(transpose[1])
+     context.data['zctr'] = center.(transpose[2])
      context.data['xvec'] = vecs.(transpose[0])
      context.data['yvec'] = vecs.(transpose[1])
      context.data['zvec'] = vecs.(transpose[2])
@@ -70,6 +89,9 @@ function set_project_data, data,grid,context=context
      context.data['xrng'] = ranges.(context.data.transpose[0])
      context.data['yrng'] = ranges.(context.data.transpose[1])
      context.data['zrng'] = ranges.(context.data.transpose[2])
+     context.data['xctr'] = center.(context.data.transpose[0])
+     context.data['yctr'] = center.(context.data.transpose[1])
+     context.data['zctr'] = center.(context.data.transpose[2])
      context.data['dimensions'] = [context.data.xrng[1]-context.data.xrng[0]+1, $
                                    context.data.yrng[1]-context.data.yrng[0]+1, $
                                    context.data.zrng[1]-context.data.zrng[0]+1]

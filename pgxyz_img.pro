@@ -24,12 +24,16 @@ pro pgxyz_img, context,name
      case 1B of
         strcmp(cur_plane,'xy'): begin
            smooth_widths = [context.graphics.smooth[0],context.graphics.smooth[1],1]
-           imgdata = (context.data.array[name])[context.data.xrng[0]:context.data.xrng[1], $
-                                                context.data.yrng[0]:context.data.yrng[1], $
-                                                context.grid.nz/2, $
+           imgdata = (context.data.array[name])[context.data.xrng[0]: $
+                                                context.data.xrng[1], $
+                                                context.data.yrng[0]: $
+                                                context.data.yrng[1], $
+                                                context.data.zctr, $
                                                 *]
-           xdata = context.data.xvec[context.data.xrng[0]:context.data.xrng[1]]
-           ydata = context.data.yvec[context.data.yrng[0]:context.data.yrng[1]]
+           xdata = context.data.xvec[context.data.xrng[0]: $
+                                     context.data.xrng[1]]
+           ydata = context.data.yvec[context.data.yrng[0]: $
+                                     context.data.yrng[1]]
            xtitle = context.graphics.axes.x.title[class]
            ytitle = context.graphics.axes.y.title[class]
            xshow = context.graphics.axes.x.show
@@ -37,12 +41,16 @@ pro pgxyz_img, context,name
         end
         strcmp(cur_plane,'xz'): begin
            smooth_widths = [context.graphics.smooth[0],context.graphics.smooth[2],1]
-           imgdata = (context.data.array[name])[context.data.xrng[0]:context.data.xrng[1], $
-                                                context.grid.ny/2, $
-                                                context.data.zrng[0]:context.data.zrng[1], $
+           imgdata = (context.data.array[name])[context.data.xrng[0]: $
+                                                context.data.xrng[1], $
+                                                context.data.yctr, $
+                                                context.data.zrng[0]: $
+                                                context.data.zrng[1], $
                                                 *]
-           xdata = context.data.xvec[context.data.xrng[0]:context.data.xrng[1]]
-           ydata = context.data.zvec[context.data.zrng[0]:context.data.zrng[1]]
+           xdata = context.data.xvec[context.data.xrng[0]: $
+                                     context.data.xrng[1]]
+           ydata = context.data.zvec[context.data.zrng[0]: $
+                                     context.data.zrng[1]]
            xtitle = context.graphics.axes.x.title[class]
            ytitle = context.graphics.axes.z.title[class]
            xshow = context.graphics.axes.x.show
@@ -50,12 +58,16 @@ pro pgxyz_img, context,name
         end
         strcmp(cur_plane,'yz'): begin
            smooth_widths = [context.graphics.smooth[1],context.graphics.smooth[2],1]
-           imgdata = (context.data.array[name])[context.grid.nx/2, $
-                                                context.data.yrng[0]:context.data.yrng[1], $
-                                                context.data.zrng[0]:context.data.zrng[1], $
+           imgdata = (context.data.array[name])[context.data.xctr, $
+                                                context.data.yrng[0]: $
+                                                context.data.yrng[1], $
+                                                context.data.zrng[0]: $
+                                                context.data.zrng[1], $
                                                 *]
-           xdata = context.data.yvec[context.data.yrng[0]:context.data.yrng[1]]
-           ydata = context.data.zvec[context.data.zrng[0]:context.data.zrng[1]]
+           xdata = context.data.yvec[context.data.yrng[0]: $
+                                     context.data.yrng[1]]
+           ydata = context.data.zvec[context.data.zrng[0]: $
+                                     context.data.zrng[1]]
            xtitle = context.graphics.axes.y.title[class]
            ytitle = context.graphics.axes.z.title[class]
            xshow = context.graphics.axes.y.show
@@ -70,8 +82,6 @@ pro pgxyz_img, context,name
      img = multi_image(imgdata,xdata,ydata, $
                        panel_index = panel_index, $
                        panel_layout = context.panel.layout[cur_plane], $
-                       ;; min_value = -max(abs(imgdata)), $
-                       ;; max_value = max(abs(imgdata)), $
                        colorbar_type = context.graphics.colorbar.type, $
                        colorbar_title = colorbar_title)
      n_panels = n_elements(panel_index)
