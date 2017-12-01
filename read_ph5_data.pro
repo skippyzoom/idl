@@ -176,60 +176,64 @@ function read_ph5_data, data_name, $
            end
            3: begin
 
-              ;; t0 = systime(1)   ;DEV
+              ;;-----------------;;
+              ;; ORIGINAL METHOD ;;
+              ;;-----------------;;
 
-              if ft_size[1] ne full_size[1] then begin
-                 tmp = ft_array
-                 ft_array = complexarr(full_size[1],ft_size[2],ft_size[3])
-                 ft_array[full_size[1]-ft_size[1]:full_size[1]-1,0:ft_size[2]-1,0:ft_size[3]-1] = tmp
-                 ;; ft_array[full_size[1]-ft_size[1]:full_size[1]-1,*,*] = tmp
-                 ft_size = size(ft_array)
-                 tmp = !NULL
-              endif
-              full_array = complexarr(full_size[1],full_size[2],full_size[3])
-              if ft_size[2] eq full_size[2] then full_array[*,*,0:ft_size[3]-1] = ft_array $
-              else begin
-                 full_array[*,0:ft_size[2]-1,0:ft_size[3]-1] = ft_array
-                 mirror = reverse(reverse(reverse(ft_array,3),2))
-                 full_array[1:full_size[1]-1,full_size[2]-ft_size[2]+1:full_size[2]-1,1:ft_size[3]-1] = $
-                    mirror[0:ft_size[1]-2,0:ft_size[2]-2,0:ft_size[3]-2]
-                 full_array[0,full_size[2]-ft_size[2]+1:full_size[2]-1,1:ft_size[3]-1] = $
-                    mirror[ft_size[1]-2,0:ft_size[2]-2,0:ft_size[3]-2]
-                 mirror = !NULL
-                 ft_array = !NULL
-              endelse
-              mirror = reverse(reverse(reverse(full_array,3),2))
-              mirror = conj(mirror)
-              ;; for iz=0,full_size[3]-1 do full_array[*,*,iz] = rotate(full_array[*,*,iz],2)
-              ;; mirror = reverse(full_array,3)
-              full_array[1:full_size[1]-1,1:full_size[2]-1,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
-                 mirror[0:ft_size[1]-2,0:full_size[2]-2,0:ft_size[3]-2]
-              full_array[1:full_size[1]-1,0,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
-                 mirror[0:ft_size[1]-2,ft_size[2]-1,0:ft_size[3]-2]
-              full_array[0,1:full_size[2]-1,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
-                 mirror[ft_size[1]-1,0:full_size[2]-2,0:ft_size[3]-2]
-              mirror = !NULL
-              ;; printf, orig_lun,systime(1)-t0 ;DEV
-              ;;<-(mirror_fft_eppic.pro)
-              ;; filename = run_dir+'full_array_check/full_array_orig-'+ $
-              ;;            strcompress(it,/remove_all)+'.sav' ;DEV
-              ;; save, full_array,filename=filename            ;DEV
-
-              ;; ft_array = ft_array_bkp ;DEV
-              ;; ft_size = size(ft_array) ;DEV
-              ;; t0 = systime(1)   ;DEV
-
+              ;; ;; t0 = systime(1)   ;DEV
+              ;; if ft_size[1] ne full_size[1] then begin
+              ;;    tmp = ft_array
+              ;;    ft_array = complexarr(full_size[1],ft_size[2],ft_size[3])
+              ;;    ft_array[full_size[1]-ft_size[1]:full_size[1]-1,0:ft_size[2]-1,0:ft_size[3]-1] = tmp
+              ;;    ;; ft_array[full_size[1]-ft_size[1]:full_size[1]-1,*,*] = tmp
+              ;;    ft_size = size(ft_array)
+              ;;    tmp = !NULL
+              ;; endif
               ;; full_array = complexarr(full_size[1],full_size[2],full_size[3])
-              ;; full_array[0:ft_size[1]-1,0:ft_size[2]-1,0:ft_size[3]-1] = ft_array
-              ;; ;; full_array[full_size[1]-ft_size[1]:full_size[1]-1, $
-              ;; ;;            full_size[2]-ft_size[2]:full_size[2]-1, $
-              ;; ;;            full_size[3]-ft_size[3]:full_size[3]-1] = reverse(ft_array,3)
-              ;; ;; printf, test_lun,systime(1)-t0 ;DEV
-              ;; ;; filename = run_dir+'full_array_check/full_array_test-'+ $
+              ;; if ft_size[2] eq full_size[2] then full_array[*,*,0:ft_size[3]-1] = ft_array $
+              ;; else begin
+              ;;    full_array[*,0:ft_size[2]-1,0:ft_size[3]-1] = ft_array
+              ;;    mirror = reverse(reverse(reverse(ft_array,3),2))
+              ;;    full_array[1:full_size[1]-1,full_size[2]-ft_size[2]+1:full_size[2]-1,1:ft_size[3]-1] = $
+              ;;       mirror[0:ft_size[1]-2,0:ft_size[2]-2,0:ft_size[3]-2]
+              ;;    full_array[0,full_size[2]-ft_size[2]+1:full_size[2]-1,1:ft_size[3]-1] = $
+              ;;       mirror[ft_size[1]-2,0:ft_size[2]-2,0:ft_size[3]-2]
+              ;;    mirror = !NULL
+              ;;    ft_array = !NULL
+              ;; endelse
+              ;; mirror = reverse(reverse(reverse(full_array,3),2))
+              ;; mirror = conj(mirror)
+              ;; ;; for iz=0,full_size[3]-1 do full_array[*,*,iz] = rotate(full_array[*,*,iz],2)
+              ;; ;; mirror = reverse(full_array,3)
+              ;; full_array[1:full_size[1]-1,1:full_size[2]-1,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
+              ;;    mirror[0:ft_size[1]-2,0:full_size[2]-2,0:ft_size[3]-2]
+              ;; full_array[1:full_size[1]-1,0,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
+              ;;    mirror[0:ft_size[1]-2,ft_size[2]-1,0:ft_size[3]-2]
+              ;; full_array[0,1:full_size[2]-1,full_size[3]-ft_size[3]+1:full_size[3]-1] = $
+              ;;    mirror[ft_size[1]-1,0:full_size[2]-2,0:ft_size[3]-2]
+              ;; mirror = !NULL
+              ;; ;; printf, orig_lun,systime(1)-t0 ;DEV
+              ;; ;;<-(mirror_fft_eppic.pro)
+              ;; ;; filename = run_dir+'full_array_check/full_array_orig-'+ $
               ;; ;;            strcompress(it,/remove_all)+'.sav' ;DEV
               ;; ;; save, full_array,filename=filename            ;DEV
-              ;; full_array = conj(full_array)
-              ;; ft_array = !NULL
+
+              ;; ;; ft_array = ft_array_bkp ;DEV
+              ;; ;; ft_size = size(ft_array) ;DEV
+              ;; ;; t0 = systime(1)   ;DEV
+
+              ;;-------------;;
+              ;; TEST METHOD ;;
+              ;;-------------;;
+
+              full_array = complexarr(full_size[1],full_size[2],full_size[3])
+              full_array[0:ft_size[1]-1,0:ft_size[2]-1,0:ft_size[3]-1] = ft_array
+              ;; printf, test_lun,systime(1)-t0 ;DEV
+              ;; filename = run_dir+'full_array_check/full_array_test-'+ $
+              ;;            strcompress(it,/remove_all)+'.sav' ;DEV
+              ;; save, full_array,filename=filename            ;DEV
+              full_array = conj(full_array)
+              ft_array = !NULL
               
               data[*,*,*,it] = full_array
            end

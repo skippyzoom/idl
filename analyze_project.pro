@@ -27,7 +27,8 @@ pro analyze_project, path, $
   data = load_eppic_data(context.data.name.toarray(), $
                          context.data.type, $
                          path = context.path, $
-                         timestep = context.params.nout*lindgen(context.params.nt_max))
+                         ;; timestep = context.params.nout*lindgen(context.params.nt_max))
+                         timestep = [0,1024,2048])
 
   ;;==Set up data for graphics
   d_keys = data.keys()

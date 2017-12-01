@@ -1,18 +1,27 @@
 ; Read an EPPIC input file into a dictionary. This function
 ; is intended to replace the @ppic3d.i/@eppic.i paradigm.
-;
-; TO DO
-; -- Check that ppic3d.i exists. If it doesn't, try eppic.i.
-;    If that doesn't exist, exit gracefully.
 ;-
 function read_parameter_file, path, $
                               name=name, $
                               comment=comment
 
+  ;;==Defaults and guards
   if n_elements(name) eq 0 then name = 'ppic3d.i'
   if n_elements(comment) eq 0 then comment = ';'
 
+  ;;==Check existence of parameter file
   filename = expand_path(path+path_sep()+name)
+  if ~file_test(filename) then begin
+     print, "[READ_PARAMETER_FILE] Could not find ",filename
+     default_names = ['ppic3d.i','eppic.i']
+     check_default = where(file_test(default_names),count)
+     if count ne 0 then begin
+        filename = default_names[min(check_default)]
+        print, "[READ_PARAMETER_FILE] Using parameter file ",filename
+     endif else return, !NULL
+  endif
+
+  ;;==Read parameters from file
   openr, rlun,filename,/get_lun
   line = ''
   params = dictionary()
