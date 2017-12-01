@@ -34,12 +34,15 @@ pro analyze_project, path, $
   d_size = size(data[d_keys[0]])
   if context.haskey('transpose') then context['transpose'] = context.transpose[0:d_size[0]-1]
   context = set_project_data(data,context.grid,context=context[*])
+  
+  ;;==Free memory
+  data = !NULL
 
   ;;==Set appropriate units for graphics
   set_data_units, context,context.params.units
   context.data['label'] = set_data_labels(context.data.name.toarray())
 
-  ;;==Create graphical output
-  project_graphics, context
-
+  ;; ;;==Create graphical output
+  ;; project_graphics, context
+STOP
 end

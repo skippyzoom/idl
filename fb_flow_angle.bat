@@ -20,7 +20,7 @@ ct = get_custom_ct(1)
 ;;==Create project dictionary
 prj = load_empty_context()
 prj['description'] = description
-prj.data['name'] = list('den1')
+prj.data['name'] = list('den1','denft1')
 prj.data['transpose'] = [2,1,0,3]
 prj.graphics['note'] = 'code_dev'
 prj.graphics['rgb_table'] = dictionary('den1', 5, $

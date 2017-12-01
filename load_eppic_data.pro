@@ -41,6 +41,8 @@ function load_eppic_data, data_name,data_type, $
      data = dictionary()
      for id=0,n_data-1 do begin
         print, "[LOAD_EPPIC_DATA] Loading ",data_name[id],"..."
+        eppic_ft_data = strmatch(data_name[id],'*ft*')
+        type = eppic_ft_data ? 6 : 4
         data[data_name[id]] = read_xxx_data(data_name[id], $
                                             data_type[id], $
                                             nx = grid.nx, $
@@ -53,7 +55,8 @@ function load_eppic_data, data_name,data_type, $
                                             iend = params.iend, $
                                             sizepertime = grid.sizepertime, $
                                             timestep = timestep, $
-                                            variable = strmatch(data_name[id],'*ft*'), $
+                                            type = type, $
+                                            eppic_ft_data = eppic_ft_data, $
                                             path = path+path_sep()+'parallel', $
                                             /verbose, $
                                             _EXTRA = ex)
