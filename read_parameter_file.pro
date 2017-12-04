@@ -14,11 +14,14 @@ function read_parameter_file, path, $
   if ~file_test(filename) then begin
      print, "[READ_PARAMETER_FILE] Could not find ",filename
      default_names = ['ppic3d.i','eppic.i']
-     check_default = where(file_test(default_names),count)
+     check_default = where(file_test(path+path_sep()+default_names),count)
      if count ne 0 then begin
-        filename = default_names[min(check_default)]
+        filename = expand_path(path+path_sep()+default_names[min(check_default)])
         print, "[READ_PARAMETER_FILE] Using parameter file ",filename
-     endif else return, !NULL
+     endif else begin
+        print, "[READ_PARAMETER_FILE] Cannot create parameter dictionary"
+        return, !NULL
+     endelse
   endif
 
   ;;==Read parameters from file
