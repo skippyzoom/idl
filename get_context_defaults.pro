@@ -54,7 +54,7 @@ function get_context_defaults, request,pattern,path=path
      context['path'] = path
      context['params'] = set_eppic_params(path)
      context['grid'] = set_grid(path)
-     nt_max = calc_timesteps(path,context.grid)
+     nt_max = calc_timesteps(path,context.grid,/verbose)
      context.params['nt_max'] = nt_max
   endif
 

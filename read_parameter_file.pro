@@ -3,7 +3,8 @@
 ;-
 function read_parameter_file, path, $
                               name=name, $
-                              comment=comment
+                              comment=comment, $
+                              verbose=verbose
 
   ;;==Defaults and guards
   if n_elements(name) eq 0 then name = 'ppic3d.i'
@@ -12,14 +13,17 @@ function read_parameter_file, path, $
   ;;==Check existence of parameter file
   filename = expand_path(path+path_sep()+name)
   if ~file_test(filename) then begin
-     print, "[READ_PARAMETER_FILE] Could not find ",filename
+     if keyword_set(verbose) then $
+        print, "[READ_PARAMETER_FILE] Could not find ",filename
      default_names = ['ppic3d.i','eppic.i']
      check_default = where(file_test(path+path_sep()+default_names),count)
      if count ne 0 then begin
         filename = expand_path(path+path_sep()+default_names[min(check_default)])
-        print, "[READ_PARAMETER_FILE] Using parameter file ",filename
+        if keyword_set(verbose) then $
+           print, "[READ_PARAMETER_FILE] Using parameter file ",filename
      endif else begin
-        print, "[READ_PARAMETER_FILE] Cannot create parameter dictionary"
+        if keyword_set(verbose) then $
+           print, "[READ_PARAMETER_FILE] Cannot create parameter dictionary"
         return, !NULL
      endelse
   endif

@@ -9,7 +9,7 @@ function set_eppic_params, path
   ;---------------------------;
   ; Read the EPPIC input file ;
   ;---------------------------;
-  params = read_parameter_file(path)
+  params = read_parameter_file(path,/verbose)
 
   ;----------;
   ; Defaults ;

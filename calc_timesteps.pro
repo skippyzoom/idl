@@ -13,7 +13,7 @@
 ;    when only transfering a subset of files from another
 ;    system (e.g. Stampede).
 ;-
-function calc_timesteps, path,grid
+function calc_timesteps, path,grid,verbose=verbose
   
   if file_test(expand_path(path+path_sep()+'domain000'),/directory) then $
      bp = expand_path(path+path_sep()+'domain*/') $
@@ -22,43 +22,53 @@ function calc_timesteps, path,grid
   case 1 of
      file_test(expand_path(path+path_sep()+'moments1.out')): begin
         nt_max = file_lines(expand_path(path+path_sep()+'moments1.out'))-1
-        print, "[CALC_TIMESTEPS] Computed max time steps from 'moments1.out'"
+        if keyword_set(verbose) then $
+           print, "[CALC_TIMESTEPS] Computed max time steps from 'moments1.out'"
      end
      file_test(expand_path(path+path_sep()+'moments0.out')): begin
         nt_max = file_lines(expand_path(path+path_sep()+'moments0.out'))-1
-        print, "[CALC_TIMESTEPS] Computed max time steps from 'moments0.out'"
+        if keyword_set(verbose) then $
+           print, "[CALC_TIMESTEPS] Computed max time steps from 'moments0.out'"
      end
      file_test(expand_path(path+path_sep()+'domain000/moments1.out')): begin
         nt_max = file_lines(expand_path(path+path_sep()+'domain000/moments1.out'))-1
-        print, "[CALC_TIMESTEPS] Computed max time steps from 'domain000/moments1.out'"
+        if keyword_set(verbose) then $
+           print, "[CALC_TIMESTEPS] Computed max time steps from 'domain000/moments1.out'"
      end
      file_test(expand_path(path+path_sep()+'domain000/moments0.out')): begin
         nt_max = file_lines(expand_path(path+path_sep()+'domain000/moments0.out'))-1
-        print, "[CALC_TIMESTEPS] Computed max time steps from 'domain000/moments0.out'"
+        if keyword_set(verbose) then $
+           print, "[CALC_TIMESTEPS] Computed max time steps from 'domain000/moments0.out'"
      end
      file_test(expand_path(path+path_sep()+'parallel'),/directory): begin
         !NULL = file_search(expand_path(path+path_sep()+'parallel/*.h5'),count=count)
         nt_max = count
-        print, "[CALC_TIMESTEPS] Computed max time steps from parallel/*.h5"
+        if keyword_set(verbose) then $
+           print, "[CALC_TIMESTEPS] Computed max time steps from parallel/*.h5"
      end
      file_test(expand_path(path+path_sep()+'den1.bin')): begin
         nt_max = timesteps(expand_path(path+path_sep()+'den1.bin'), $
                           grid.sizepertime,grid.nsubdomains,basepath=bp)
-        print, "[CALC_TIMESTEPS] Computed max time steps from den1.bin"
+        if keyword_set(verbose) then $
+           print, "[CALC_TIMESTEPS] Computed max time steps from den1.bin"
      end
      file_test(expand_path(path+path_sep()+'phi.bin')): begin
         nt_max = timesteps(expand_path(path+path_sep()+'phi.bin'), $
                           grid.sizepertime,grid.nsubdomains,basepath=bp)
-        print, "[CALC_TIMESTEPS] Computed max time steps from phi.bin"
+        if keyword_set(verbose) then $
+           print, "[CALC_TIMESTEPS] Computed max time steps from phi.bin"
      end
      file_test(expand_path(path+path_sep()+'den0.bin')): begin
         nt_max = timesteps(expand_path(path+path_sep()+'den0.bin'), $
                           grid.sizepertime,grid.nsubdomains,basepath=bp)
-        print, "[CALC_TIMESTEPS] Computed max time steps from 'den0.bin'"
+        if keyword_set(verbose) then $
+           print, "[CALC_TIMESTEPS] Computed max time steps from 'den0.bin'"
      end
-     else: print, "[CALC_TIMESTEPS] Could not compute max time steps"
+     else: begin
+        if keyword_set(verbose) then $
+           print, "[CALC_TIMESTEPS] Could not compute max time steps"
+     end
   endcase
-  ;; times = dt*nout*findgen(nt_max)/(nt_max-1)
 
   return, nt_max
 
