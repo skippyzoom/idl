@@ -25,7 +25,7 @@ pro quick_look, path,directory=directory
   grid = set_grid(path)
   nt_max = calc_timesteps(path,grid)
 
-  ;;==Read in simulation data
+  ;;==Read in raw simulation data
   data = load_eppic_data(['den1','phi'],path=path)
 
   ;;==Set up graphics keywords
@@ -70,7 +70,7 @@ pro quick_look, path,directory=directory
      end
   endcase
 
-  ;;==Create images of ion density
+  ;;==Create images of ion density from raw data
   case params.ndim_space of 
      2: begin
         img = image(reform(data.den1[*,*,0]),/buffer,rgb_table=5)
@@ -104,37 +104,111 @@ pro quick_look, path,directory=directory
      end
   endcase
 
-  ;;==Create images of smoothed ion density
+  ;;==Create images of density Fourier spectra from raw data
   case params.ndim_space of 
      2: begin
-        img = image(reform(smooth(data.den1[*,*,0],2.0/grid.dx,/edge_wrap)),/buffer,rgb_table=5)
+        img = image(10*alog10(fft(reform(data.den1[*,*,0]),/center)^2),/buffer,rgb_table=39)
         txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
-        image_save, img,filename=directory+path_sep()+"den1_sm-t0.png"
-        img = image(reform(smooth(data.den1[*,*,nt_max-1],2.0/grid.dx,/edge_wrap)),/buffer,rgb_table=5)
+        image_save, img,filename=directory+path_sep()+"fftden1-t0.png"
+        img = image(10*alog10(fft(reform(data.den1[*,*,nt_max-1]),/center)^2),/buffer,rgb_table=39)
         txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
-        image_save, img,filename=directory+path_sep()+"den1_sm-tf.png"
+        image_save, img,filename=directory+path_sep()+"fftden1-tf.png"
      end
      3: begin
-        img = image(reform(smooth(data.den1[*,*,grid.nz/2,0],2.0/grid.dx,/edge_wrap)),/buffer,rgb_table=5)
+        img = image(10*alog10(fft(reform(data.den1[*,*,grid.nz/2,0]),/center)^2),/buffer,rgb_table=39)
         txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
-        image_save, img,filename=directory+path_sep()+"den1_xy_sm-t0.png"
-        img = image(reform(smooth(data.den1[*,*,grid.nz/2,nt_max-1],2.0/grid.dx,/edge_wrap)),/buffer,rgb_table=5)
+        image_save, img,filename=directory+path_sep()+"fftden1_xy-t0.png"
+        img = image(10*alog10(fft(reform(data.den1[*,*,grid.nz/2,nt_max-1]),/center)^2),/buffer,rgb_table=39)
         txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
-        image_save, img,filename=directory+path_sep()+"den1_xy_sm-tf.png"
+        image_save, img,filename=directory+path_sep()+"fftden1_xy-tf.png"
 
-        img = image(reform(smooth(data.den1[*,grid.ny/2,*,0],2.0/grid.dx,/edge_wrap)),/buffer,rgb_table=5)
+        img = image(10*alog10(fft(reform(data.den1[*,grid.ny/2,*,0]),/center)^2),/buffer,rgb_table=39)
         txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
-        image_save, img,filename=directory+path_sep()+"den1_xz_sm-t0.png"
-        img = image(reform(smooth(data.den1[*,grid.nz/2,*,nt_max-1],2.0/grid.dx,/edge_wrap)),/buffer,rgb_table=5)
+        image_save, img,filename=directory+path_sep()+"fftden1_xz-t0.png"
+        img = image(10*alog10(fft(reform(data.den1[*,grid.ny/2,*,nt_max-1]),/center)^2),/buffer,rgb_table=39)
         txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
-        image_save, img,filename=directory+path_sep()+"den1_xz_sm-tf.png"
+        image_save, img,filename=directory+path_sep()+"fftden1_xz-tf.png"
 
-        img = image(reform(smooth(data.den1[grid.nx/2,*,*,0],2.0/grid.dx,/edge_wrap)),/buffer,rgb_table=5)
+        img = image(10*alog10(fft(reform(data.den1[grid.nx/2,*,*,0]),/center)^2),/buffer,rgb_table=39)
         txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
-        image_save, img,filename=directory+path_sep()+"den1_yz_sm-t0.png"
-        img = image(reform(smooth(data.den1[grid.nx/2,*,*,nt_max-1],2.0/grid.dx,/edge_wrap)),/buffer,rgb_table=5)
+        image_save, img,filename=directory+path_sep()+"fftden1_yz-t0.png"
+        img = image(10*alog10(fft(reform(data.den1[grid.nx/2,*,*,nt_max-1]),/center)^2),/buffer,rgb_table=39)
         txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
-        image_save, img,filename=directory+path_sep()+"den1_yz_sm-tf.png"
+        image_save, img,filename=directory+path_sep()+"fftden1_yz-tf.png"
+     end
+  endcase
+
+  ;;==Free memory
+  data = !NULL
+
+  ;;==Read in FT simulation data
+  data = load_eppic_data(['denft1'],path=path,timestep=params.nout*[0,nt_max-1])
+
+  ;;==Create images of ion density spectra from FT data
+  case params.ndim_space of 
+     2: begin
+        img = image(reform(data.denft1[*,*,0]),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1-t0.png"
+        img = image(reform(data.denft1[*,*,nt_max-1]),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1-tf.png"
+     end
+     3: begin
+        img = image(reform(data.denft1[*,*,grid.nz/2,0]),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1_xy-t0.png"
+        img = image(reform(data.denft1[*,*,grid.nz/2,nt_max-1]),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1_xy-tf.png"
+
+        img = image(reform(data.denft1[*,grid.ny/2,*,0]),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1_xz-t0.png"
+        img = image(reform(data.denft1[*,grid.ny/2,*,nt_max-1]),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1_xz-tf.png"
+
+        img = image(reform(data.denft1[grid.nx/2,*,*,0]),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1_yz-t0.png"
+        img = image(reform(data.denft1[grid.nx/2,*,*,nt_max-1]),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1_yz-tf.png"
+     end
+  endcase
+
+  ;;==Create images of ion density from FT data
+  case params.ndim_space of 
+     2: begin
+        img = image(reform(fft(data.denft1[*,*,0]),/inverse),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1-t0.png"
+        img = image(reform(fft(data.denft1[*,*,nt_max-1]),/inverse),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1-tf.png"
+     end
+     3: begin
+        img = image(reform(fft(data.denft1[*,*,grid.nz/2,0]),/inverse),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1_xy-t0.png"
+        img = image(reform(fft(data.denft1[*,*,grid.nz/2,nt_max-1]),/inverse),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1_xy-tf.png"
+
+        img = image(reform(fft(data.denft1[*,grid.ny/2,*,0]),/inverse),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1_xz-t0.png"
+        img = image(reform(fft(data.denft1[*,grid.ny/2,*,nt_max-1]),/inverse),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1_xz-tf.png"
+
+        img = image(reform(fft(data.denft1[grid.nx/2,*,*,0]),/inverse),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1_yz-t0.png"
+        img = image(reform(fft(data.denft1[grid.nx/2,*,*,nt_max-1]),/inverse),/buffer,rgb_table=5)
+        txt = text(0.1,0.1,path,target=img,font_name=font_name,font_size=font_size)
+        image_save, img,filename=directory+path_sep()+"ifftdenft1_yz-tf.png"
      end
   endcase
 
