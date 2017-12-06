@@ -29,13 +29,16 @@ function analyze_moments, nt_max,path=path
   if n_elements(params) ne 0 then begin
 
      ;;==Set default parameters
-     if (n_elements(kb) eq 0) then if (md0 lt 1e-8) then kb = 1.38e-23 else kb = 1
      coll_rate0 = params.coll_rate0
      coll_rate1 = params.coll_rate1
-     Bx = params.Bx
-     By = params.By
-     Bz = params.Bz
-     B0 = sqrt(Bx^2 + By^2 + Bz^2)
+     md0 = params.md0
+     md1 = params.md1
+     qd0 = params.qd0
+     qd1 = params.qd1
+     Bx0 = params.Bx
+     By0 = params.By
+     Bz0 = params.Bz
+     B0 = sqrt(Bx0^2 + By0^2 + Bz0^2)
      Ex0_external = params.Ex0_external
      Ey0_external = params.Ey0_external
      Ez0_external = params.Ez0_external
@@ -52,7 +55,11 @@ function analyze_moments, nt_max,path=path
      vxthd1 = params.vxthd1
      vythd1 = params.vythd1
      vzthd1 = params.vzthd1
+     if (n_elements(kb) eq 0) then if (md0 lt 1e-8) then kb = 1.38e-23 else kb = 1
 
+     ;;==Transform coordinates for 3-D 
+     if Bz0 eq 0.0 and Bx0 ne 0.0 then Bz = Bx0
+        
                                 ;--------;
                                 ; Hybrid ;
                                 ;--------;
@@ -69,16 +76,16 @@ function analyze_moments, nt_max,path=path
 
         ;;==Theoretical values
         ;;--cyclotron frequencies
-        wc0  = params.qd0*B0/params.md0
-        wc1  = params.qd1*B0/params.md1
+        wc0  = qd0*B0/md0
+        wc1  = qd1*B0/md1
         ;;--parallel mobilities
         if (coll_rate0 ne 0) then $
-           mu0_start = params.qd0/params.coll_rate0/params.md0 $
+           mu0_start = qd0/coll_rate0/md0 $
         else mu0_start = 0
         if (coll_rate1 ne 0) then $
-           mu1_start = params.qd1/params.coll_rate1/params.md1 $
+           mu1_start = qd1/coll_rate1/md1 $
         else mu1_start = 0
-STOP ;;-->START HERE
+
         ;;--Pedersen mobilities and drift
         ped0_start = mu0_start/(1+wc0^2/(coll_rate0*1.0)^2)
         ped1_start = mu1_start/(1+wc1^2/(coll_rate1*1.0)^2)
@@ -163,7 +170,10 @@ STOP ;;-->START HERE
 
         ;;==Simulated values
         ;;--Collision frequencies and Psi
-        nu0 = moments0[5,*]/moments0[1,*]*wc0     ;Hall drift
+        if Bz0 ne 0.0 then $
+           nu0 = wc0*moments0[5,*]/moments0[1,*] $ ;Hall drift
+        else $
+           nu0 = wc0*moments0[5,*]/(-moments0[9,*])
         nu1 = Ey0_external/(moments1[5,*])*(qd1/md1) ;Ped drift
         Psi = abs(nu0*nu1/(wc0*wc1))
         driver = (Ey0_external/B0)/(1+Psi)
