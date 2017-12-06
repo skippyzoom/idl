@@ -11,7 +11,10 @@
 ; detects that EPPIC used parallel HDF output.
 ;-
 
-function set_grid, path
+function set_grid, path=path
+  
+  if n_elements(path) eq 0 then path = './'
+
   params = set_eppic_params(path)
   if params.hdf_output_arrays eq 2 then begin
      case params.ndim_space of
@@ -25,7 +28,6 @@ function set_grid, path
            sizepertime = long64(nxg)*long64(nyg)*long64(nzg)
            nout_avg = params.nout_avg
            nsubdomains = params.nsubdomains
-           ;; print, "[SET_GRID] Swapped X and Y for 2-D PHDF"
         end
         3: begin
            nzg = params.nz/params.nout_avg
@@ -37,7 +39,6 @@ function set_grid, path
            sizepertime = long64(nxg)*long64(nyg)*long64(nzg)
            nout_avg = params.nout_avg
            nsubdomains = params.nsubdomains
-           ;; print, "[SET_GRID] Swapped X and Z for 3-D PHDF"
         end
      endcase
   endif else begin

@@ -12,7 +12,7 @@
 ; runs, based on the value of efield_algorithm.
 ;-
 
-function analyze_moments, nt_max,path=path
+function analyze_moments, path=path
 
   ;;==Set default path
   if n_elements(path) eq 0 then path = './'
@@ -56,7 +56,7 @@ function analyze_moments, nt_max,path=path
      vythd1 = params.vythd1
      vzthd1 = params.vzthd1
      if (n_elements(kb) eq 0) then if (md0 lt 1e-8) then kb = 1.38e-23 else kb = 1
-
+STOP
      ;;==Transform coordinates for 3-D 
      if Bz0 eq 0.0 and Bx0 ne 0.0 then Bz = Bx0
         
@@ -170,11 +170,16 @@ function analyze_moments, nt_max,path=path
 
         ;;==Simulated values
         ;;--Collision frequencies and Psi
-        if Bz0 ne 0.0 then $
-           nu0 = wc0*moments0[5,*]/moments0[1,*] $ ;Hall drift
-        else $
-           nu0 = wc0*moments0[5,*]/(-moments0[9,*])
-        nu1 = Ey0_external/(moments1[5,*])*(qd1/md1) ;Ped drift
+        ;; if Bz0 ne 0.0 then $
+        ;;    nu0 = wc0*moments0[5,*]/moments0[1,*] $ ;Hall drift
+        ;; else $
+        ;;    nu0 = wc0*moments0[5,*]/(-moments0[9,*])
+        case 1B of 
+           (B0 eq Bz): nu0 = wc0*moments0[5,*]/moments0[1,*]    ;From Hall drift
+           (B0 eq By): nu0 = wc0*(-moments0[9,*])/moments0[1,*] ;From Hall drift
+           (B0 eq Bx): nu0 = wc0*moments0[5,*]/(-moments0[9,*]) ;From Hall drift
+        endcase
+        nu1 = Ey0_external/(moments1[5,*])*(qd1/md1) ;From Ped drift
         Psi = abs(nu0*nu1/(wc0*wc1))
         driver = (Ey0_external/B0)/(1+Psi)
         ;;--parallel mobilities
