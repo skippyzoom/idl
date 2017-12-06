@@ -240,7 +240,7 @@ function analyze_moments, path=path
         Cs = sqrt(kb*(T0+T1)/md1)
      endelse                    ;pure PIC
 
-     dist0 = {moments:moments0, $
+     dist0 = {data:moments0, $
               wc:wc0, $
               mu_start:mu0_start, $
               ped_start:ped0_start, $
@@ -255,7 +255,7 @@ function analyze_moments, path=path
               hall:hall0, $
               v_hall:v_hall0, $
               T:T0}
-     dist1 = {moments:moments1, $
+     dist1 = {data:moments1, $
               wc:wc1, $
               mu_start:mu1_start, $
               ped_start:ped1_start, $
@@ -271,11 +271,11 @@ function analyze_moments, path=path
               v_hall:v_hall1, $
               T:T1}
 
-     moment_vars = {dist0:dist0, dist1:dist1, $
-                    Psi_start:Psi_start, Psi:Psi, $
-                    Cs_start:Cs_start, Cs:Cs, driver:driver}
+     moment_struct = {dist0:dist0, dist1:dist1, $
+                      Psi_start:Psi_start, Psi:Psi, $
+                      Cs_start:Cs_start, Cs:Cs, driver:driver}
      
-     return, moment_vars
+     return, moment_struct
   endif $
   else begin
      print, "[ANALYZE_MOMENTS] Could not read parameter file"
