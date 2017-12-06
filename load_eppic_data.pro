@@ -14,9 +14,9 @@ function load_eppic_data, data_name,data_type, $
 
   ;;==Load the simulation run parameters
   if n_elements(path) eq 0 then path = '.'
-  params = set_eppic_params(path)
-  grid = set_grid(path)
-  nt_max = calc_timesteps(path,grid)
+  params = set_eppic_params(path=path)
+  grid = set_grid(path=path)
+  nt_max = calc_timesteps(path=path,grid=grid)
 
   ;;==Loop through given data names and read data
   if n_elements(data_name) gt 0 then begin

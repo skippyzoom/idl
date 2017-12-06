@@ -29,7 +29,7 @@ function read_ph5_data, data_name, $
      run_dir = strmid(path,0,strpos(path,'parallel',/reverse_search))
 
   ;;==Read in run parameters
-  params = set_eppic_params(run_dir)
+  params = set_eppic_params(path=run_dir)
 
   ;;==Extract global dimensions from parameters
   nx = params.nx*params.nsubdomains

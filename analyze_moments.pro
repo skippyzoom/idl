@@ -28,7 +28,7 @@ function analyze_moments, path=path
   if n_elements(path) eq 0 then path = './'
 
   ;;==Read sim parameters and moment files
-  params = set_eppic_params(path)
+  params = set_eppic_params(path=path)
   if file_test(path+path_sep()+'domain000',/directory) then $
      bp = path+path_sep()+'domain000/' $
   else bp = './'
@@ -68,6 +68,17 @@ function analyze_moments, path=path
      vzthd1 = params.vzthd1
      if (n_elements(kb) eq 0) then if (md0 lt 1e-8) then kb = 1.38e-23 else kb = 1
 
+     ;;==Create constant electron moments for QN, inertialess electrons
+     if efield_algorithm eq 1 or efield_algorithm eq 2 then begin
+        moments0 = moments1*0.0
+        moments0[1,*] = vx0d0   ;x drift velocity
+        moments0[2,*] = vxthd0^2 ;x thermal velocity
+        moments0[5,*] = vy0d0    ;y drift velocity
+        moments0[6,*] = vythd0^2 ;y thermal velocity
+        moments0[9,*] = vz0d0    ;z drift velocity
+        moments0[10,*] = vzthd0^2 ;z thermal velocity
+     endif
+
      ;;==Transform coordinates for 3-D
      case 1B of
         (B0 eq Bz0): begin
@@ -102,15 +113,6 @@ function analyze_moments, path=path
                                 ; Hybrid ;
                                 ;--------;
      if efield_algorithm eq 1 or efield_algorithm eq 2 then begin
-
-        ;;==Constant electron moments from input values
-        moments0 = moments1*0.0
-        moments0[1,*] = vx0d0   ;x drift velocity
-        moments0[2,*] = vxthd0^2 ;x thermal velocity
-        moments0[5,*] = vy0d0    ;y drift velocity
-        moments0[6,*] = vythd0^2 ;y thermal velocity
-        moments0[9,*] = vz0d0    ;z drift velocity
-        moments0[10,*] = vzthd0^2 ;z thermal velocity
 
         ;;==Theoretical values
         ;;--cyclotron frequencies

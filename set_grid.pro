@@ -15,7 +15,7 @@ function set_grid, path=path
   
   if n_elements(path) eq 0 then path = './'
 
-  params = set_eppic_params(path)
+  params = set_eppic_params(path=path)
   if params.hdf_output_arrays eq 2 then begin
      case params.ndim_space of
         2: begin
