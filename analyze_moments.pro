@@ -10,6 +10,16 @@
 ; The original moment_plots.pro was written by Meers Oppenheim
 ; in May 2006. This version analyzes either pure PIC or hybrid
 ; runs, based on the value of efield_algorithm.
+;
+; NOTES
+; -- This function assumes that distribution 0 is magnetized
+;    and distribution 1 is unmagnetized when it calculates
+;    collision frequencies.
+; -- This function assumes that B0 is aligned with one 
+;    physical coordinate, then rotates the logical coordinates
+;    so that B0 is aligned with z. It does this to simplify
+;    some calculations that require vector components (e.g.,
+;    nu0 and nu1)
 ;-
 
 function analyze_moments, path=path
@@ -19,7 +29,8 @@ function analyze_moments, path=path
 
   ;;==Read sim parameters and moment files
   params = set_eppic_params(path)
-  if file_test('domain000',/directory) then bp = 'domain000/' $
+  if file_test(path+path_sep()+'domain000',/directory) then $
+     bp = path+path_sep()+'domain000/' $
   else bp = './'
   if file_test(bp+'moments0.out') then $
      moments0=readarray(bp+'moments0.out',13,lineskip=1)
@@ -39,9 +50,9 @@ function analyze_moments, path=path
      By0 = params.By
      Bz0 = params.Bz
      B0 = sqrt(Bx0^2 + By0^2 + Bz0^2)
-     Ex0_external = params.Ex0_external
-     Ey0_external = params.Ey0_external
-     Ez0_external = params.Ez0_external
+     Ex0 = params.Ex0_external
+     Ey0 = params.Ey0_external
+     Ez0 = params.Ez0_external
      efield_algorithm = params.efield_algorithm
      vx0d0 = params.vx0d0
      vy0d0 = params.vy0d0
@@ -56,10 +67,37 @@ function analyze_moments, path=path
      vythd1 = params.vythd1
      vzthd1 = params.vzthd1
      if (n_elements(kb) eq 0) then if (md0 lt 1e-8) then kb = 1.38e-23 else kb = 1
-STOP
-     ;;==Transform coordinates for 3-D 
-     if Bz0 eq 0.0 and Bx0 ne 0.0 then Bz = Bx0
-        
+
+     ;;==Transform coordinates for 3-D
+     case 1B of
+        (B0 eq Bz0): begin
+           vxpd0 = moments0[1,*]
+           vypd0 = moments0[5,*]
+           vzpd0 = moments0[9,*]
+           vxpd1 = moments1[1,*]
+           vypd1 = moments1[5,*]
+           vzpd1 = moments1[9,*]
+           Eyp = Ey0
+        end
+        (B0 eq By0): begin
+           vxpd0 = moments0[1,*]
+           vypd0 = -moments0[9,*]
+           vzpd0 = moments0[5,*]
+           vxpd1 = moments1[1,*]
+           vypd1 = -moments1[9,*]
+           vzpd1 = moments1[5,*]
+           Eyp = -Ez0
+        end
+        (B0 eq Bx0): begin
+           vxpd0 = -moments0[9,*]
+           vypd0 = moments0[5,*]
+           vzpd0 = moments0[1,*]
+           vxpd1 = -moments1[9,*]
+           vypd1 = moments1[5,*]
+           vzpd1 = moments1[1,*]
+           Eyp = Ey0
+        end
+     endcase
                                 ;--------;
                                 ; Hybrid ;
                                 ;--------;
@@ -89,27 +127,28 @@ STOP
         ;;--Pedersen mobilities and drift
         ped0_start = mu0_start/(1+wc0^2/(coll_rate0*1.0)^2)
         ped1_start = mu1_start/(1+wc1^2/(coll_rate1*1.0)^2)
-        v_ped0_start= Ey0_external*ped0_start
-        v_ped1_start= Ey0_external*ped1_start
+        v_ped0_start= Eyp*ped0_start
+        v_ped1_start= Eyp*ped1_start
         ;;--Hall mobilities and drift
         hall0_start = qd0*wc0/(md0*(wc0^2+coll_rate0^2))
         hall1_start = qd1*wc1/(md1*(wc1^2+coll_rate1^2))
-        v_hall0_start = Ey0_external*hall0_start
-        v_hall1_start = Ey0_external*hall1_start
+        v_hall0_start = Eyp*hall0_start
+        v_hall1_start = Eyp*hall1_start
         ;;--Temperatures and acoustic speed
         T0_start = 0.5*(md0/kb)*(vxthd0^2+vythd0^2+vzthd0^2)
         T1_start = 0.5*(md1/kb)*(vxthd1^2+vythd1^2+vzthd1^2)
         Cs_start = sqrt(kb*(T0_start + T1_start)/md1)
         ;;--Psi
         Psi_start = abs(coll_rate0*coll_rate1/(wc0*wc1))
-        driver = (Ey0_external/B0)/(1+Psi_start)
+        driver = (Eyp/B0)/(1+Psi_start)
 
         ;;==Simulated values
         ;;--Collision frequencies and Psi
-        nu0 = moments1[5,*]*0.0 + coll_rate0      ;Input value
-        nu1 = Ey0_external/(moments1[5,*])*(qd1/md1) ;Ped drift
+        nu0 = moments1[5,*]*0.0 + coll_rate0      ;From Input value
+        ;; nu1 = Eyp/(moments1[5,*])*(qd1/md1) ;Ped drift
+        nu1 = (Eyp/vypd1)*(qd1/md1) ;From Ped drift        
         Psi = abs(nu0*nu1/(wc0*wc1))
-        driver = (Ey0_external/B0)/(1+Psi)
+        driver = (Eyp/B0)/(1+Psi)
         ;;--parallel mobilities
         !NULL = where(nu0 ne 0.0,count)
         if (count ne 0) then $
@@ -122,13 +161,13 @@ STOP
         ;;--Pedersen mobilities and drift
         ped0 = mu0/(1+wc0^2/(nu0*1.0)^2)
         ped1 = mu1/(1+wc1^2/(nu1*1.0)^2)
-        v_ped0 = Ey0_external*ped0
-        v_ped1 = Ey0_external*ped1
+        v_ped0 = Eyp*ped0
+        v_ped1 = Eyp*ped1
         ;;--Hall mobilities and drift
         hall0 = qd0*wc0/(md0*(wc0^2+nu0^2))
         hall1 = qd1*wc1/(md1*(wc1^2+nu1^2))
-        v_hall0 = Ey0_external*hall0
-        v_hall1 = Ey0_external*hall1
+        v_hall0 = Eyp*hall0
+        v_hall1 = Eyp*hall1
         ;;--Temperatures and acoustic speed
         T0 = (moments0[2,*] + moments0[6,*] + moments0[10,*])/3. * md0/kb
         T1 = (moments1[2,*] + moments1[6,*] + moments1[10,*])/3. * md1/kb
@@ -153,35 +192,27 @@ STOP
         ;;--Pedersen mobilities and drift
         ped0_start = mu0_start/(1+wc0^2/(coll_rate0*1.0)^2)
         ped1_start = mu1_start/(1+wc1^2/(coll_rate1*1.0)^2)
-        v_ped0_start= Ey0_external*ped0_start
-        v_ped1_start= Ey0_external*ped1_start
+        v_ped0_start= Eyp*ped0_start
+        v_ped1_start= Eyp*ped1_start
         ;;--Hall mobilities and drift
         hall0_start = qd0*wc0/(md0*(wc0^2+coll_rate0^2))
         hall1_start = qd1*wc1/(md1*(wc1^2+coll_rate1^2))
-        v_hall0_start = Ey0_external*hall0_start
-        v_hall1_start = Ey0_external*hall1_start
+        v_hall0_start = Eyp*hall0_start
+        v_hall1_start = Eyp*hall1_start
         ;;--Temperatures and acoustic speed
         T0_start = 0.5*(md0/kb)*(vxthd0^2+vythd0^2+vzthd0^2)
         T1_start = 0.5*(md1/kb)*(vxthd1^2+vythd1^2+vzthd1^2)
         Cs_start = sqrt(kb*(T0_start + T1_start)/md1)
         ;;--Psi
         Psi_start = abs(coll_rate0*coll_rate1/(wc0*wc1))
-        driver = (Ey0_external/B0)/(1+Psi_start)
+        driver = (Eyp/B0)/(1+Psi_start)
 
         ;;==Simulated values
         ;;--Collision frequencies and Psi
-        ;; if Bz0 ne 0.0 then $
-        ;;    nu0 = wc0*moments0[5,*]/moments0[1,*] $ ;Hall drift
-        ;; else $
-        ;;    nu0 = wc0*moments0[5,*]/(-moments0[9,*])
-        case 1B of 
-           (B0 eq Bz): nu0 = wc0*moments0[5,*]/moments0[1,*]    ;From Hall drift
-           (B0 eq By): nu0 = wc0*(-moments0[9,*])/moments0[1,*] ;From Hall drift
-           (B0 eq Bx): nu0 = wc0*moments0[5,*]/(-moments0[9,*]) ;From Hall drift
-        endcase
-        nu1 = Ey0_external/(moments1[5,*])*(qd1/md1) ;From Ped drift
+        nu0 = wc0*vypd0/vxpd0               ;From Hall drift
+        nu1 = (Eyp/vypd1)*(qd1/md1)         ;From Ped drift
         Psi = abs(nu0*nu1/(wc0*wc1))
-        driver = (Ey0_external/B0)/(1+Psi)
+        driver = (Eyp/B0)/(1+Psi)
         ;;--parallel mobilities
         !NULL = where(nu0 ne 0.0,count)
         if (count ne 0) then $
@@ -194,13 +225,13 @@ STOP
         ;;--Pedersen mobilities and drift
         ped0 = mu0/(1+wc0^2/(nu0*1.0)^2)
         ped1 = mu1/(1+wc1^2/(nu1*1.0)^2)
-        v_ped0 = Ey0_external*ped0
-        v_ped1 = Ey0_external*ped1
+        v_ped0 = Eyp*ped0
+        v_ped1 = Eyp*ped1
         ;;--Hall mobilities and drift
         hall0 = qd0*wc0/(md0*(wc0^2+nu0^2))
         hall1 = qd1*wc1/(md1*(wc1^2+nu1^2))
-        v_hall0 = Ey0_external*hall0
-        v_hall1 = Ey0_external*hall1
+        v_hall0 = Eyp*hall0
+        v_hall1 = Eyp*hall1
         ;;--Temperatures and acoustic speed
         T0 = (moments0[2,*] + moments0[6,*] + moments0[10,*])/3. * md0/kb
         T1 = (moments1[2,*] + moments1[6,*] + moments1[10,*])/3. * md1/kb
