@@ -18,10 +18,6 @@ function calc_timesteps, path=path,grid=grid,verbose=verbose
   ;;==Set default path
   if n_elements(path) eq 0 then path = './'
 
-  ;; if file_test(expand_path(path+path_sep()+'domain000'),/directory) then $
-  ;;    bp = expand_path(path+path_sep()+'domain*/') $
-  ;; else bp = expand_path(path+path_sep()+'./')
-
   ;;==Check typical cases for a way to compute nt_max
   nt_max = 0
   case 1 of
