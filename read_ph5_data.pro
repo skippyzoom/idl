@@ -65,31 +65,36 @@ function read_ph5_data, data_name, $
   ;;==Check if the data is EPPIC Fourier-transformed data
   if keyword_set(eppic_ft_data) then begin
      tmp = get_h5_data(h5_file[0],data_name+'_index')
-     n_dim = (size(tmp))[1]
-     case n_dim of
-        1: begin
-           ft_template = {ikx:0, val:complex(0.0,0.0)}
-           data = make_array(nx,nt,type=type)
-        end
-        2: begin
-           ft_template = {ikx:0, iky:0, val:complex(0.0,0.0)}
-           data = make_array(nx,ny,nt,type=type)
-        end
-        3: begin
-           ft_template = {ikx:0, iky:0, ikz:0, val:complex(0.0,0.0)}
-           data = make_array(nx,ny,nz,nt,type=type)
-        end           
-     endcase     
+     if n_elements(tmp) ne 0 then begin
+        n_dim = (size(tmp))[1]
+        case n_dim of
+           1: begin
+              ft_template = {ikx:0, val:complex(0.0,0.0)}
+              data = make_array(nx,nt,type=type)
+           end
+           2: begin
+              ft_template = {ikx:0, iky:0, val:complex(0.0,0.0)}
+              data = make_array(nx,ny,nt,type=type)
+           end
+           3: begin
+              ft_template = {ikx:0, iky:0, ikz:0, val:complex(0.0,0.0)}
+              data = make_array(nx,ny,nz,nt,type=type)
+           end           
+        endcase     
+        tmp = !NULL
+     endif
   endif $
   else begin
      tmp = get_h5_data(h5_file[0],data_name)
-     n_dim = (size(tmp))[0]
-     case n_dim of
-        1: data = make_array(nx/nout_avg,nt,type=type)
-        2: data = make_array(nx/nout_avg,ny/nout_avg,nt,type=type)
-        3: data = make_array(nx/nout_avg,ny/nout_avg,nz/nout_avg,nt,type=type)
-     endcase
-     tmp = !NULL
+     if n_elements(tmp) ne 0 then begin
+        n_dim = (size(tmp))[0]
+        case n_dim of
+           1: data = make_array(nx/nout_avg,nt,type=type)
+           2: data = make_array(nx/nout_avg,ny/nout_avg,nt,type=type)
+           3: data = make_array(nx/nout_avg,ny/nout_avg,nz/nout_avg,nt,type=type)
+        endcase
+        tmp = !NULL
+     endif
   endelse
 
   ;;==Loop over all available time steps
@@ -191,5 +196,6 @@ function read_ph5_data, data_name, $
             strcompress(null_count,/remove_all),"/", $
             strcompress(nt,/remove_all)," files."
 
+  if n_elements(data) eq 0 then data = !NULL
   return, data
 end

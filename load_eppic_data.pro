@@ -5,16 +5,6 @@
 ; for different simulation quantities.
 ;
 ; The default for timestep is all time steps.
-;
-; TO DO:
-; -- Only create dictionary entries for data that has
-;    been read successfully.
-; -- Allow user to specify names of IDL save files
-;    from which to read data.
-; -- Add option to calculate E-field component(s) or 
-;    magnitude? May be more trouble than it's worth,
-;    but could also provide a more streamlined setup
-;    for kmag_interpolate-related routines.
 ;-
 
 function load_eppic_data, data_name,data_type, $
