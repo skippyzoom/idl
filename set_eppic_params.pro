@@ -4,11 +4,12 @@
 ; TO DO
 ; -- Consider setting the units dictionary elsewhere.
 ;-
-function set_eppic_params, path
+function set_eppic_params, path=path
 
   ;---------------------------;
   ; Read the EPPIC input file ;
   ;---------------------------;
+  if n_elements(path) eq 0 then path = './'
   params = read_parameter_file(path,/verbose)
 
   ;----------;
