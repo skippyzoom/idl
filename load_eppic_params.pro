@@ -21,4 +21,4 @@ cd, path
 params = set_eppic_params(path)
 grid = set_grid(path)
 nt_max = calc_timesteps(path,grid)
-moment_vars = analyze_moments(nt_max)
+moment_vars = analyze_moments(nt_max,path)
