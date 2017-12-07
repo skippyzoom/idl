@@ -152,7 +152,7 @@ function read_ph5_data, data_name, $
                  full_array[0:ft_size[1]-1,0:ft_size[2]-1] = ft_array
                  ft_array = !NULL              
                  full_array = rotate(full_array,2)
-                 full_array = shift(full_array,1)
+                 full_array = shift(full_array,[1,1])
                  full_array = conj(full_array)
                  data[*,*,it] = full_array
               end
@@ -160,8 +160,20 @@ function read_ph5_data, data_name, $
                  full_array = complexarr(full_size[1],full_size[2],full_size[3])
                  full_array[0:ft_size[1]-1,0:ft_size[2]-1,0:ft_size[3]-1] = ft_array
                  ft_array = !NULL              
+
+                 ;; for iz=0,full_size[3]-1 do full_array[*,*,iz] = rotate(full_array[*,*,iz],2) 
+
+                 ;; for iz=0,full_size[3]-1 do full_array[*,*,iz] = reverse(full_array[*,*,iz],1) 
+
+                 ;; for iz=0,full_size[3]-1 do full_array[*,*,iz] = reverse(full_array[*,*,iz],2) 
+
+                 ;; for iz=0,full_size[3]-1 do $
+                 ;;    full_array[*,*,iz] = reverse(rotate(full_array[*,*,iz],2),2)
+
                  for iz=0,full_size[3]-1 do $
-                    full_array[*,*,iz] = shift(reform(rotate(full_array[*,*,iz],2)),[1,1])
+                    full_array[*,*,iz] = rotate(reverse(reform(full_array[*,*,iz]),1),2)
+                 
+                 full_array = shift(full_array,[1,1,0])
                  full_array = conj(full_array)
                  data[*,*,*,it] = full_array
               end
