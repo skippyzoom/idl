@@ -7,29 +7,22 @@
 ; -- This function should remain independent of any project dictionary.
 ;
 ; TO DO
-; -- Set up panel-specific colorbars. May require 
-;    making img an array of object references.
 ; -- Check for consistency between panel_layout and panel_index.
-; -- Allow user to set middle of colorbar to zero? Some data
-;    ranges cause the middle to be a very small +/- number,
-;    which causes plusminus_labels to add a sign even though
-;    the tick name after formatting is '0.0'. There is a
-;    work-around in place, so this isn't urgent.
 ;-
 function multi_image, imgdata,xdata,ydata, $
-                     panel_index=panel_index, $
-                     panel_layout=panel_layout, $
-                     rgb_table=rgb_table, $
-                     min_value=min_value, $
-                     max_value=max_value, $
-                     xtitle=xtitle, $
-                     ytitle=ytitle, $
-                     xshow=xshow, $
-                     yshow=yshow, $
-                     xrange=xrange, $
-                     yrange=yrange, $
-                     colorbar_type=colorbar_type, $
-                     colorbar_title=colorbar_title
+                      panel_index=panel_index, $
+                      panel_layout=panel_layout, $
+                      rgb_table=rgb_table, $
+                      min_value=min_value, $
+                      max_value=max_value, $
+                      xtitle=xtitle, $
+                      ytitle=ytitle, $
+                      xshow=xshow, $
+                      yshow=yshow, $
+                      xrange=xrange, $
+                      yrange=yrange, $
+                      colorbar_type=colorbar_type, $
+                      colorbar_title=colorbar_title
 
   if n_elements(imgdata) eq 0 then begin
      print, "[MULTI_IMAGE] Please supply image array. No graphics produced."
