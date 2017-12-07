@@ -32,11 +32,21 @@ pro eppic_first_look, path,directory=directory
   params = set_eppic_params(path=path)
   grid = set_grid(path=path)
   nt_max = calc_timesteps(path=path,grid=grid)
-  moments = analyze_moments(path=path)
 
   ;;==Choose time steps to read
   timestep = params.nout*[0,nt_max-1]
 
+                                ;---------;
+                                ; Moments ;
+                                ;---------;
+  ;;==Read in data
+  moments = analyze_moments(path=path)
+
+  ;;==Create plots
+  plot_moments, moments,params=params, $
+                path=path+path_sep()+directory, $
+                font_name=font_name,font_size=font_size
+  
                                 ;-----------;
                                 ; Potential ;
                                 ;-----------;
@@ -86,6 +96,7 @@ pro eppic_first_look, path,directory=directory
                 path=path+path_sep()+directory, $
                 center=[0,0,0], $
                 rgb_table=39,font_name=font_name,font_size=font_size
+STOP
   ;;==Free memory
   data = !NULL
 end
