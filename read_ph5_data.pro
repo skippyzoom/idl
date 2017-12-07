@@ -170,8 +170,8 @@ function read_ph5_data, data_name, $
                  ;; for iz=0,full_size[3]-1 do $
                  ;;    full_array[*,*,iz] = reverse(rotate(full_array[*,*,iz],2),2)
 
-                 for iz=0,full_size[3]-1 do $
-                    full_array[*,*,iz] = rotate(reverse(reform(full_array[*,*,iz]),1),2)
+                 ;; for iz=0,full_size[3]-1 do $
+                 ;;    full_array[*,*,iz] = rotate(reverse(reform(full_array[*,*,iz]),1),2)
                  
                  full_array = shift(full_array,[1,1,0])
                  full_array = conj(full_array)
