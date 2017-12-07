@@ -213,6 +213,10 @@ function analyze_moments, path=path
         ;;--Collision frequencies and Psi
         nu0 = wc0*vypd0/vxpd0               ;From Hall drift
         nu1 = (Eyp/vypd1)*(qd1/md1)         ;From Ped drift
+        ;; nu0 = 0.5*qd0*Eyp/(md0*vypd0)*(1 + sqrt(1-(2*md0*vypd0*wc0/(qd0*Eyp))^2))
+        ;; nu1 = 0.5*qd1*Eyp/(md1*vypd1)*(1 + sqrt(1-(2*md1*vypd1*wc1/(qd1*Eyp))^2))
+        ;; nu0 = 0.5*qd0*Eyp/(md0*vypd0)*(1 - sqrt(1-(2*md0*vypd0*wc0/(qd0*Eyp))^2))
+        ;; nu1 = 0.5*qd1*Eyp/(md1*vypd1)*(1 - sqrt(1-(2*md1*vypd1*wc1/(qd1*Eyp))^2))
         Psi = abs(nu0*nu1/(wc0*wc1))
         driver = (Eyp/B0)/(1+Psi)
         ;;--parallel mobilities
