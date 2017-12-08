@@ -18,7 +18,7 @@
 ;-
 if n_elements(path) eq 0 then path = '.'
 cd, path
-params = set_eppic_params(path)
-grid = set_grid(path)
-nt_max = calc_timesteps(path,grid)
-moment_vars = analyze_moments(nt_max,path)
+params = set_eppic_params(path=path)
+grid = set_grid(path=path)
+nt_max = calc_timesteps(path=path,grid=grid)
+moment_vars = analyze_moments(path=path)
