@@ -22,9 +22,19 @@ pro plot_moments, moments, $
   if n_elements(params) ne 0 then tvec *= params.dt*1e3
 
   ;;==Declare which quantities to plot
-  variables = ['nu','v_hall','v_ped','T']
-  names = ['Collision frequency','Pedersen drift speed','Hall drift speed','Temperature']
-  n_pages = n_elements(names)
+  ;; variables = ['nu','v_hall','v_ped','T']
+  ;; names = ['Collision frequency','Pedersen drift speed','Hall drift speed','Temperature']
+  ;; n_pages = n_elements(names)
+  variables = hash()
+  variables['Collision frequency'] = list('nu','nu_start')
+  variables['Temperature'] = list('Tx','Ty','Tz','T')
+  variables['Pedersen drift speed'] = list('v_ped','v_ped_start')
+  variables['Hall drift speed'] = list('v_hall','v_hall_start')
+  n_pages = variables.count()
+  v_keys = variables.keys()
+
+  ;;==Make a vector of line formats (Is there a better method?)
+  format = ['k-','k--','k:','k+','k*','kD']
 
   ;;==Loop over distributions
   for id=0,n_dist-1 do begin
@@ -37,31 +47,80 @@ pro plot_moments, moments, $
 
      ;;==Loop over quantities
      for ip=0,n_pages-1 do begin
-        ivar = variables[ip]
-        sim_data = reform(idist[ivar])
-        in_data = idist[ivar+'_start'] + 0.0*tvec
-        ymin = min([in_data,min(sim_data[nt/4:*])])
-        pad = (ymin lt 0) ? 1.1 : 0.9
-        ymin *= pad
-        ymax = max([in_data,max(sim_data[nt/4:*])])
-        pad = (ymax gt 0) ? 1.1 : 0.9
-        ymax *= pad
-        plt[ip] = plot(tvec,sim_data,/buffer, $
-                       yrange = [ymin,ymax], $
-                       xstyle = 1, $
-                       ystyle = 1, $
-                       xtitle = 'Time [ms]', $
-                       ytitle = names[ip], $
-                       name = "sim")
-        opl = plot(tvec,in_data,'k--',/overplot, $
-                   name = "input")
-        leg = legend(target=[plt[ip],opl],/auto_text_color)
-        opl = !NULL
-        leg = !NULL
+
+        ;;==Get the current variables list
+        ivar = variables[v_keys[ip]]
+        n_var = n_elements(ivar)
+
+        if n_var ne 0 then begin
+
+           ;;==Calculate the global min and max values
+           idata = reform(idist[ivar[0]])
+           ymin = min(idata[nt/4:*])
+           ymax = max(idata[nt/4:*])
+           for iv=1,n_var-1 do begin
+              idata = reform(idist[ivar[iv]])
+              if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
+              ymin = min([ymin,min(idata[nt/4:*])])
+              ymax = max([ymax,max(idata[nt/4:*])])
+           endfor
+           pad = (ymin lt 0) ? 1.1 : 0.9
+           ymin *= pad
+           pad = (ymax gt 0) ? 1.1 : 0.9
+           ymax *= pad
+
+           ;;==Create plots
+           idata = reform(idist[ivar[0]])
+           if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
+           plt[ip] = plot(tvec,idata, $
+                          format[0], $
+                          /buffer, $
+                          yrange = [ymin,ymax], $
+                          xstyle = 1, $
+                          ystyle = 1, $
+                          xtitle = 'Time [ms]', $
+                          ytitle = v_keys[ip], $
+                          name = ivar[0])
+           if n_var gt 1 then opl = objarr(n_var-1)
+           for iv=1,n_var-1 do begin
+              idata = reform(idist[ivar[iv]])
+              if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
+              opl[iv-1] = plot(tvec,idata, $
+                               format[iv], $
+                               /overplot, $
+                               name = ivar[iv])
+           endfor
+           leg = legend(target = [plt[ip],opl], $
+                        /auto_text_color)
+           opl = !NULL
+           leg = !NULL
+        endif
+        ;; ivar = variables[ip]
+        ;; sim_data = reform(idist[ivar])
+        ;; in_data = idist[ivar+'_start'] + 0.0*tvec
+        ;; ymin = min([in_data,min(sim_data[nt/4:*])])
+        ;; pad = (ymin lt 0) ? 1.1 : 0.9
+        ;; ymin *= pad
+        ;; ymax = max([in_data,max(sim_data[nt/4:*])])
+        ;; pad = (ymax gt 0) ? 1.1 : 0.9
+        ;; ymax *= pad
+        ;; plt[ip] = plot(tvec,sim_data,/buffer, $
+        ;;                yrange = [ymin,ymax], $
+        ;;                xstyle = 1, $
+        ;;                ystyle = 1, $
+        ;;                xtitle = 'Time [ms]', $
+        ;;                ytitle = names[ip], $
+        ;;                name = "sim")
+        ;; opl = plot(tvec,in_data,'k--',/overplot, $
+        ;;            name = "input")
+        ;; leg = legend(target=[plt[ip],opl],/auto_text_color)
+        ;; opl = !NULL
+        ;; leg = !NULL
      endfor
 
      ;;==Save
      image_save, plt,filename=path+path_sep()+dist_keys[id]+'.pdf'
+     plt = !NULL
 
   endfor
 

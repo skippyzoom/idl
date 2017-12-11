@@ -40,32 +40,32 @@ function analyze_moments, path=path
   if n_elements(params) ne 0 then begin
 
      ;;==Set default parameters
-     coll_rate0 = params.coll_rate0
-     coll_rate1 = params.coll_rate1
-     md0 = params.md0
-     md1 = params.md1
-     qd0 = params.qd0
-     qd1 = params.qd1
-     Bx0 = params.Bx
-     By0 = params.By
-     Bz0 = params.Bz
+     coll_rate0 = float(params.coll_rate0)
+     coll_rate1 = float(params.coll_rate1)
+     md0 = float(params.md0)
+     md1 = float(params.md1)
+     qd0 = float(params.qd0)
+     qd1 = float(params.qd1)
+     Bx0 = float(params.Bx)
+     By0 = float(params.By)
+     Bz0 = float(params.Bz)
      B0 = sqrt(Bx0^2 + By0^2 + Bz0^2)
-     Ex0 = params.Ex0_external
-     Ey0 = params.Ey0_external
-     Ez0 = params.Ez0_external
+     Ex0 = float(params.Ex0_external)
+     Ey0 = float(params.Ey0_external)
+     Ez0 = float(params.Ez0_external)
      efield_algorithm = params.efield_algorithm
-     vx0d0 = params.vx0d0
-     vy0d0 = params.vy0d0
-     vz0d0 = params.vz0d0
-     vx0d1 = params.vx0d1
-     vy0d1 = params.vy0d1
-     vz0d1 = params.vz0d1
-     vxthd0 = params.vxthd0
-     vythd0 = params.vythd0
-     vzthd0 = params.vzthd0
-     vxthd1 = params.vxthd1
-     vythd1 = params.vythd1
-     vzthd1 = params.vzthd1
+     vx0d0 = float(params.vx0d0)
+     vy0d0 = float(params.vy0d0)
+     vz0d0 = float(params.vz0d0)
+     vx0d1 = float(params.vx0d1)
+     vy0d1 = float(params.vy0d1)
+     vz0d1 = float(params.vz0d1)
+     vxthd0 = float(params.vxthd0)
+     vythd0 = float(params.vythd0)
+     vzthd0 = float(params.vzthd0)
+     vxthd1 = float(params.vxthd1)
+     vythd1 = float(params.vythd1)
+     vzthd1 = float(params.vzthd1)
      if (n_elements(kb) eq 0) then if (md0 lt 1e-8) then kb = 1.38e-23 else kb = 1
 
      ;;==Create constant electron moments for QN, inertialess electrons
@@ -112,7 +112,7 @@ function analyze_moments, path=path
                                 ;--------;
                                 ; Hybrid ;
                                 ;--------;
-     if efield_algorithm eq 1 or efield_algorithm eq 2 then begin
+     if (efield_algorithm eq 1) || (efield_algorithm eq 2) then begin
 
         ;;==Theoretical values
         ;;--cyclotron frequencies
@@ -137,8 +137,16 @@ function analyze_moments, path=path
         v_hall0_start = Eyp*hall0_start
         v_hall1_start = Eyp*hall1_start
         ;;--Temperatures and acoustic speed
-        T0_start = 0.5*(md0/kb)*(vxthd0^2+vythd0^2+vzthd0^2)
-        T1_start = 0.5*(md1/kb)*(vxthd1^2+vythd1^2+vzthd1^2)
+        ;; T0_start = 0.5*(md0/kb)*(vxthd0^2+vythd0^2+vzthd0^2)
+        ;; T1_start = 0.5*(md1/kb)*(vxthd1^2+vythd1^2+vzthd1^2)
+        Tx0_start = (md0/kb)*vxthd0^2
+        Ty0_start = (md0/kb)*vythd0^2
+        Tz0_start = (md0/kb)*vzthd0^2
+        T0_start = (Tx0_start+Ty0_start+Tz0_start)/3.0
+        Tx1_start = (md1/kb)*vxthd1^2
+        Ty1_start = (md1/kb)*vythd1^2
+        Tz1_start = (md1/kb)*vzthd1^2
+        T1_start = (Tx1_start+Ty1_start+Tz1_start)/3.0
         Cs_start = sqrt(kb*(T0_start + T1_start)/md1)
         ;;--Psi
         Psi_start = abs(coll_rate0*coll_rate1/(wc0*wc1))
@@ -171,8 +179,16 @@ function analyze_moments, path=path
         v_hall0 = Eyp*hall0
         v_hall1 = Eyp*hall1
         ;;--Temperatures and acoustic speed
-        T0 = (moments0[2,*] + moments0[6,*] + moments0[10,*])/3. * md0/kb
-        T1 = (moments1[2,*] + moments1[6,*] + moments1[10,*])/3. * md1/kb
+        ;; T0 = (moments0[2,*] + moments0[6,*] + moments0[10,*])/3. * md0/kb
+        ;; T1 = (moments1[2,*] + moments1[6,*] + moments1[10,*])/3. * md1/kb
+        Tx0 = (md0/kb)*moments0[2,*]
+        Ty0 = (md0/kb)*moments0[6,*]
+        Tz0 = (md0/kb)*moments0[10,*]
+        T0 = (Tx0+Ty0+Tz0)/3.0
+        Tx1 = (md1/kb)*moments1[2,*]
+        Ty1 = (md1/kb)*moments1[6,*]
+        Tz1 = (md1/kb)*moments1[10,*]
+        T1 = (Tx1+Ty1+Tz1)/3.0
         Cs = sqrt(kb*(T0+T1)/md1)
      endif $                    ;hybrid
 
@@ -192,8 +208,8 @@ function analyze_moments, path=path
            mu1_start = qd1/coll_rate1/md1 $
         else mu1_start = 0
         ;;--Pedersen mobilities and drift
-        ped0_start = mu0_start/(1+wc0^2/(coll_rate0*1.0)^2)
-        ped1_start = mu1_start/(1+wc1^2/(coll_rate1*1.0)^2)
+        ped0_start = mu0_start/(1+wc0^2/(coll_rate0)^2)
+        ped1_start = mu1_start/(1+wc1^2/(coll_rate1)^2)
         v_ped0_start= Eyp*ped0_start
         v_ped1_start= Eyp*ped1_start
         ;;--Hall mobilities and drift
@@ -202,8 +218,16 @@ function analyze_moments, path=path
         v_hall0_start = Eyp*hall0_start
         v_hall1_start = Eyp*hall1_start
         ;;--Temperatures and acoustic speed
-        T0_start = 0.5*(md0/kb)*(vxthd0^2+vythd0^2+vzthd0^2)
-        T1_start = 0.5*(md1/kb)*(vxthd1^2+vythd1^2+vzthd1^2)
+        ;; T0_start = 0.5*(md0/kb)*(vxthd0^2+vythd0^2+vzthd0^2)
+        ;; T1_start = 0.5*(md1/kb)*(vxthd1^2+vythd1^2+vzthd1^2)
+        Tx0_start = (md0/kb)*vxthd0^2
+        Ty0_start = (md0/kb)*vythd0^2
+        Tz0_start = (md0/kb)*vzthd0^2
+        T0_start = (Tx0_start+Ty0_start+Tz0_start)/3.0
+        Tx1_start = (md1/kb)*vxthd1^2
+        Ty1_start = (md1/kb)*vythd1^2
+        Tz1_start = (md1/kb)*vzthd1^2
+        T1_start = (Tx1_start+Ty1_start+Tz1_start)/3.0
         Cs_start = sqrt(kb*(T0_start + T1_start)/md1)
         ;;--Psi
         Psi_start = abs(coll_rate0*coll_rate1/(wc0*wc1))
@@ -239,8 +263,16 @@ function analyze_moments, path=path
         v_hall0 = Eyp*hall0
         v_hall1 = Eyp*hall1
         ;;--Temperatures and acoustic speed
-        T0 = (moments0[2,*] + moments0[6,*] + moments0[10,*])/3. * md0/kb
-        T1 = (moments1[2,*] + moments1[6,*] + moments1[10,*])/3. * md1/kb
+        ;; T0 = (moments0[2,*] + moments0[6,*] + moments0[10,*])/3. * md0/kb
+        ;; T1 = (moments1[2,*] + moments1[6,*] + moments1[10,*])/3. * md1/kb
+        Tx0 = (md0/kb)*moments0[2,*]
+        Ty0 = (md0/kb)*moments0[6,*]
+        Tz0 = (md0/kb)*moments0[10,*]
+        T0 = (Tx0+Ty0+Tz0)/3.0
+        Tx1 = (md1/kb)*moments1[2,*]
+        Ty1 = (md1/kb)*moments1[6,*]
+        Tz1 = (md1/kb)*moments1[10,*]
+        T1 = (Tx1+Ty1+Tz1)/3.0
         Cs = sqrt(kb*(T0+T1)/md1)
      endelse                    ;pure PIC
 
@@ -251,6 +283,9 @@ function analyze_moments, path=path
               v_ped_start:v_ped0_start, $
               hall_start:hall0_start, $
               v_hall_start:v_hall0_start, $
+              Tx_start:Tx0_start, $
+              Ty_start:Ty0_start, $
+              Tz_start:Tz0_start, $
               T_start:T0_start, $
               nu_start:coll_rate0, $
               nu:nu0, $
@@ -258,6 +293,9 @@ function analyze_moments, path=path
               v_ped:v_ped0, $
               hall:hall0, $
               v_hall:v_hall0, $
+              Tx:Tx0, $
+              Ty:Ty0, $
+              Tz:Tz0, $
               T:T0}
      dist1 = {data:moments1, $
               wc:wc1, $
@@ -266,6 +304,9 @@ function analyze_moments, path=path
               v_ped_start:v_ped1_start, $
               hall_start:hall1_start, $
               v_hall_start:v_hall1_start, $
+              Tx_start:Tx1_start, $
+              Ty_start:Ty1_start, $
+              Tz_start:Tz1_start, $
               T_start:T1_start, $
               nu_start:coll_rate1, $
               nu:nu1, $
@@ -273,6 +314,9 @@ function analyze_moments, path=path
               v_ped:v_ped1, $
               hall:hall1, $
               v_hall:v_hall1, $
+              Tx:Tx1, $
+              Ty:Ty1, $
+              Tz:Tz1, $
               T:T1}
 
      moment_struct = {dist0:dist0, dist1:dist1, $
