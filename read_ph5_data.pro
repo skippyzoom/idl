@@ -135,23 +135,34 @@ function read_ph5_data, data_name, $
            endfor
            ft_array = complexarr(tmp_range[*,1]-tmp_range[*,0]+1)
            case n_dim of 
-              3: ft_array[ft_struct.ikx,ft_struct.iky,ft_struct.ikz] = $
-                 ft_struct.val
-              2: ft_array[ft_struct.ikx,ft_struct.iky] = $
-                 ft_struct.val
+              3: begin
+                 ft_array[ft_struct.ikx,ft_struct.iky,ft_struct.ikz] = $
+                    ft_struct.val
+                 ft_size = size(ft_array)
+                 if ft_size[0] eq 2 then $
+                    ft_array = reform(ft_array,ft_size[1],ft_size[2],1) $
+                 else if ft_size[0] eq 1 then $
+                    ft_array = reform(ft_array,ft_size[1],1,1)
+              end
+              2: begin
+                 ft_array[ft_struct.ikx,ft_struct.iky] = $
+                    ft_struct.val
+                 if ft_size[0] eq 1 then $
+                    ft_array = reform(ft_array,ft_size[1],1)
+              end
               1: ft_array[ft_struct.ikx] = ft_struct.val
            endcase
            ;;<-(fill_k_array)
+           ft_size = size(ft_array)
            ft_struct = !NULL
            ;;->Based on mirror_fft_eppic.pro
            full_size = [ndim_space,nx,ny,nz]
-           ft_size = size(ft_array)
            case ndim_space of
               2: begin
                  full_array = complexarr(full_size[1],full_size[2])              
                  full_array[0:ft_size[1]-1,0:ft_size[2]-1] = ft_array
                  ft_array = !NULL              
-                 full_array = rotate(full_array,2)
+                 ;; full_array = rotate(full_array,2)
                  full_array = shift(full_array,[1,1])
                  full_array = conj(full_array)
                  data[*,*,it] = full_array
@@ -159,20 +170,8 @@ function read_ph5_data, data_name, $
               3: begin
                  full_array = complexarr(full_size[1],full_size[2],full_size[3])
                  full_array[0:ft_size[1]-1,0:ft_size[2]-1,0:ft_size[3]-1] = ft_array
-                 ft_array = !NULL              
-
-                 ;; for iz=0,full_size[3]-1 do full_array[*,*,iz] = rotate(full_array[*,*,iz],2) 
-
-                 ;; for iz=0,full_size[3]-1 do full_array[*,*,iz] = reverse(full_array[*,*,iz],1) 
-
-                 ;; for iz=0,full_size[3]-1 do full_array[*,*,iz] = reverse(full_array[*,*,iz],2) 
-
-                 ;; for iz=0,full_size[3]-1 do $
-                 ;;    full_array[*,*,iz] = reverse(rotate(full_array[*,*,iz],2),2)
-
-                 ;; for iz=0,full_size[3]-1 do $
-                 ;;    full_array[*,*,iz] = rotate(reverse(reform(full_array[*,*,iz]),1),2)
-                 
+                 ft_array = !NULL                 
+                 ;; for iz=0,nz-1 do full_array[*,*,iz] = rotate(full_array[*,*,iz],2)
                  full_array = shift(full_array,[1,1,0])
                  full_array = conj(full_array)
                  data[*,*,*,it] = full_array
