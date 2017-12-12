@@ -19,12 +19,9 @@ pro plot_moments, moments, $
   ;;==Get number of time steps
   nt = n_elements(reform(moments.dist1.nu))
   tvec = dindgen(nt)
-  if n_elements(params) ne 0 then tvec *= params.dt*1e3
+  if n_elements(params) ne 0 then tvec *= params.nout*params.dt*1e3
 
   ;;==Declare which quantities to plot
-  ;; variables = ['nu','v_hall','v_ped','T']
-  ;; names = ['Collision frequency','Pedersen drift speed','Hall drift speed','Temperature']
-  ;; n_pages = n_elements(names)
   variables = hash()
   variables['Collision frequency'] = list('nu','nu_start')
   variables['Temperature'] = list('Tx','Ty','Tz','T')
@@ -95,27 +92,6 @@ pro plot_moments, moments, $
            opl = !NULL
            leg = !NULL
         endif
-        ;; ivar = variables[ip]
-        ;; sim_data = reform(idist[ivar])
-        ;; in_data = idist[ivar+'_start'] + 0.0*tvec
-        ;; ymin = min([in_data,min(sim_data[nt/4:*])])
-        ;; pad = (ymin lt 0) ? 1.1 : 0.9
-        ;; ymin *= pad
-        ;; ymax = max([in_data,max(sim_data[nt/4:*])])
-        ;; pad = (ymax gt 0) ? 1.1 : 0.9
-        ;; ymax *= pad
-        ;; plt[ip] = plot(tvec,sim_data,/buffer, $
-        ;;                yrange = [ymin,ymax], $
-        ;;                xstyle = 1, $
-        ;;                ystyle = 1, $
-        ;;                xtitle = 'Time [ms]', $
-        ;;                ytitle = names[ip], $
-        ;;                name = "sim")
-        ;; opl = plot(tvec,in_data,'k--',/overplot, $
-        ;;            name = "input")
-        ;; leg = legend(target=[plt[ip],opl],/auto_text_color)
-        ;; opl = !NULL
-        ;; leg = !NULL
      endfor
 
      ;;==Save
