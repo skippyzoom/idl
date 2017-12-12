@@ -70,7 +70,7 @@ pro plot_moments, moments, $
            pad = (ymax gt 0) ? 1.1 : 0.9
            ymax *= pad
 
-           ;;==Create plots
+           ;;==Create distribution-specific plots
            idata = reform(idist[ivar.name[0]])
            if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
            plt[ip] = plot(tvec,idata, $
@@ -99,9 +99,77 @@ pro plot_moments, moments, $
      endfor
 
      ;;==Save
-     image_save, plt,filename=path+path_sep()+dist_keys[id]+'.pdf'
+     image_save, plt,filename=path+path_sep()+dist_keys[id]+'_moments.pdf'
      plt = !NULL
 
   endfor
+
+  ;;==Create common-quantity plots
+  variables = hash()
+  variables['Psi factor'] = dictionary('name', ['Psi','Psi_start'], $
+                                       'format', ['b-','b--'])
+  variables['Sound speed'] = dictionary('name', ['Cs','Cs_start'], $
+                                       'format', ['b-','b--'])
+  n_pages = variables.count()
+  v_keys = variables.keys()
+
+  ;;==Set up array of plot handles
+  plt = objarr(n_pages)
+
+  ;;==Loop over quantities
+  for ip=0,n_pages-1 do begin
+
+     ;;==Get the current variables list
+     ivar = variables[v_keys[ip]]
+     n_var = n_elements(ivar.name)
+
+     if n_var ne 0 then begin
+
+        ;;==Calculate the global min and max values
+        idata = reform(m_dict[ivar.name[0]])
+        ymin = min(idata[nt/4:*])
+        ymax = max(idata[nt/4:*])
+        for iv=1,n_var-1 do begin
+           idata = reform(m_dict[ivar.name[iv]])
+           if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
+           ymin = min([ymin,min(idata[nt/4:*])])
+           ymax = max([ymax,max(idata[nt/4:*])])
+        endfor
+        pad = (ymin lt 0) ? 1.1 : 0.9
+        ymin *= pad
+        pad = (ymax gt 0) ? 1.1 : 0.9
+        ymax *= pad
+
+        ;;==Create distribution-specific plots
+        idata = reform(m_dict[ivar.name[0]])
+        if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
+        plt[ip] = plot(tvec,idata, $
+                       ivar.format[0], $
+                       /buffer, $
+                       yrange = [ymin,ymax], $
+                       xstyle = 1, $
+                       ystyle = 1, $
+                       xtitle = 'Time [ms]', $
+                       ytitle = v_keys[ip], $
+                       name = ivar.name[0])
+        if n_var gt 1 then opl = objarr(n_var-1)
+        for iv=1,n_var-1 do begin
+           idata = reform(m_dict[ivar.name[iv]])
+           if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
+           opl[iv-1] = plot(tvec,idata, $
+                            ivar.format[iv], $
+                            /overplot, $
+                            name = ivar.name[iv])
+        endfor
+        leg = legend(target = [plt[ip],opl], $
+                     /auto_text_color)
+        opl = !NULL
+        leg = !NULL
+     endif
+  endfor
+
+  ;;==Save
+  image_save, plt,filename=path+path_sep()+'common_moments.pdf'
+  plt = !NULL
 
 end
