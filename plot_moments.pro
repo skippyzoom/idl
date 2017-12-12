@@ -23,16 +23,20 @@ pro plot_moments, moments, $
 
   ;;==Declare which quantities to plot
   variables = hash()
-  variables['Collision frequency'] = list('nu','nu_start')
-  variables['Temperature'] = list('Tx','Ty','Tz','T')
-  variables['Pedersen drift speed'] = list('v_ped','v_ped_start')
-  variables['Hall drift speed'] = list('v_hall','v_hall_start')
+  variables['Collision frequency'] = dictionary('name', ['nu','nu_start'], $
+                                                'format', ['b-','b--'])
+  variables['Component temperature'] = dictionary('name', ['Tx','Ty','Tz', $
+                                                           'Tx_start','Ty_start','Tz_start'], $
+                                                  'format', ['b-','r-','g-','b--','r--','g--'])
+  variables['Total temperature'] = dictionary('name', ['T','T_start'], $
+                                              'format', ['b-','b--'])
+  variables['Pedersen drift speed'] = dictionary('name', ['v_ped','v_ped_start'], $
+                                                 'format', ['b-','b--'])
+  variables['Hall drift speed'] = dictionary('name',['v_hall','v_hall_start'], $
+                                             'format', ['b-','b--'])
   n_pages = variables.count()
   v_keys = variables.keys()
-
-  ;;==Make a vector of line formats (Is there a better method?)
-  format = ['k-','k--','k:','k+','k*','kD']
-
+  
   ;;==Loop over distributions
   for id=0,n_dist-1 do begin
      
@@ -47,16 +51,16 @@ pro plot_moments, moments, $
 
         ;;==Get the current variables list
         ivar = variables[v_keys[ip]]
-        n_var = n_elements(ivar)
+        n_var = n_elements(ivar.name)
 
         if n_var ne 0 then begin
 
            ;;==Calculate the global min and max values
-           idata = reform(idist[ivar[0]])
+           idata = reform(idist[ivar.name[0]])
            ymin = min(idata[nt/4:*])
            ymax = max(idata[nt/4:*])
            for iv=1,n_var-1 do begin
-              idata = reform(idist[ivar[iv]])
+              idata = reform(idist[ivar.name[iv]])
               if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
               ymin = min([ymin,min(idata[nt/4:*])])
               ymax = max([ymax,max(idata[nt/4:*])])
@@ -67,25 +71,25 @@ pro plot_moments, moments, $
            ymax *= pad
 
            ;;==Create plots
-           idata = reform(idist[ivar[0]])
+           idata = reform(idist[ivar.name[0]])
            if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
            plt[ip] = plot(tvec,idata, $
-                          format[0], $
+                          ivar.format[0], $
                           /buffer, $
                           yrange = [ymin,ymax], $
                           xstyle = 1, $
                           ystyle = 1, $
                           xtitle = 'Time [ms]', $
                           ytitle = v_keys[ip], $
-                          name = ivar[0])
+                          name = ivar.name[0])
            if n_var gt 1 then opl = objarr(n_var-1)
            for iv=1,n_var-1 do begin
-              idata = reform(idist[ivar[iv]])
+              idata = reform(idist[ivar.name[iv]])
               if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
               opl[iv-1] = plot(tvec,idata, $
-                               format[iv], $
+                               ivar.format[iv], $
                                /overplot, $
-                               name = ivar[iv])
+                               name = ivar.name[iv])
            endfor
            leg = legend(target = [plt[ip],opl], $
                         /auto_text_color)
