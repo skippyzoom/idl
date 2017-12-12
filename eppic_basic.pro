@@ -7,7 +7,21 @@
 ;
 ; Created on 11Dec2017 (may)
 ;-
-pro eppic_basic, path,directory=directory
+pro eppic_basic, path, $
+                 directory=directory, $
+                 moments=moments, $
+                 phi=phi, $
+                 den=den, $
+                 denft=denft, $
+                 all=all
+
+  ;;==Defaults and guards
+  if keyword_set(all) then begin
+     moments = 1B
+     phi = 1B
+     den = 1B
+     denft = 1B
+  endif
 
   ;;==Navigate to working directory
   cd, path
@@ -33,15 +47,17 @@ pro eppic_basic, path,directory=directory
                                 ;-------------------------------;
                                 ; 1-D plots of velocity moments ;
                                 ;-------------------------------;
-  ;;==Read in data
-  moments = analyze_moments(path=path)
+  if keyword_set(moments) then begin
 
-  ;;==Create plots
-  plot_moments, moments,params=params, $
-                path=filepath, $
-                font_name=font_name,font_size=font_size
+     ;;==Read in data
+     moments = analyze_moments(path=path)
 
+     ;;==Create plots
+     plot_moments, moments,params=params, $
+                   path=filepath, $
+                   font_name=font_name,font_size=font_size
 
+  endif
 
   ;;==Choose time steps for images
   nt = 9
@@ -50,43 +66,50 @@ pro eppic_basic, path,directory=directory
                                 ;--------------------;
                                 ; 2-D images of data ;
                                 ;--------------------;
+
   ;;==Create a dictionary of graphics options for each quantity
   data = hash()
-  data['Potential'] = dictionary('name','phi', $
-                                 'rgb_table', 5, $
-                                 'min_value', -0.1, $
-                                 'max_value', 0.1, $
-                                 'origin', hash('yz',0), $
-                                 'fft_direction', 0, $
-                                 'rotate_direction', 0)
-  data['Density (dist 0)'] = dictionary('name','den0', $
-                                        'rgb_table', 5, $
-                                        'min_value', -0.1, $
-                                        'max_value', 0.1, $
-                                        'origin', hash('yz',0), $
-                                        'fft_direction', 0, $
-                                        'rotate_direction', 0)
-  data['Density (dist 1)'] = dictionary('name','den1', $
-                                        'rgb_table', 5, $
-                                        'min_value', -0.1, $
-                                        'max_value', 0.1, $
-                                        'origin', hash('yz',0), $
-                                        'fft_direction', 0, $
-                                        'rotate_direction', 0)
-  data['FT Density (dist 0)'] = dictionary('name','denft0', $
-                                           'rgb_table', 5, $
-                                           'min_value', -0.1, $
-                                           'max_value', 0.1, $
-                                           'origin', hash('yz',0), $
-                                           'fft_direction', 0, $
-                                           'rotate_direction', 2)
-  data['FT Density (dist 1)'] = dictionary('name','denft1', $
-                                           'rgb_table', 5, $
-                                           'min_value', -0.1, $
-                                           'max_value', 0.1, $
-                                           'origin', hash('yz',0), $
-                                           'fft_direction', 0, $
-                                           'rotate_direction', 2)
+
+  ;;==Electrostatic potential
+  if keyword_set(phi) then begin
+     data['Potential'] = dictionary('name','phi', $
+                                    'rgb_table', 5, $
+                                    'min_value', -0.1, $
+                                    'max_value', 0.1, $
+                                    'origin', hash('yz',0), $
+                                    'fft_direction', 0, $
+                                    'rotate_direction', 0)
+  endif
+
+  ;;==Densities
+  if keyword_set(den) then begin
+     for id=0,params.ndist-1 do begin
+        dist = strcompress(id,/remove_all)
+        data['Density (dist '+dist+')'] = dictionary('name','den'+dist, $
+                                                     'rgb_table', 5, $
+                                                     'min_value', -0.1, $
+                                                     'max_value', 0.1, $
+                                                     'origin', hash('yz',0), $
+                                                     'fft_direction', 0, $
+                                                     'rotate_direction', 0)
+     endfor
+  endif
+
+  ;;==Fourier-transformed densities
+  if keyword_set(denft) then begin
+     for id=0,params.ndist-1 do begin
+        dist = strcompress(id,/remove_all)
+        data['FT Density (dist '+dist+')'] = dictionary('name','denft'+dist, $
+                                                 'rgb_table', 5, $
+                                                 'min_value', -0.1, $
+                                                 'max_value', 0.1, $
+                                                 'origin', hash('yz',0), $
+                                                 'fft_direction', 0, $
+                                                 'rotate_direction', 2)
+     endfor
+  endif
+
+  ;;==Get an array of keys into the data hash
   d_keys = data.keys()
 
   ;;==Loop over data quantities
