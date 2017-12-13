@@ -1,5 +1,8 @@
 function multi_colorbar, img,type,_EXTRA=ex
 
+  ;;==Defaults and guards
+  if n_elements(type) eq 0 then type = 'none'
+
   ;;==Get the number of image panels
   np = n_elements(img)
 

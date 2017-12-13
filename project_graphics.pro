@@ -26,6 +26,17 @@ pro project_graphics, context
      1: nx = data_size[1]
   endswitch
 
+  ;;==Extract spatial range info
+  xrng = context.image[imgkeys[id]].data.xrng
+  yrng = context.image[imgkeys[id]].data.yrng
+  zrng = context.image[imgkeys[id]].data.zrng
+  xctr = context.image[imgkeys[id]].data.xctr
+  yctr = context.image[imgkeys[id]].data.yctr
+  zctr = context.image[imgkeys[id]].data.zctr
+  xvec = context.image[imgkeys[id]].data.xvec
+  yvec = context.image[imgkeys[id]].data.yvec
+  zvec = context.image[imgkeys[id]].data.zvec
+
   ;;==Read simulation parameters, etc.
   params = set_eppic_params(path=path)
   grid = set_grid(path=path)
@@ -70,20 +81,41 @@ pro project_graphics, context
            ;;==Extract appropriate subarray
            case 1B of
               strcmp(planes[ip],'xy'): begin
-                 imgdata = reform(data[*,*,origin['xy'],*])
+                 imgdata = data[xrng[0]:xrng[1],yrng[0]:yrng[1],zctr,*]
+                 imgdata = reform(imgdata)
+                 xdata = xvec[xrng[0]:xrng[1]]
+                 ydata = yvec[yrng[0]:yrng[1]]
               end
               strcmp(planes[ip],'xz'): begin
-                 imgdata = reform(data[*,origin['xz'],*,*])
+                 imgdata = data[xrng[0]:xrng[1],yctr,zrng[0]:zrng[1],*]
+                 imgdata = reform(imgdata)
+                 xdata = xvec[xrng[0]:xrng[1]]
+                 ydata = zvec[zrng[0]:zrng[1]]
               end
               strcmp(planes[ip],'yz'): begin
-                 imgdata = reform(data[origin['yz'],*,*,*])
+                 imgdata = data[xctr,yrng[0]:yrng[1],zrng[0]:zrng[1],*]
+                 imgdata = reform(imgdata)
+                 xdata = yvec[yrng[0]:yrng[1]]
+                 ydata = zvec[zrng[0]:zrng[1]]
               end
+              else: message, "Did not recognize plane ("+plane[ip]+")"
            endcase
 
            ;;==Create image
            ;;-->Update multi_image and use that here?
+           ;;   Eventually want to pass _EXTRA = imgkw, where 
+           ;;   imgkey = context[imgkeys[id]].keywords.tostruct()
+           ;;   after removing any non-IDL keywords
+           img = multi_image(imgdata,xdata,ydata)
 
            ;;==Add a colorbar
+           if context[imgkeys[id]].colorbar.haskey('type') then begin
+              context[imgkeys[id]].colorbar.type
+              context[imgkeys[id]].colorbar.remove, 'type'
+           endif $
+           else type = 'none'
+           clrkw = context[imgkeys[id]].colorbar.tostruct()
+           img = multi_colorbar(img,type,_EXTRA = clrkw)
 
            ;;==Add path label
 

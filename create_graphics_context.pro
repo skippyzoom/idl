@@ -7,6 +7,27 @@ function create_graphics_context, path=path
   font_name = 'Times'
   font_size = 10
 
+  ;;==Set up spatial ranges
+  ranges = {x: [0,grid.nx-1], $
+            y: [0,grid.ny-1], $
+            z: [0,grid.nz-1]}
+  center = {x: grid.nx/2, $
+            y: grid.ny/2, $
+            z: grid.nz/2}
+  vecs = {x: grid.x, $
+          y: grid.y, $
+          z: grid.z} 
+  transpose = [0,1,2,3]
+  xrng = ranges.(transpose[0])
+  yrng = ranges.(transpose[1])
+  zrng = ranges.(transpose[2])
+  xctr = center.(transpose[0])
+  yctr = center.(transpose[1])
+  zctr = center.(transpose[2])
+  xvec = vecs.(transpose[0])
+  yvec = vecs.(transpose[1])
+  zvec = vecs.(transpose[2])
+
   ;;==Read in simulation parameters
   params = set_eppic_params(path=path)
   grid = set_grid(path=path)
@@ -23,20 +44,39 @@ function create_graphics_context, path=path
   nt = gc[key].layout[0]*gc[key].layout[1]
   gc[key].timestep = params.nout*(nt_max/(nt-1))*lindgen(nt)
   gc[key].position = multi_position(gc[key].layout)
+  gc[key].colorbar = dictionary('orientation', 1, $
+                                'textpos', 1, $
+                                'tickdir', 1, $
+                                'ticklen', 0.2, $
+                                'major', 7, $
+                                'font_name', 'Times', $
+                                'font_size', 8.0, $
+                                'type', 'global')
+  
 
   ;;==Store info specific to images
   key = 'image'
   gc[key] = hash()
 
-  ;;==Store info for electrostatic potential
+  ;;==Electrostatic potential
   key = 'Potential'
   gc.image[key] = dictionary()
-  gc.image[key].data = dictionary('name','phi')
+  gc.image[key].data = dictionary('name', 'phi', $
+                                  'xrng', xrng, $
+                                  'yrng', yrng, $
+                                  'zrng', zrng, $
+                                  'xctr', xctr, $
+                                  'yctr', yctr, $
+                                  'zctr', zctr, $
+                                  'xvec', xvec, $
+                                  'yvec', yvec, $
+                                  'zvec', zvec, $
+                                  'transpose', transpose)
   gc.image[key].keywords = dictionary('rgb_table', 5, $
                                       'font_name', font_name, $
                                       'font_size', font_size)
 
-  ;;==Store info for (forward) FFT of electrostatic potential
+  ;;==Forward FFT of electrostatic potential
   key = 'FFT Potential'
   gc.image[key] = dictionary()
   gc.image[key].data = dictionary('name','phi', $
@@ -45,10 +85,20 @@ function create_graphics_context, path=path
                                       'font_name', font_name, $
                                       'font_size', font_size)
 
-  ;;==Store info for electric field
+  ;;==Electric field
   key = 'E field'
   gc.image[key] = dictionary()
-  gc.image[key].data = dictionary('name','phi', $
+  gc.image[key].data = dictionary('name', 'phi', $
+                                  'xrng', xrng, $
+                                  'yrng', yrng, $
+                                  'zrng', zrng, $
+                                  'xctr', xctr, $
+                                  'yctr', yctr, $
+                                  'zctr', zctr, $
+                                  'xvec', xvec, $
+                                  'yvec', yvec, $
+                                  'zvec', zvec, $
+                                  'transpose', transpose, $
                                   'gradient', 1, $
                                   'scale', -1.0, $
                                   'rms', 1)
@@ -56,15 +106,25 @@ function create_graphics_context, path=path
                                       'font_name', font_name, $
                                       'font_size', font_size)
 
-  ;;==Store info for ion density
+  ;;==Ion density
   key = 'Ion density'
   gc.image[key] = dictionary()
-  gc.image[key].data = dictionary('name','den1')
+  gc.image[key].data = dictionary('name', 'den1', $
+                                  'xrng', xrng, $
+                                  'yrng', yrng, $
+                                  'zrng', zrng, $
+                                  'xctr', xctr, $
+                                  'yctr', yctr, $
+                                  'zctr', zctr, $
+                                  'xvec', xvec, $
+                                  'yvec', yvec, $
+                                  'zvec', zvec, $
+                                  'transpose', transpose)
   gc.image[key].keywords = dictionary('rgb_table', 5, $
                                       'font_name', font_name, $
                                       'font_size', font_size)
 
-  ;;==Store info for EPPIC FT ion density
+  ;;==EPPIC FT ion density
   key = 'FFT Ion density'
   gc.image[key] = dictionary()
   gc.image[key].data = dictionary('name','denft1', $
