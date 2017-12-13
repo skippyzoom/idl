@@ -20,9 +20,7 @@ function multi_image, imgdata,xdata,ydata, $
                       xshow=xshow, $
                       yshow=yshow, $
                       xrange=xrange, $
-                      yrange=yrange, $
-                      colorbar_type=colorbar_type, $
-                      colorbar_title=colorbar_title
+                      yrange=yrange
 
   if n_elements(imgdata) eq 0 then begin
      print, "[MULTI_IMAGE] Please supply image array. No graphics produced."

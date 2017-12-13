@@ -100,12 +100,12 @@ pro eppic_basic, path, $
      for id=0,params.ndist-1 do begin
         dist = strcompress(id,/remove_all)
         data['FT Density (dist '+dist+')'] = dictionary('name','denft'+dist, $
-                                                 'rgb_table', 5, $
-                                                 'min_value', -0.1, $
-                                                 'max_value', 0.1, $
-                                                 'origin', hash('yz',0), $
-                                                 'fft_direction', 0, $
-                                                 'rotate_direction', 2)
+                                                        'rgb_table', 5, $
+                                                        'min_value', -0.1, $
+                                                        'max_value', 0.1, $
+                                                        'origin', hash('yz',0), $
+                                                        'fft_direction', 0, $
+                                                        'rotate_direction', 2)
      endfor
   endif
 
