@@ -87,11 +87,12 @@ pro project_graphics, context
                  layout = intarr(3,nt)
                  for it=0,nt-1 do layout[*,it] = [input[0],input[1],it+1]
               endif
-              context.info.remove, 'layout'
+              context.image[imgkeys[id]].keywords.layout = layout
            endif
 
            ;;==Modify file name
-           filename = strip_extension(filename)+'_'+planes[ip]+'.'+ext
+           filename = context.image[imgkeys[id]].data.filebase+ $
+                      '_'+planes[ip]+'.'+context.info.ext
 
            ;;==Extract appropriate subarray
            case 1B of
@@ -120,10 +121,9 @@ pro project_graphics, context
            ;;-->Update multi_image and use that here?
            ;;   Eventually want to pass _EXTRA = imgkw, where 
            ;;   imgkw = context.image[imgkeys[id]].keywords.tostruct()
-           ;;   after removing any non-IDL keywords
-           context.image[imgkeys[id]].keywords.layout = layout[*,it]
+           ;;   after removing any non-IDL keywords. Time-dependent
+           ;;   IDL keywords should remain in imgkw.           
            imgkw = context.image[imgkeys[id]].keywords.tostruct()
-STOP
            img = multi_image(imgdata,xdata,ydata,_EXTRA=imgkw)
 
            ;;==Add a colorbar
