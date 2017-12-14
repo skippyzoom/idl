@@ -112,6 +112,10 @@ pro project_graphics, context,filepath=filepath
            ;;   imgkw = context.image[imgkeys[id]].keywords.tostruct()
            ;;   after removing any non-IDL keywords. Time-dependent
            ;;   IDL keywords should remain in imgkw.           
+           if strcmp(context.colorbar.keywords.type, 'global') then begin
+              context.image[imgkeys[id]].keywords.max_value = max(abs(imgdata))
+              context.image[imgkeys[id]].keywords.min_value = -max(abs(imgdata))
+           endif
            imgkw = context.image[imgkeys[id]].keywords.tostruct()
            img = multi_image(imgdata,xdata,ydata,_EXTRA=imgkw)
 
