@@ -109,6 +109,8 @@ function create_graphics_context, path=path
   key = 'Potential'
   gc.image[key] = dictionary()
   gc.image[key].data = dictionary('name', 'phi', $
+                                  'scale', 1e3, $
+                                  'units', '[mV]', $
                                   'grid', 'r')
   gc.image[key].data.filebase = gc.image[key].data.name
   gc.image[key].keywords = dictionary('rgb_table', 5, $
@@ -136,6 +138,8 @@ function create_graphics_context, path=path
   key = 'RMS E field'
   gc.image[key] = dictionary()
   gc.image[key].data = dictionary('name', 'phi', $
+                                  'scale', 1e3, $
+                                  'units', '[mV/m]', $
                                   'grid', 'r', $
                                   'gradient', 1, $
                                   'scale', -1.0, $
@@ -152,6 +156,8 @@ function create_graphics_context, path=path
   key = 'Ion density'
   gc.image[key] = dictionary()
   gc.image[key].data = dictionary('name', 'den1', $
+                                  'scale', 1e2, $
+                                  'units', '[%]', $
                                   'grid', 'r')
   gc.image[key].data.filebase = gc.image[key].data.name
   gc.image[key].keywords = dictionary('rgb_table', 5, $
