@@ -14,6 +14,7 @@ function multi_colorbar, img,type,_EXTRA=ex
 
         ;;==Calculate position
         all_pos = dblarr(4,np)
+        for ip=0,np-1 do all_pos[*,ip] = img[ip].position
         width = 0.0225
         height = 0.20
         buffer = 0.03
@@ -46,6 +47,7 @@ function multi_colorbar, img,type,_EXTRA=ex
      strcmp(type,'panel',5): begin
         print, "[MULTI_COLORBAR] Panel-specific colorbar not implemented"
      end
+     strcmp(type,'none'): ;; Do nothing
   endcase
 
   return, img

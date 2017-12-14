@@ -6,6 +6,9 @@ function create_graphics_context, path=path
   ;;==Declare common image keywords
   font_name = 'Times'
   font_size = 10
+  axis_style = 0
+  layout = [2,2]
+  position = multi_position(layout[*])
 
   ;;==Read in simulation parameters
   params = set_eppic_params(path=path)
@@ -37,22 +40,23 @@ function create_graphics_context, path=path
   gc = dictionary()
 
   ;;==Store info common to all images
-  key = 'info'
+  key = 'global'
   gc[key] = dictionary()
-  gc[key].ext = '.pdf'
+  gc[key].ext = 'pdf'
   gc[key].path = path
-  gc[key].layout = [2,2]
-  nt = gc[key].layout[0]*gc[key].layout[1]
+  ;; gc[key].layout = [2,2]
+  ;; nt = gc[key].layout[0]*gc[key].layout[1]
+  nt = layout[0]*layout[1]
   gc[key].timestep = params.nout*(nt_max/(nt-1))*lindgen(nt)
-  gc[key].position = multi_position(gc[key].layout)
-  gc[key].colorbar = dictionary('orientation', 1, $
-                                'textpos', 1, $
-                                'tickdir', 1, $
-                                'ticklen', 0.2, $
-                                'major', 7, $
-                                'font_name', 'Times', $
-                                'font_size', 8.0, $
-                                'type', 'global')
+  ;; gc[key].position = multi_position(gc[key].layout)
+  ;; gc[key].colorbar = dictionary('orientation', 1, $
+  ;;                               'textpos', 1, $
+  ;;                               'tickdir', 1, $
+  ;;                               'ticklen', 0.2, $
+  ;;                               'major', 7, $
+  ;;                               'font_name', 'Times', $
+  ;;                               'font_size', 8.0, $
+  ;;                               'type', 'global')
 
   ;;==Store info about image dimesions, etc.
   ;;  r is for coordinate space
@@ -80,6 +84,18 @@ function create_graphics_context, path=path
                          'zvec', zvec, $
                          'transpose', transpose)
 
+  ;;==Store info for the colorbar(s)
+  key = 'colorbar'
+  gc[key] = dictionary()
+  gc[key].keywords = dictionary('orientation', 1, $
+                                'textpos', 1, $
+                                'tickdir', 1, $
+                                'ticklen', 0.2, $
+                                'major', 7, $
+                                'font_name', 'Times', $
+                                'font_size', 8.0, $
+                                'type', 'global')
+
   ;;==Store info specific to images
   key = 'image'
   gc[key] = hash()
@@ -91,6 +107,9 @@ function create_graphics_context, path=path
                                   'grid', 'r')
   gc.image[key].data.filebase = gc.image[key].data.name
   gc.image[key].keywords = dictionary('rgb_table', 5, $
+                                      'layout', layout, $
+                                      'position', position, $
+                                      'axis_style', axis_style, $
                                       'font_name', font_name, $
                                       'font_size', font_size)
 
@@ -102,6 +121,9 @@ function create_graphics_context, path=path
                                   'fft_direction', -1)
   gc.image[key].data.filebase = gc.image[key].data.name+'-fwdFT'
   gc.image[key].keywords = dictionary('rgb_table', 39, $
+                                      'layout', layout, $
+                                      'position', position, $
+                                      'axis_style', axis_style, $
                                       'font_name', font_name, $
                                       'font_size', font_size)
 
@@ -115,6 +137,9 @@ function create_graphics_context, path=path
                                   'rms', 1)
   gc.image[key].data.filebase = 'E-rms'
   gc.image[key].keywords = dictionary('rgb_table', 5, $
+                                      'layout', layout, $
+                                      'position', position, $
+                                      'axis_style', axis_style, $
                                       'font_name', font_name, $
                                       'font_size', font_size)
 
@@ -125,6 +150,9 @@ function create_graphics_context, path=path
                                   'grid', 'r')
   gc.image[key].data.filebase = gc.image[key].data.name
   gc.image[key].keywords = dictionary('rgb_table', 5, $
+                                      'layout', layout, $
+                                      'position', position, $
+                                      'axis_style', axis_style, $
                                       'font_name', font_name, $
                                       'font_size', font_size)
 
@@ -136,6 +164,9 @@ function create_graphics_context, path=path
                                   'rotate_direction', 2)
   gc.image[key].data.filebase = gc.image[key].data.name
   gc.image[key].keywords = dictionary('rgb_table', 39, $
+                                      'layout', layout, $
+                                      'position', position, $
+                                      'axis_style', axis_style, $
                                       'font_name', font_name, $
                                       'font_size', font_size)
 

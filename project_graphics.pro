@@ -1,8 +1,12 @@
-pro project_graphics, context
+pro project_graphics, context,filepath=filepath
+
+  ;;==Defaults and guards
+  if n_elements(context) eq 0 || ~isa(context,'dictionary') then $
+     message, "[PROJECT_GRAPHICS] Please supply a graphics context dictionary"
 
   ;;==Get general info
-  path = context.info.path
-  timestep = context.info.timestep
+  path = context.global.path
+  timestep = context.global.timestep
 
   ;;==Get image hash keys
   imgkeys = context.image.keys()
@@ -80,19 +84,21 @@ pro project_graphics, context
         for ip=0,n_planes-1 do begin
 
            ;;==Construct panel layout array for this plane
-           if context.info.haskey('layout') then begin
-              layout = context.info.layout
-              if n_elements(layout) ne 0 then begin
-                 input = layout
-                 layout = intarr(3,nt)
-                 for it=0,nt-1 do layout[*,it] = [input[0],input[1],it+1]
-              endif
-              context.image[imgkeys[id]].keywords.layout = layout
-           endif
+           ;; if context.global.haskey('layout') then begin
+           ;;    layout = context.global.layout
+           ;;    if n_elements(layout) ne 0 then begin
+           ;;       input = layout
+           ;;       layout = intarr(3,nt)
+           ;;       for it=0,nt-1 do layout[*,it] = [input[0],input[1],it+1]
+           ;;    endif
+           ;;    context.image[imgkeys[id]].keywords.layout = layout
+           ;; endif
+           ;; if context.global.haskey('position') then $
+           ;;    context.image[imgkeys[id]].keywords.position = context.global.position
 
            ;;==Modify file name
            filename = context.image[imgkeys[id]].data.filebase+ $
-                      '_'+planes[ip]+'.'+context.info.ext
+                      '_'+planes[ip]+'.'+context.global.ext
 
            ;;==Extract appropriate subarray
            case 1B of
@@ -127,17 +133,23 @@ pro project_graphics, context
            img = multi_image(imgdata,xdata,ydata,_EXTRA=imgkw)
 
            ;;==Add a colorbar
-           if context.info.colorbar.haskey('type') then begin
-              context.info.colorbar.type
-              context.info.colorbar.remove, 'type'
+           if context.colorbar.keywords.haskey('type') then begin
+              type = context.colorbar.keywords.type
+              context.colorbar.keywords.remove, 'type'
            endif $
            else type = 'none'
-           clrkw = context.info.colorbar.tostruct()
+           clrkw = context.colorbar.keywords.tostruct()
            img = multi_colorbar(img,type,_EXTRA = clrkw)
 
            ;;==Add path label
+           txt = text(0.50,0.98,path, $
+                      alignment = 0.5, $
+                      target = img, $
+                      font_name = font_name, $
+                      font_size = font_size)
 
            ;;==Save the image
+           image_save, img,filename=filepath+path_sep()+filename
 
         endfor ;;-->Planes
 
@@ -145,5 +157,5 @@ pro project_graphics, context
      2: begin
      end
   endcase ;;-->Dimensions
-STOP
+
 end
