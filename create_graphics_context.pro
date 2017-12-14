@@ -8,7 +8,9 @@ function create_graphics_context, path=path
   font_size = 10
   axis_style = 0
   layout = [2,2]
-  position = multi_position(layout[*])
+  position = multi_position(layout[*], $
+                            edges = [0.12,0.10,0.80,0.80], $
+                            buffer = [0.00,0.10])
 
   ;;==Read in simulation parameters
   params = set_eppic_params(path=path)
