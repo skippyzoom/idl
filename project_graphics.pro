@@ -83,23 +83,6 @@ pro project_graphics, context,filepath=filepath
         ;;==Loop over planes
         for ip=0,n_planes-1 do begin
 
-           ;;==Construct panel layout array for this plane
-           ;; if context.global.haskey('layout') then begin
-           ;;    layout = context.global.layout
-           ;;    if n_elements(layout) ne 0 then begin
-           ;;       input = layout
-           ;;       layout = intarr(3,nt)
-           ;;       for it=0,nt-1 do layout[*,it] = [input[0],input[1],it+1]
-           ;;    endif
-           ;;    context.image[imgkeys[id]].keywords.layout = layout
-           ;; endif
-           ;; if context.global.haskey('position') then $
-           ;;    context.image[imgkeys[id]].keywords.position = context.global.position
-
-           ;;==Modify file name
-           filename = context.image[imgkeys[id]].data.filebase+ $
-                      '_'+planes[ip]+'.'+context.global.ext
-
            ;;==Extract appropriate subarray
            case 1B of
               strcmp(planes[ip],'xy'): begin
@@ -147,6 +130,10 @@ pro project_graphics, context,filepath=filepath
                       target = img, $
                       font_name = font_name, $
                       font_size = font_size)
+
+           ;;==Update file name
+           filename = context.image[imgkeys[id]].data.filebase+ $
+                      '_'+planes[ip]+'.'+context.global.ext
 
            ;;==Save the image
            image_save, img,filename=filepath+path_sep()+filename
