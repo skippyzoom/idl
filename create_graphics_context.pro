@@ -3,10 +3,15 @@ function create_graphics_context, path=path
   ;;==Defaults and guards
   if n_elements(path) eq 0 then path = './'
 
-  ;;==Set up global graphics options
+  ;;==Declare common image keywords
   font_name = 'Times'
   font_size = 10
 
+  ;;==Read in simulation parameters
+  params = set_eppic_params(path=path)
+  grid = set_grid(path=path)
+  nt_max = calc_timesteps(path=path,grid=grid)
+  
   ;;==Set up spatial ranges
   ranges = {x: [0,grid.nx-1], $
             y: [0,grid.ny-1], $
@@ -28,17 +33,13 @@ function create_graphics_context, path=path
   yvec = vecs.(transpose[1])
   zvec = vecs.(transpose[2])
 
-  ;;==Read in simulation parameters
-  params = set_eppic_params(path=path)
-  grid = set_grid(path=path)
-  nt_max = calc_timesteps(path=path,grid=grid)
-  
   ;;==Initialize the graphics context
   gc = dictionary()
 
   ;;==Store info common to all images
   key = 'info'
   gc[key] = dictionary()
+  gc[key].ext = '.pdf'
   gc[key].path = path
   gc[key].layout = [2,2]
   nt = gc[key].layout[0]*gc[key].layout[1]
@@ -52,7 +53,6 @@ function create_graphics_context, path=path
                                 'font_name', 'Times', $
                                 'font_size', 8.0, $
                                 'type', 'global')
-  
 
   ;;==Store info about image dimesions, etc.
   ;;  r is for coordinate space
@@ -89,6 +89,7 @@ function create_graphics_context, path=path
   gc.image[key] = dictionary()
   gc.image[key].data = dictionary('name', 'phi', $
                                   'grid', 'r')
+  gc.image[key].data.filebase = gc.image[key].data.name
   gc.image[key].keywords = dictionary('rgb_table', 5, $
                                       'font_name', font_name, $
                                       'font_size', font_size)
@@ -99,18 +100,20 @@ function create_graphics_context, path=path
   gc.image[key].data = dictionary('name','phi', $
                                   'grid', 'k', $
                                   'fft_direction', -1)
+  gc.image[key].data.filebase = gc.image[key].data.name+'-fwdFT'
   gc.image[key].keywords = dictionary('rgb_table', 39, $
                                       'font_name', font_name, $
                                       'font_size', font_size)
 
-  ;;==Electric field
-  key = 'E field'
+  ;;==RMS Electric field
+  key = 'RMS E field'
   gc.image[key] = dictionary()
   gc.image[key].data = dictionary('name', 'phi', $
                                   'grid', 'r', $
                                   'gradient', 1, $
                                   'scale', -1.0, $
                                   'rms', 1)
+  gc.image[key].data.filebase = 'E-rms'
   gc.image[key].keywords = dictionary('rgb_table', 5, $
                                       'font_name', font_name, $
                                       'font_size', font_size)
@@ -120,6 +123,7 @@ function create_graphics_context, path=path
   gc.image[key] = dictionary()
   gc.image[key].data = dictionary('name', 'den1', $
                                   'grid', 'r')
+  gc.image[key].data.filebase = gc.image[key].data.name
   gc.image[key].keywords = dictionary('rgb_table', 5, $
                                       'font_name', font_name, $
                                       'font_size', font_size)
@@ -130,6 +134,7 @@ function create_graphics_context, path=path
   gc.image[key].data = dictionary('name','denft1', $
                                   'grid', 'k', $
                                   'rotate_direction', 2)
+  gc.image[key].data.filebase = gc.image[key].data.name
   gc.image[key].keywords = dictionary('rgb_table', 39, $
                                       'font_name', font_name, $
                                       'font_size', font_size)
