@@ -96,6 +96,9 @@ function create_graphics_context, path=path
                                 'major', 7, $
                                 'font_name', 'Times', $
                                 'font_size', 8.0, $
+                                'width', 0.0225, $
+                                'height', 0.20, $
+                                'buffer', 0.03, $
                                 'type', 'global')
 
   ;;==Store info specific to images

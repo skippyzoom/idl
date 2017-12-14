@@ -1,7 +1,10 @@
-function multi_colorbar, img,type,_EXTRA=ex
+function multi_colorbar, img,type,width=width,height=height,buffer=buffer,_EXTRA=ex
 
   ;;==Defaults and guards
   if n_elements(type) eq 0 then type = 'none'
+  if n_elements(width) eq 0 then width = 0.02
+  if n_elements(height) eq 0 then height = 0.20
+  if n_elements(buffer) eq 0 then buffer = 0.03
 
   ;;==Get the number of image panels
   np = n_elements(img)
@@ -15,9 +18,6 @@ function multi_colorbar, img,type,_EXTRA=ex
         ;;==Calculate position
         all_pos = dblarr(4,np)
         for ip=0,np-1 do all_pos[*,ip] = img[ip].position
-        width = 0.0225
-        height = 0.20
-        buffer = 0.03
         x0 = max(all_pos[2,*])+buffer
         x1 = x0+width
         y0 = 0.50*(1-height)

@@ -123,10 +123,25 @@ pro project_graphics, context,filepath=filepath
            if context.colorbar.keywords.haskey('type') then begin
               type = context.colorbar.keywords.type
               context.colorbar.keywords.remove, 'type'
-           endif $
-           else type = 'none'
+           endif else type = 'none'
+           if context.colorbar.keywords.haskey('width') then begin
+              width = context.colorbar.keywords.width
+              context.colorbar.keywords.remove, 'width'
+           endif
+           if context.colorbar.keywords.haskey('height') then begin
+              height = context.colorbar.keywords.height
+              context.colorbar.keywords.remove, 'height'
+           endif
+           if context.colorbar.keywords.haskey('buffer') then begin
+              buffer = context.colorbar.keywords.buffer
+              context.colorbar.keywords.remove, 'buffer'
+           endif
            clrkw = context.colorbar.keywords.tostruct()
-           img = multi_colorbar(img,type,_EXTRA = clrkw)
+           img = multi_colorbar(img,type, $
+                                width = 0.0225, $
+                                height = 0.20, $
+                                buffer = 0.03, $
+                                _EXTRA = clrkw)
 
            ;;==Add path label
            ;; txt = text(0.50,0.98,path, $
