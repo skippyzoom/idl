@@ -18,26 +18,23 @@ function multi_colorbar, img,type,width=width,height=height,buffer=buffer,_EXTRA
         ;;==Calculate position
         all_pos = dblarr(4,np)
         for ip=0,np-1 do all_pos[*,ip] = img[ip].position
+        mid = 0.5*(max(all_pos[3,*])+min(all_pos[1,*]))
         x0 = max(all_pos[2,*])+buffer
         x1 = x0+width
-        y0 = 0.50*(1-height)
-        y1 = 0.50*(1+height)
+        y0 = mid*(1-height)
+        y1 = mid*(1+height)
         position = [x0,y0,x1,y1]
         d_ex.position = position
 
-        ;;==Calculate tickmark values
-        if d_ex.haskey('major') then begin
-           tickvalues = img[np-1].min_value[0] + $
-                        (img[np-1].max_value[0]-img[np-1].min_value[0])* $
-                        findgen(d_ex.major)/(d_ex.major-1)
-           if (d_ex.major mod 2) ne 0 && (img[np-1].max_value[0]-img[np-1].min_value[0] eq 0) then $
-              tickvalues[d_ex.major/2] = 0.0
-           d_ex.tickvalues = tickvalues
-        endif
-
-        ;;==Create tickmark labels
-        if d_ex.haskey('tickvalues') then $
-           tickname = plusminus_labels(tickvalues,format='f8.2')
+        ;;==Calculate tickmark values and labels
+        if ~d_ex.haskey('major') then major = 5
+        tickvalues = img[np-1].min_value[0] + $
+                     (img[np-1].max_value[0]-img[np-1].min_value[0])* $
+                     findgen(d_ex.major)/(d_ex.major-1)
+        if (d_ex.major mod 2) ne 0 && (img[np-1].max_value[0]-img[np-1].min_value[0] eq 0) then $
+           tickvalues[d_ex.major/2] = 0.0
+        d_ex.tickvalues = tickvalues
+        d_ex.tickname = plusminus_labels(tickvalues,format='f8.2')
 
         ;;==Create the colorbar                       
         clr = colorbar(target = img[0], $
