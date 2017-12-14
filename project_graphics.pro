@@ -125,11 +125,12 @@ pro project_graphics, context,filepath=filepath
            img = multi_colorbar(img,type,_EXTRA = clrkw)
 
            ;;==Add path label
-           txt = text(0.50,0.98,path, $
+           ;; txt = text(0.50,0.98,path, $
+           txt = text(0.50,0.00,path, $
                       alignment = 0.5, $
                       target = img, $
-                      font_name = font_name, $
-                      font_size = font_size)
+                      font_name = 'Times', $
+                      font_size = 5.0)
 
            ;;==Update file name
            filename = context.image[imgkeys[id]].data.filebase+ $
