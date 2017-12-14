@@ -87,31 +87,26 @@ pro project_graphics, context,filepath=filepath
            case 1B of
               strcmp(planes[ip],'xy'): begin
                  imgdata = data[xrng[0]:xrng[1],yrng[0]:yrng[1],zctr,*]
-                 imgdata = reform(imgdata)
                  xdata = xvec[xrng[0]:xrng[1]]
                  ydata = yvec[yrng[0]:yrng[1]]
               end
               strcmp(planes[ip],'xz'): begin
                  imgdata = data[xrng[0]:xrng[1],yctr,zrng[0]:zrng[1],*]
-                 imgdata = reform(imgdata)
                  xdata = xvec[xrng[0]:xrng[1]]
                  ydata = zvec[zrng[0]:zrng[1]]
               end
               strcmp(planes[ip],'yz'): begin
                  imgdata = data[xctr,yrng[0]:yrng[1],zrng[0]:zrng[1],*]
-                 imgdata = reform(imgdata)
                  xdata = yvec[yrng[0]:yrng[1]]
                  ydata = zvec[zrng[0]:zrng[1]]
               end
               else: message, "Did not recognize plane ("+plane[ip]+")"
            endcase
+           imgdata = reform(imgdata)
 
            ;;==Create image
-           ;;-->Update multi_image and use that here?
-           ;;   Eventually want to pass _EXTRA = imgkw, where 
-           ;;   imgkw = context.image[imgkeys[id]].keywords.tostruct()
-           ;;   after removing any non-IDL keywords. Time-dependent
-           ;;   IDL keywords should remain in imgkw.           
+           if context.image[imgkeys[id]].data.haskey('scale') then $
+              imgdata *= context.image[imgkeys[id]].data.scale
            if strcmp(context.colorbar.keywords.type, 'global') then begin
               context.image[imgkeys[id]].keywords.max_value = max(abs(imgdata))
               context.image[imgkeys[id]].keywords.min_value = -max(abs(imgdata))
@@ -136,6 +131,10 @@ pro project_graphics, context,filepath=filepath
               buffer = context.colorbar.keywords.buffer
               context.colorbar.keywords.remove, 'buffer'
            endif
+           if context.image[imgkeys[id]].data.haskey('units') then $
+              context.colorbar.keywords.title = imgkeys[id]+ $
+                                                ' '+ $
+                                                context.image[imgkeys[id]].data.units
            clrkw = context.colorbar.keywords.tostruct()
            img = multi_colorbar(img,type, $
                                 width = 0.0225, $
