@@ -26,16 +26,30 @@ pro project_graphics, context
      1: nx = data_size[1]
   endswitch
 
-  ;;==Extract spatial range info
-  xrng = context.image[imgkeys[id]].data.xrng
-  yrng = context.image[imgkeys[id]].data.yrng
-  zrng = context.image[imgkeys[id]].data.zrng
-  xctr = context.image[imgkeys[id]].data.xctr
-  yctr = context.image[imgkeys[id]].data.yctr
-  zctr = context.image[imgkeys[id]].data.zctr
-  xvec = context.image[imgkeys[id]].data.xvec
-  yvec = context.image[imgkeys[id]].data.yvec
-  zvec = context.image[imgkeys[id]].data.zvec
+  ;;==Extract dimensional info
+  if strcmp(context.image[imgkeys[id]].data.grid, 'k') then begin
+     xrng = context.grid.k.xrng
+     yrng = context.grid.k.yrng
+     zrng = context.grid.k.zrng
+     xctr = context.grid.k.xctr
+     yctr = context.grid.k.yctr
+     zctr = context.grid.k.zctr
+     xvec = context.grid.k.xvec
+     yvec = context.grid.k.yvec
+     zvec = context.grid.k.zvec
+  endif $
+  else begin
+     xrng = context.grid.r.xrng
+     yrng = context.grid.r.yrng
+     zrng = context.grid.r.zrng
+     xctr = context.grid.r.xctr
+     yctr = context.grid.r.yctr
+     zctr = context.grid.r.zctr
+     xvec = context.grid.r.xvec
+     yvec = context.grid.r.yvec
+     zvec = context.grid.r.zvec
+  endelse
+  context.image[imgkeys[id]].data.remove, 'grid'  
 
   ;;==Read simulation parameters, etc.
   params = set_eppic_params(path=path)
@@ -73,6 +87,7 @@ pro project_graphics, context
                  layout = intarr(3,nt)
                  for it=0,nt-1 do layout[*,it] = [input[0],input[1],it+1]
               endif
+              context.info.remove, 'layout'
            endif
 
            ;;==Modify file name
@@ -104,17 +119,20 @@ pro project_graphics, context
            ;;==Create image
            ;;-->Update multi_image and use that here?
            ;;   Eventually want to pass _EXTRA = imgkw, where 
-           ;;   imgkey = context[imgkeys[id]].keywords.tostruct()
+           ;;   imgkw = context.image[imgkeys[id]].keywords.tostruct()
            ;;   after removing any non-IDL keywords
-           img = multi_image(imgdata,xdata,ydata)
+           context.image[imgkeys[id]].keywords.layout = layout[*,it]
+           imgkw = context.image[imgkeys[id]].keywords.tostruct()
+STOP
+           img = multi_image(imgdata,xdata,ydata,_EXTRA=imgkw)
 
            ;;==Add a colorbar
-           if context[imgkeys[id]].colorbar.haskey('type') then begin
-              context[imgkeys[id]].colorbar.type
-              context[imgkeys[id]].colorbar.remove, 'type'
+           if context.info.colorbar.haskey('type') then begin
+              context.info.colorbar.type
+              context.info.colorbar.remove, 'type'
            endif $
            else type = 'none'
-           clrkw = context[imgkeys[id]].colorbar.tostruct()
+           clrkw = context.info.colorbar.tostruct()
            img = multi_colorbar(img,type,_EXTRA = clrkw)
 
            ;;==Add path label

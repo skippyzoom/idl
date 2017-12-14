@@ -54,6 +54,32 @@ function create_graphics_context, path=path
                                 'type', 'global')
   
 
+  ;;==Store info about image dimesions, etc.
+  ;;  r is for coordinate space
+  ;;  k is for spectral space
+  key = 'grid'
+  gc[key] = dictionary()
+  gc[key].r = dictionary('xrng', xrng, $
+                         'yrng', yrng, $
+                         'zrng', zrng, $
+                         'xctr', xctr, $
+                         'yctr', yctr, $
+                         'zctr', zctr, $
+                         'xvec', xvec, $
+                         'yvec', yvec, $
+                         'zvec', zvec, $
+                         'transpose', transpose)
+  gc[key].k = dictionary('xrng', xrng, $
+                         'yrng', yrng, $
+                         'zrng', zrng, $
+                         'xctr', xctr, $
+                         'yctr', yctr, $
+                         'zctr', zctr, $
+                         'xvec', xvec, $
+                         'yvec', yvec, $
+                         'zvec', zvec, $
+                         'transpose', transpose)
+
   ;;==Store info specific to images
   key = 'image'
   gc[key] = hash()
@@ -62,16 +88,7 @@ function create_graphics_context, path=path
   key = 'Potential'
   gc.image[key] = dictionary()
   gc.image[key].data = dictionary('name', 'phi', $
-                                  'xrng', xrng, $
-                                  'yrng', yrng, $
-                                  'zrng', zrng, $
-                                  'xctr', xctr, $
-                                  'yctr', yctr, $
-                                  'zctr', zctr, $
-                                  'xvec', xvec, $
-                                  'yvec', yvec, $
-                                  'zvec', zvec, $
-                                  'transpose', transpose)
+                                  'grid', 'r')
   gc.image[key].keywords = dictionary('rgb_table', 5, $
                                       'font_name', font_name, $
                                       'font_size', font_size)
@@ -80,6 +97,7 @@ function create_graphics_context, path=path
   key = 'FFT Potential'
   gc.image[key] = dictionary()
   gc.image[key].data = dictionary('name','phi', $
+                                  'grid', 'k', $
                                   'fft_direction', -1)
   gc.image[key].keywords = dictionary('rgb_table', 39, $
                                       'font_name', font_name, $
@@ -89,16 +107,7 @@ function create_graphics_context, path=path
   key = 'E field'
   gc.image[key] = dictionary()
   gc.image[key].data = dictionary('name', 'phi', $
-                                  'xrng', xrng, $
-                                  'yrng', yrng, $
-                                  'zrng', zrng, $
-                                  'xctr', xctr, $
-                                  'yctr', yctr, $
-                                  'zctr', zctr, $
-                                  'xvec', xvec, $
-                                  'yvec', yvec, $
-                                  'zvec', zvec, $
-                                  'transpose', transpose, $
+                                  'grid', 'r', $
                                   'gradient', 1, $
                                   'scale', -1.0, $
                                   'rms', 1)
@@ -110,16 +119,7 @@ function create_graphics_context, path=path
   key = 'Ion density'
   gc.image[key] = dictionary()
   gc.image[key].data = dictionary('name', 'den1', $
-                                  'xrng', xrng, $
-                                  'yrng', yrng, $
-                                  'zrng', zrng, $
-                                  'xctr', xctr, $
-                                  'yctr', yctr, $
-                                  'zctr', zctr, $
-                                  'xvec', xvec, $
-                                  'yvec', yvec, $
-                                  'zvec', zvec, $
-                                  'transpose', transpose)
+                                  'grid', 'r')
   gc.image[key].keywords = dictionary('rgb_table', 5, $
                                       'font_name', font_name, $
                                       'font_size', font_size)
@@ -128,6 +128,7 @@ function create_graphics_context, path=path
   key = 'FFT Ion density'
   gc.image[key] = dictionary()
   gc.image[key].data = dictionary('name','denft1', $
+                                  'grid', 'k', $
                                   'rotate_direction', 2)
   gc.image[key].keywords = dictionary('rgb_table', 39, $
                                       'font_name', font_name, $
