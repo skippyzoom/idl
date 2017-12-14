@@ -34,7 +34,7 @@ function multi_position, np, $
      end
      else: message, "np may be a scalar or [ncols,nrows]" 
   endcase
-  if n_elements(edges) eq 0 then edges = [0.1,0.1,0.9,0.9]
+  if n_elements(edges) eq 0 then edges = [0.0,0.0,1.0,1.0]
   if n_elements(buffers) eq 0 then buffers = [0.0,0.0]
 
   ;;==Declare array
