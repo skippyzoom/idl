@@ -111,6 +111,7 @@ function create_graphics_context, path=path
   gc.image[key].data = dictionary('name', 'phi', $
                                   'scale', 1e3, $
                                   'units', '[mV]', $
+                                  'symbol', '$\phi$', $
                                   'grid', 'r')
   gc.image[key].data.filebase = gc.image[key].data.name
   gc.image[key].keywords = dictionary('rgb_table', 5, $
@@ -124,6 +125,7 @@ function create_graphics_context, path=path
   key = 'FFT Potential'
   gc.image[key] = dictionary()
   gc.image[key].data = dictionary('name','phi', $
+                                  'symbol', 'FFT($\phi$)', $
                                   'grid', 'k', $
                                   'fft_direction', -1)
   gc.image[key].data.filebase = gc.image[key].data.name+'-fwdFT'
@@ -140,6 +142,7 @@ function create_graphics_context, path=path
   gc.image[key].data = dictionary('name', 'phi', $
                                   'scale', 1e3, $
                                   'units', '[mV/m]', $
+                                  'symbol', '<|E|>', $
                                   'grid', 'r', $
                                   'gradient', 1, $
                                   'scale', -1.0, $
@@ -158,6 +161,7 @@ function create_graphics_context, path=path
   gc.image[key].data = dictionary('name', 'den1', $
                                   'scale', 1e2, $
                                   'units', '[%]', $
+                                  'symbol', '$\delta$ n/$n_0$', $
                                   'grid', 'r')
   gc.image[key].data.filebase = gc.image[key].data.name
   gc.image[key].keywords = dictionary('rgb_table', 5, $
@@ -172,6 +176,7 @@ function create_graphics_context, path=path
   gc.image[key] = dictionary()
   gc.image[key].data = dictionary('name','denft1', $
                                   'grid', 'k', $
+                                  'symbol', 'FFT($\delta$ n/$n_0$)', $
                                   'rotate_direction', 2)
   gc.image[key].data.filebase = gc.image[key].data.name
   gc.image[key].keywords = dictionary('rgb_table', 39, $

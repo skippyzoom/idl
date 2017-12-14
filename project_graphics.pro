@@ -131,20 +131,22 @@ pro project_graphics, context,filepath=filepath
               buffer = context.colorbar.keywords.buffer
               context.colorbar.keywords.remove, 'buffer'
            endif
+           if context.image[imgkeys[id]].data.haskey('symbol') then $
+              title = context.image[imgkeys[id]].data.symbol $
+           else $
+              title = imgkeys[id]
            if context.image[imgkeys[id]].data.haskey('units') then $
-              context.colorbar.keywords.title = imgkeys[id]+ $
-                                                ' '+ $
-                                                context.image[imgkeys[id]].data.units
+               title += ' '+context.image[imgkeys[id]].data.units
+           context.colorbar.keywords.title = title
            clrkw = context.colorbar.keywords.tostruct()
            img = multi_colorbar(img,type, $
-                                width = 0.0225, $
-                                height = 0.20, $
-                                buffer = 0.03, $
+                                width = width, $
+                                height = height, $
+                                buffer = buffer, $
                                 _EXTRA = clrkw)
 
            ;;==Add path label
-           ;; txt = text(0.50,0.98,path, $
-           txt = text(0.50,0.00,path, $
+           txt = text(0.00,0.00,path, $
                       alignment = 0.5, $
                       target = img, $
                       font_name = 'Times', $
