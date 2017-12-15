@@ -12,6 +12,12 @@ function multi_colorbar, img,type,width=width,height=height,buffer=buffer,_EXTRA
   ;;==Extract the inherited keyword struct to a dictionary
   d_ex = dictionary(ex,/extract)
 
+  ;;==Remove non-IDL keywords
+  if d_ex.haskey('type') then d_ex.remove, 'type'
+  if d_ex.haskey('width') then d_ex.remove, 'width'
+  if d_ex.haskey('height') then d_ex.remove, 'height'
+  if d_ex.haskey('buffer') then d_ex.remove, 'buffer'
+
   case 1B of 
      strcmp(type,'global',6): begin
 

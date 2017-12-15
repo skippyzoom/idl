@@ -46,19 +46,8 @@ function create_graphics_context, path=path
   gc[key] = dictionary()
   gc[key].ext = 'pdf'
   gc[key].path = path
-  ;; gc[key].layout = [2,2]
-  ;; nt = gc[key].layout[0]*gc[key].layout[1]
   nt = layout[0]*layout[1]
   gc[key].timestep = params.nout*(nt_max/(nt-1))*lindgen(nt)
-  ;; gc[key].position = multi_position(gc[key].layout)
-  ;; gc[key].colorbar = dictionary('orientation', 1, $
-  ;;                               'textpos', 1, $
-  ;;                               'tickdir', 1, $
-  ;;                               'ticklen', 0.2, $
-  ;;                               'major', 7, $
-  ;;                               'font_name', 'Times', $
-  ;;                               'font_size', 8.0, $
-  ;;                               'type', 'global')
 
   ;;==Store info about image dimesions, etc.
   ;;  r is for coordinate space
@@ -97,7 +86,7 @@ function create_graphics_context, path=path
                                 'font_name', 'Times', $
                                 'font_size', 8.0, $
                                 'width', 0.0225, $
-                                'height', 0.20, $
+                                'height', 0.40, $
                                 'buffer', 0.03, $
                                 'type', 'global')
 
@@ -121,20 +110,20 @@ function create_graphics_context, path=path
                                       'font_name', font_name, $
                                       'font_size', font_size)
 
-  ;;==Forward FFT of electrostatic potential
-  key = 'FFT Potential'
-  gc.image[key] = dictionary()
-  gc.image[key].data = dictionary('name','phi', $
-                                  'symbol', 'FFT($\phi$)', $
-                                  'grid', 'k', $
-                                  'fft_direction', -1)
-  gc.image[key].data.filebase = gc.image[key].data.name+'-fwdFT'
-  gc.image[key].keywords = dictionary('rgb_table', 39, $
-                                      'layout', layout, $
-                                      'position', position, $
-                                      'axis_style', axis_style, $
-                                      'font_name', font_name, $
-                                      'font_size', font_size)
+  ;; ;;==Forward FFT of electrostatic potential
+  ;; key = 'FFT Potential'
+  ;; gc.image[key] = dictionary()
+  ;; gc.image[key].data = dictionary('name','phi', $
+  ;;                                 'symbol', 'FFT($\phi$)', $
+  ;;                                 'grid', 'k', $
+  ;;                                 'fft_direction', -1)
+  ;; gc.image[key].data.filebase = gc.image[key].data.name+'-fwdFT'
+  ;; gc.image[key].keywords = dictionary('rgb_table', 39, $
+  ;;                                     'layout', layout, $
+  ;;                                     'position', position, $
+  ;;                                     'axis_style', axis_style, $
+  ;;                                     'font_name', font_name, $
+  ;;                                     'font_size', font_size)
 
   ;;==RMS Electric field
   key = 'RMS E field'
@@ -145,7 +134,7 @@ function create_graphics_context, path=path
                                   'symbol', '<|E|>', $
                                   'grid', 'r', $
                                   'gradient', 1, $
-                                  'scale', -1.0, $
+                                  'gradient_scale', -1.0, $
                                   'rms', 1)
   gc.image[key].data.filebase = 'E-rms'
   gc.image[key].keywords = dictionary('rgb_table', 5, $
@@ -171,20 +160,20 @@ function create_graphics_context, path=path
                                       'font_name', font_name, $
                                       'font_size', font_size)
 
-  ;;==EPPIC FT ion density
-  key = 'FFT Ion density'
-  gc.image[key] = dictionary()
-  gc.image[key].data = dictionary('name','denft1', $
-                                  'grid', 'k', $
-                                  'symbol', 'FFT($\delta$ n/$n_0$)', $
-                                  'rotate_direction', 2)
-  gc.image[key].data.filebase = gc.image[key].data.name
-  gc.image[key].keywords = dictionary('rgb_table', 39, $
-                                      'layout', layout, $
-                                      'position', position, $
-                                      'axis_style', axis_style, $
-                                      'font_name', font_name, $
-                                      'font_size', font_size)
+  ;; ;;==EPPIC FT ion density
+  ;; key = 'FFT Ion density'
+  ;; gc.image[key] = dictionary()
+  ;; gc.image[key].data = dictionary('name','denft1', $
+  ;;                                 'grid', 'k', $
+  ;;                                 'symbol', 'FFT($\delta$ n/$n_0$)', $
+  ;;                                 'rotate_direction', 2)
+  ;; gc.image[key].data.filebase = gc.image[key].data.name
+  ;; gc.image[key].keywords = dictionary('rgb_table', 39, $
+  ;;                                     'layout', layout, $
+  ;;                                     'position', position, $
+  ;;                                     'axis_style', axis_style, $
+  ;;                                     'font_name', font_name, $
+  ;;                                     'font_size', font_size)
 
 
   return, gc
