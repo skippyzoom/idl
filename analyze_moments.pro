@@ -276,7 +276,18 @@ function analyze_moments, path=path
         Cs = sqrt(kb*(T0+T1)/md1)
      endelse                    ;pure PIC
 
-     dist0 = {data:moments0, $
+     dist0 = {vx_m1:reform(moments0[1,*]), $
+              vx_m2:reform(moments0[2,*]), $
+              vx_m3:reform(moments0[3,*]), $
+              vx_m4:reform(moments0[4,*]), $
+              vy_m1:reform(moments0[5,*]), $
+              vy_m2:reform(moments0[6,*]), $
+              vy_m3:reform(moments0[7,*]), $
+              vy_m4:reform(moments0[8,*]), $
+              vz_m1:reform(moments0[9,*]), $
+              vz_m2:reform(moments0[10,*]), $
+              vz_m3:reform(moments0[11,*]), $
+              vz_m4:reform(moments0[12,*]), $
               wc:wc0, $
               mu_start:mu0_start, $
               ped_start:ped0_start, $
@@ -297,7 +308,18 @@ function analyze_moments, path=path
               Ty:Ty0, $
               Tz:Tz0, $
               T:T0}
-     dist1 = {data:moments1, $
+     dist1 = {vx_m1:reform(moments1[1,*]), $
+              vx_m2:reform(moments1[2,*]), $
+              vx_m3:reform(moments1[3,*]), $
+              vx_m4:reform(moments1[4,*]), $
+              vy_m1:reform(moments1[5,*]), $
+              vy_m2:reform(moments1[6,*]), $
+              vy_m3:reform(moments1[7,*]), $
+              vy_m4:reform(moments1[8,*]), $
+              vz_m1:reform(moments1[9,*]), $
+              vz_m2:reform(moments1[10,*]), $
+              vz_m3:reform(moments1[11,*]), $
+              vz_m4:reform(moments1[12,*]), $
               wc:wc1, $
               mu_start:mu1_start, $
               ped_start:ped1_start, $

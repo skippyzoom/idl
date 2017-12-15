@@ -6,7 +6,8 @@ pro plot_moments, moments, $
                   params=params, $
                   path=path, $
                   font_name=font_name, $
-                  font_size=font_size
+                  font_size=font_size, $
+                  raw_moments=raw_moments
 
   ;;==Convert moments struct to dictionary
   if isa(moments,'struct') then m_dict = dictionary(moments,/extract)
@@ -32,8 +33,20 @@ pro plot_moments, moments, $
                                               'format', ['b-','b--'])
   variables['Pedersen drift speed'] = dictionary('name', ['v_ped','v_ped_start'], $
                                                  'format', ['b-','b--'])
-  variables['Hall drift speed'] = dictionary('name',['v_hall','v_hall_start'], $
+  variables['Hall drift speed'] = dictionary('name', ['v_hall','v_hall_start'], $
                                              'format', ['b-','b--'])
+  variables['Mean Velocity'] = dictionary('name', ['vx_m1','vy_m1','vz_m1'], $
+                                              'format', ['b-','r-','g-'])
+  if keyword_set(raw_moments) then begin
+     variables['Raw 1st moment'] = dictionary('name', ['vx_m1','vy_m1','vz_m1'], $
+                                              'format', ['b-','r-','g-'])
+     variables['Raw 2nd moment'] = dictionary('name', ['vx_m2','vy_m2','vz_m2'], $
+                                              'format', ['b-','r-','g-'])
+     variables['Raw 3rd moment'] = dictionary('name', ['vx_m3','vy_m3','vz_m3'], $
+                                              'format', ['b-','r-','g-'])
+     variables['Raw 4th moment'] = dictionary('name', ['vx_m4','vy_m4','vz_m4'], $
+                                              'format', ['b-','r-','g-'])
+  endif
   n_pages = variables.count()
   v_keys = variables.keys()
   
