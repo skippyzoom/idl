@@ -24,28 +24,39 @@ pro plot_moments, moments, $
 
   ;;==Declare which quantities to plot
   variables = hash()
-  variables['Collision frequency'] = dictionary('name', ['nu','nu_start'], $
-                                                'format', ['b-','b--'])
-  variables['Component temperature'] = dictionary('name', ['Tx','Ty','Tz', $
-                                                           'Tx_start','Ty_start','Tz_start'], $
-                                                  'format', ['b-','r-','g-','b--','r--','g--'])
-  variables['Total temperature'] = dictionary('name', ['T','T_start'], $
-                                              'format', ['b-','b--'])
-  variables['Pedersen drift speed'] = dictionary('name', ['v_ped','v_ped_start'], $
-                                                 'format', ['b-','b--'])
-  variables['Hall drift speed'] = dictionary('name', ['v_hall','v_hall_start'], $
-                                             'format', ['b-','b--'])
-  variables['Mean Velocity'] = dictionary('name', ['vx_m1','vy_m1','vz_m1'], $
-                                              'format', ['b-','r-','g-'])
+  variables['Collision frequency [$s^{-1}$]'] = dictionary('data', ['nu','nu_start'], $
+                                                           'name', ['$\nu_{sim}$','$\nu_{inp}$'], $
+                                                           'format', ['b-','b--'])
+  variables['Component temperature [$K$]'] = dictionary('data', ['Tx','Ty','Tz', $
+                                                                 'Tx_start','Ty_start','Tz_start'], $
+                                                        'name', ['$T_{x,sim}$','$T_{y,sim}$','$T_{z,sim}$', $
+                                                                 '$T_{x,inp}$','$T_{y,inp}$','$T_{z,inp}$'], $
+                                                        'format', ['b-','r-','g-','b--','r--','g--'])
+  variables['Total temperature [$K$]'] = dictionary('data', ['T','T_start'], $
+                                                    'name', ['$T_{sim}$','$T_{inp}$'], $
+                                                    'format', ['b-','b--'])
+  variables['Pedersen drift speed [$m/s$]'] = dictionary('data', ['v_ped','v_ped_start'], $
+                                                         'name', ['$V_{P,sim}$','$V_{P,inp}$'], $
+                                                         'format', ['b-','b--'])
+  variables['Hall drift speed [$m/s$]'] = dictionary('data', ['v_hall','v_hall_start'], $
+                                                     'name', ['$V_{H,sim}$','$V_{H,inp}$'], $
+                                                     'format', ['b-','b--'])
+  variables['Mean Velocity [$m/s$]'] = dictionary('data', ['vx_m1','vy_m1','vz_m1'], $
+                                                  'name', ['$<V_x>$','$<V_y>$','$<V_z>$'], $
+                                                  'format', ['b-','r-','g-'])
   if keyword_set(raw_moments) then begin
-     variables['Raw 1st moment'] = dictionary('name', ['vx_m1','vy_m1','vz_m1'], $
-                                              'format', ['b-','r-','g-'])
-     variables['Raw 2nd moment'] = dictionary('name', ['vx_m2','vy_m2','vz_m2'], $
-                                              'format', ['b-','r-','g-'])
-     variables['Raw 3rd moment'] = dictionary('name', ['vx_m3','vy_m3','vz_m3'], $
-                                              'format', ['b-','r-','g-'])
-     variables['Raw 4th moment'] = dictionary('name', ['vx_m4','vy_m4','vz_m4'], $
-                                              'format', ['b-','r-','g-'])
+     variables['Raw 1st moment [$m/s$]'] = dictionary('data', ['vx_m1','vy_m1','vz_m1'], $
+                                                      'name', ['$<V_x>$','$<V_y>$','$<V_z>$'], $
+                                                      'format', ['b-','r-','g-'])
+     variables['Raw 2nd moment [$m^2/s^2$]'] = dictionary('data', ['vx_m2','vy_m2','vz_m2'], $
+                                                          'name', ['$<V_x^2>$','$<V_y^2>$','$<V_z^2>$'], $
+                                                          'format', ['b-','r-','g-'])
+     variables['Raw 3rd moment [$m^3/s^3$]'] = dictionary('data', ['vx_m3','vy_m3','vz_m3'], $
+                                                          'name', ['$<V_x^3>$','$<V_y^3>$','$<V_z^3>$'], $
+                                                          'format', ['b-','r-','g-'])
+     variables['Raw 4th moment [$m^4/s^4$]'] = dictionary('data', ['vx_m4','vy_m4','vz_m4'], $
+                                                          'name', ['$<V_x^4>$','$<V_y^4>$','$<V_z^4>$'], $
+                                                          'format', ['b-','r-','g-'])
   endif
   n_pages = variables.count()
   v_keys = variables.keys()
@@ -64,16 +75,16 @@ pro plot_moments, moments, $
 
         ;;==Get the current variables list
         ivar = variables[v_keys[ip]]
-        n_var = n_elements(ivar.name)
+        n_var = n_elements(ivar.data)
 
         if n_var ne 0 then begin
 
            ;;==Calculate the global min and max values
-           idata = reform(idist[ivar.name[0]])
+           idata = reform(idist[ivar.data[0]])
            ymin = min(idata[nt/4:*])
            ymax = max(idata[nt/4:*])
            for iv=1,n_var-1 do begin
-              idata = reform(idist[ivar.name[iv]])
+              idata = reform(idist[ivar.data[iv]])
               if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
               ymin = min([ymin,min(idata[nt/4:*])])
               ymax = max([ymax,max(idata[nt/4:*])])
@@ -84,7 +95,7 @@ pro plot_moments, moments, $
            ymax *= pad
 
            ;;==Create distribution-specific plots
-           idata = reform(idist[ivar.name[0]])
+           idata = reform(idist[ivar.data[0]])
            if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
            plt[ip] = plot(tvec,idata, $
                           ivar.format[0], $
@@ -97,7 +108,7 @@ pro plot_moments, moments, $
                           name = ivar.name[0])
            if n_var gt 1 then opl = objarr(n_var-1)
            for iv=1,n_var-1 do begin
-              idata = reform(idist[ivar.name[iv]])
+              idata = reform(idist[ivar.data[iv]])
               if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
               opl[iv-1] = plot(tvec,idata, $
                                ivar.format[iv], $
@@ -119,10 +130,12 @@ pro plot_moments, moments, $
 
   ;;==Create common-quantity plots
   variables = hash()
-  variables['Psi factor'] = dictionary('name', ['Psi','Psi_start'], $
+  variables['Psi factor'] = dictionary('data', ['Psi','Psi_start'], $
+                                       'name', ['$\Psi_{0,sim}$','$\Psi_{0,inp}$'], $
                                        'format', ['b-','b--'])
-  variables['Sound speed'] = dictionary('name', ['Cs','Cs_start'], $
-                                       'format', ['b-','b--'])
+  variables['Sound speed'] = dictionary('data', ['Cs','Cs_start'], $
+                                        'name', ['$C_{s,sim}$','$C_{s,inp}$'], $
+                                        'format', ['b-','b--'])
   n_pages = variables.count()
   v_keys = variables.keys()
 
@@ -134,16 +147,16 @@ pro plot_moments, moments, $
 
      ;;==Get the current variables list
      ivar = variables[v_keys[ip]]
-     n_var = n_elements(ivar.name)
+     n_var = n_elements(ivar.data)
 
      if n_var ne 0 then begin
 
         ;;==Calculate the global min and max values
-        idata = reform(m_dict[ivar.name[0]])
+        idata = reform(m_dict[ivar.data[0]])
         ymin = min(idata[nt/4:*])
         ymax = max(idata[nt/4:*])
         for iv=1,n_var-1 do begin
-           idata = reform(m_dict[ivar.name[iv]])
+           idata = reform(m_dict[ivar.data[iv]])
            if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
            ymin = min([ymin,min(idata[nt/4:*])])
            ymax = max([ymax,max(idata[nt/4:*])])
@@ -154,7 +167,7 @@ pro plot_moments, moments, $
         ymax *= pad
 
         ;;==Create distribution-specific plots
-        idata = reform(m_dict[ivar.name[0]])
+        idata = reform(m_dict[ivar.data[0]])
         if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
         plt[ip] = plot(tvec,idata, $
                        ivar.format[0], $
@@ -167,7 +180,7 @@ pro plot_moments, moments, $
                        name = ivar.name[0])
         if n_var gt 1 then opl = objarr(n_var-1)
         for iv=1,n_var-1 do begin
-           idata = reform(m_dict[ivar.name[iv]])
+           idata = reform(m_dict[ivar.data[iv]])
            if n_elements(idata) eq 1 then idata = idata[0] + 0.0*tvec
            opl[iv-1] = plot(tvec,idata, $
                             ivar.format[iv], $
