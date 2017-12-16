@@ -24,26 +24,6 @@ pro plot_moments, moments, $
 
   ;;==Declare which quantities to plot
   variables = hash()
-  variables['Collision frequency [$s^{-1}$]'] = dictionary('data', ['nu','nu_start'], $
-                                                           'name', ['$\nu_{sim}$','$\nu_{inp}$'], $
-                                                           'format', ['b-','b--'])
-  variables['Component temperature [$K$]'] = dictionary('data', ['Tx','Ty','Tz', $
-                                                                 'Tx_start','Ty_start','Tz_start'], $
-                                                        'name', ['$T_{x,sim}$','$T_{y,sim}$','$T_{z,sim}$', $
-                                                                 '$T_{x,inp}$','$T_{y,inp}$','$T_{z,inp}$'], $
-                                                        'format', ['b-','r-','g-','b--','r--','g--'])
-  variables['Total temperature [$K$]'] = dictionary('data', ['T','T_start'], $
-                                                    'name', ['$T_{sim}$','$T_{inp}$'], $
-                                                    'format', ['b-','b--'])
-  variables['Pedersen drift speed [$m/s$]'] = dictionary('data', ['v_ped','v_ped_start'], $
-                                                         'name', ['$V_{P,sim}$','$V_{P,inp}$'], $
-                                                         'format', ['b-','b--'])
-  variables['Hall drift speed [$m/s$]'] = dictionary('data', ['v_hall','v_hall_start'], $
-                                                     'name', ['$V_{H,sim}$','$V_{H,inp}$'], $
-                                                     'format', ['b-','b--'])
-  variables['Mean Velocity [$m/s$]'] = dictionary('data', ['vx_m1','vy_m1','vz_m1'], $
-                                                  'name', ['$<V_x>$','$<V_y>$','$<V_z>$'], $
-                                                  'format', ['b-','r-','g-'])
   if keyword_set(raw_moments) then begin
      variables['Raw 1st moment [$m/s$]'] = dictionary('data', ['vx_m1','vy_m1','vz_m1'], $
                                                       'name', ['$<V_x>$','$<V_y>$','$<V_z>$'], $
@@ -57,7 +37,29 @@ pro plot_moments, moments, $
      variables['Raw 4th moment [$m^4/s^4$]'] = dictionary('data', ['vx_m4','vy_m4','vz_m4'], $
                                                           'name', ['$<V_x^4>$','$<V_y^4>$','$<V_z^4>$'], $
                                                           'format', ['b-','r-','g-'])
-  endif
+  endif $
+  else begin
+     variables['Collision frequency [$s^{-1}$]'] = dictionary('data', ['nu','nu_start'], $
+                                                              'name', ['$\nu_{sim}$','$\nu_{inp}$'], $
+                                                              'format', ['b-','b--'])
+     variables['Component temperature [$K$]'] = dictionary('data', ['Tx','Ty','Tz', $
+                                                                    'Tx_start','Ty_start','Tz_start'], $
+                                                           'name', ['$T_{x,sim}$','$T_{y,sim}$','$T_{z,sim}$', $
+                                                                    '$T_{x,inp}$','$T_{y,inp}$','$T_{z,inp}$'], $
+                                                           'format', ['b-','r-','g-','b--','r--','g--'])
+     variables['Total temperature [$K$]'] = dictionary('data', ['T','T_start'], $
+                                                       'name', ['$T_{sim}$','$T_{inp}$'], $
+                                                       'format', ['b-','b--'])
+     variables['Pedersen drift speed [$m/s$]'] = dictionary('data', ['v_ped','v_ped_start'], $
+                                                            'name', ['$V_{P,sim}$','$V_{P,inp}$'], $
+                                                            'format', ['b-','b--'])
+     variables['Hall drift speed [$m/s$]'] = dictionary('data', ['v_hall','v_hall_start'], $
+                                                        'name', ['$V_{H,sim}$','$V_{H,inp}$'], $
+                                                        'format', ['b-','b--'])
+     variables['Mean Velocity [$m/s$]'] = dictionary('data', ['vx_m1','vy_m1','vz_m1'], $
+                                                     'name', ['$<V_x>$','$<V_y>$','$<V_z>$'], $
+                                                     'format', ['b-','r-','g-'])
+  endelse
   n_pages = variables.count()
   v_keys = variables.keys()
   
@@ -123,7 +125,12 @@ pro plot_moments, moments, $
      endfor
 
      ;;==Save
-     image_save, plt,filename=path+path_sep()+dist_keys[id]+'_moments.pdf'
+     if keyword_set(raw_moments) then $
+        filename = path+path_sep()+dist_keys[id]+'-raw_moments.pdf' $
+     else $
+        filename = path+path_sep()+dist_keys[id]+'-moments.pdf'
+
+     image_save, plt,filename=filename
      plt = !NULL
 
   endfor
