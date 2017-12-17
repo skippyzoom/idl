@@ -73,7 +73,8 @@ pro project_graphics, context,filepath=filepath
            n_planes = n_elements(planes)
 
            ;;==Calculate forward/inverse FFT, if requested
-           if keyword_set(context.image[imgkeys[id]].data.fft_direction) then begin
+           if context.image[imgkeys[id]].data.haskey('fft_direction') && $
+              context.image[imgkeys[id]].data.fft_direction ne 0 then begin
               for it=0,nt-1 do begin
                  data[*,*,*,it] = real_part(fft(data[*,*,*,it], $
                                                 context.image[imgkeys[id]].data.fft_direction, $
@@ -90,31 +91,79 @@ pro project_graphics, context,filepath=filepath
                     imgdata = data[xrng[0]:xrng[1],yrng[0]:yrng[1],zctr,*]
                     xdata = xvec[xrng[0]:xrng[1]]
                     ydata = yvec[yrng[0]:yrng[1]]
+                    grad_dx = grid.dx
+                    grad_dy = grid.dy
+                    if context.image[imgkeys[id]].data.haskey('gradient_f0') then begin
+                       if n_elements(context.image[imgkeys[id]].data.gradient_f0) eq 1 then $
+                          grad_f0 = [context.image[imgkeys[id]].data.gradient_f0, $
+                                     context.image[imgkeys[id]].data.gradient_f0] $
+                       else $
+                          grad_f0 = [context.image[imgkeys[id]].data.gradient_f0[0], $
+                                     context.image[imgkeys[id]].data.gradient_f0[1]]
+                    endif else grad_f0 = [0.0,0.0]
                  end
                  strcmp(planes[ip],'xz'): begin
                     imgdata = data[xrng[0]:xrng[1],yctr,zrng[0]:zrng[1],*]
                     xdata = xvec[xrng[0]:xrng[1]]
                     ydata = zvec[zrng[0]:zrng[1]]
+                    grad_dx = grid.dx
+                    grad_dy = grid.dz
+                    if context.image[imgkeys[id]].data.haskey('gradient_f0') then begin
+                       if n_elements(context.image[imgkeys[id]].data.gradient_f0) eq 1 then $
+                          grad_f0 = [context.image[imgkeys[id]].data.gradient_f0, $
+                                     context.image[imgkeys[id]].data.gradient_f0] $
+                       else $
+                          grad_f0 = [context.image[imgkeys[id]].data.gradient_f0[0], $
+                                     context.image[imgkeys[id]].data.gradient_f0[2]]
+                    endif else grad_f0 = [0.0,0.0]
                  end
                  strcmp(planes[ip],'yz'): begin
                     imgdata = data[xctr,yrng[0]:yrng[1],zrng[0]:zrng[1],*]
                     xdata = yvec[yrng[0]:yrng[1]]
                     ydata = zvec[zrng[0]:zrng[1]]
+                    grad_dx = grid.dy
+                    grad_dy = grid.dz
+                    if context.image[imgkeys[id]].data.haskey('gradient_f0') then begin
+                       if n_elements(context.image[imgkeys[id]].data.gradient_f0) eq 1 then $
+                          grad_f0 = [context.image[imgkeys[id]].data.gradient_f0, $
+                                     context.image[imgkeys[id]].data.gradient_f0] $
+                       else $
+                          grad_f0 = [context.image[imgkeys[id]].data.gradient_f0[1], $
+                                     context.image[imgkeys[id]].data.gradient_f0[2]]
+                    endif else grad_f0 = [0.0,0.0]
                  end
                  else: message, "Did not recognize plane ("+plane[ip]+")"
               endcase
               imgdata = reform(imgdata)
 
               ;;==Calculate gradient, if requested
-              if keyword_set(context.image[imgkeys[id]].data.gradient) then begin
+              if context.image[imgkeys[id]].data.haskey('gradient_scale') then begin
+                 for it=0,nt-1 do begin
+                    imgdata[*,*,it] = smooth(imgdata[*,*,it],[1.0/grad_dx,1.0/grad_dy],/edge_wrap) ;DEV
+                    gradf = gradient(imgdata[*,*,it],dx=grad_dx[*],dy=grad_dy[*])
+                    gradf.x *= context.image[imgkeys[id]].data.gradient_scale
+                    gradf.y *= context.image[imgkeys[id]].data.gradient_scale
+                    gradf.x += grad_f0[0]
+                    gradf.y += grad_f0[1]
+                    if context.image[imgkeys[id]].data.haskey('gradient_image') then begin
+                       if strcmp(context.image[imgkeys[id]].data.gradient_image,'magnitude') then $
+                          imgdata[*,*,it] = sqrt(gradf.x^2 + gradf.y^2)
+                    endif
+                 endfor
               endif
+
+              ;;==Smooth data, if requested
 
               ;;==Create image
               if context.image[imgkeys[id]].data.haskey('scale') then $
                  imgdata *= context.image[imgkeys[id]].data.scale
               if strcmp(context.colorbar.keywords.type, 'global') then begin
                  context.image[imgkeys[id]].keywords.max_value = max(abs(imgdata))
-                 context.image[imgkeys[id]].keywords.min_value = -max(abs(imgdata))
+                 if context.image[imgkeys[id]].data.haskey('rms') && $
+                    context.image[imgkeys[id]].data.rms eq 1 then $
+                       context.image[imgkeys[id]].keywords.min_value = 0 $
+                 else $
+                    context.image[imgkeys[id]].keywords.min_value = -max(abs(imgdata))
               endif
               imgkw = context.image[imgkeys[id]].keywords.tostruct()
               img = multi_image(imgdata,xdata,ydata,_EXTRA=imgkw)
@@ -122,19 +171,15 @@ pro project_graphics, context,filepath=filepath
               ;;==Add a colorbar
               if context.colorbar.keywords.haskey('type') then begin
                  type = context.colorbar.keywords.type
-                 ;; context.colorbar.keywords.remove, 'type'
               endif else type = 'none'
               if context.colorbar.keywords.haskey('width') then begin
                  width = context.colorbar.keywords.width
-                 ;; context.colorbar.keywords.remove, 'width'
               endif
               if context.colorbar.keywords.haskey('height') then begin
                  height = context.colorbar.keywords.height
-                 ;; context.colorbar.keywords.remove, 'height'
               endif
               if context.colorbar.keywords.haskey('buffer') then begin
                  buffer = context.colorbar.keywords.buffer
-                 ;; context.colorbar.keywords.remove, 'buffer'
               endif
               if context.image[imgkeys[id]].data.haskey('symbol') then $
                  title = context.image[imgkeys[id]].data.symbol $
@@ -163,6 +208,8 @@ pro project_graphics, context,filepath=filepath
 
               ;;==Save the image
               image_save, img,filename=filepath+path_sep()+filename
+
+              ;;==Create movie
 
            endfor ;;-->n_planes
 

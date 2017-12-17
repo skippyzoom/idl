@@ -47,7 +47,8 @@ function create_graphics_context, path=path
   gc[key].ext = 'pdf'
   gc[key].path = path
   nt = layout[0]*layout[1]
-  gc[key].timestep = params.nout*(nt_max/(nt-1))*lindgen(nt)
+  ;; gc[key].timestep = params.nout*(nt_max/(nt-1))*lindgen(nt)
+  gc[key].timestep = params.nout*[nt_max/4,nt_max/2,3*nt_max/4,nt_max-1]
 
   ;;==Store info about image dimesions, etc.
   ;;  r is for coordinate space
@@ -133,32 +134,35 @@ function create_graphics_context, path=path
                                   'units', '[mV/m]', $
                                   'symbol', '<|E|>', $
                                   'grid', 'r', $
-                                  'gradient', 1, $
+                                  'gradient_f0', [params.Ex0_external, $
+                                                  params.Ey0_external, $
+                                                  params.Ez0_external], $
                                   'gradient_scale', -1.0, $
+                                  'gradient_image', 'magnitude', $
                                   'rms', 1)
   gc.image[key].data.filebase = 'E-rms'
-  gc.image[key].keywords = dictionary('rgb_table', 5, $
+  gc.image[key].keywords = dictionary('rgb_table', 3, $
                                       'layout', layout, $
                                       'position', position, $
                                       'axis_style', axis_style, $
                                       'font_name', font_name, $
                                       'font_size', font_size)
 
-  ;;==Ion density
-  key = 'Ion density'
-  gc.image[key] = dictionary()
-  gc.image[key].data = dictionary('name', 'den1', $
-                                  'scale', 1e2, $
-                                  'units', '[%]', $
-                                  'symbol', '$\delta$ n/$n_0$', $
-                                  'grid', 'r')
-  gc.image[key].data.filebase = gc.image[key].data.name
-  gc.image[key].keywords = dictionary('rgb_table', 5, $
-                                      'layout', layout, $
-                                      'position', position, $
-                                      'axis_style', axis_style, $
-                                      'font_name', font_name, $
-                                      'font_size', font_size)
+  ;; ;;==Ion density
+  ;; key = 'Ion density'
+  ;; gc.image[key] = dictionary()
+  ;; gc.image[key].data = dictionary('name', 'den1', $
+  ;;                                 'scale', 1e2, $
+  ;;                                 'units', '[%]', $
+  ;;                                 'symbol', '$\delta$ n/$n_0$', $
+  ;;                                 'grid', 'r')
+  ;; gc.image[key].data.filebase = gc.image[key].data.name
+  ;; gc.image[key].keywords = dictionary('rgb_table', 5, $
+  ;;                                     'layout', layout, $
+  ;;                                     'position', position, $
+  ;;                                     'axis_style', axis_style, $
+  ;;                                     'font_name', font_name, $
+  ;;                                     'font_size', font_size)
 
   ;; ;;==EPPIC FT ion density
   ;; key = 'FFT Ion density'

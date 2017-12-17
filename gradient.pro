@@ -32,16 +32,15 @@ function gradient, f, $
            dz = dx
            print, "[GRADIENT] Set dz = dx = ",strcompress(dx,/remove_all)
         endif
-        dx = [dx,dy,dz]
+        dq = [dx,dy,dz]
         use_xyz = 1B
      end
      else: begin
         if n_elements(dx) ne fsize[0] then begin
-           dx_in = dx
-           dx = fltarr(size(f,/n_dim))
-           dx[0:n_elements(dx_in)-1] = dx_in
-           dx[n_elements(dx_in):*] = 1.0
-           print, "[GRADIENT] Set remaining entries of dx to 1.0"
+           dq = fltarr(size(f,/n_dim))
+           dq[0:n_elements(dx)-1] = dx
+           dq[n_elements(dx):*] = 1.0
+           print, "[GRADIENT] Set remaining entries of dq to 1.0"
         endif
      end
   endcase
@@ -51,7 +50,7 @@ function gradient, f, $
   
   ;;==Set up coordinate keys
   if use_xyz then coord = ['x','y','z'] $
-  else coord  = 'x'+strcompress(1+indgen(n_elements(dx)),/remove_all)
+  else coord  = 'x'+strcompress(1+indgen(n_elements(dq)),/remove_all)
 
   ;;==Set up the shift vectors
   svec = make_array([2,size(f,/n_dim)],type=size(f,/type),value=0)
@@ -60,7 +59,7 @@ function gradient, f, $
 
   ;;==Calculate the gradient
   for id=0,size(f,/n_dim)-1 do begin
-     gradf[coord[id]] = (shift(f,svec[0,*])-shift(f,svec[1,*]))/(2*dx[id])
+     gradf[coord[id]] = (shift(f,svec[0,*])-shift(f,svec[1,*]))/(2*dq[id])
      svec[0,*] = shift(svec[0,*],1)
      svec[1,*] = shift(svec[1,*],1)
   endfor
