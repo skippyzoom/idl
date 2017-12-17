@@ -1,20 +1,69 @@
 ;+
-; Returns a struct representing the gradient of a function, f.
+; Returns a dictionary representing the gradient of a function, f.
+; Each member field contains one component of Grad[f].
+;
+; DX, DY, DZ: The user may supply a single value for each differential
+; or may supply dx as a vector of differentials. If f has more than
+; 3 dimensions, dx must be a vector. This approach provides consistency
+; with other gradient functions, which only allow the user to supply 
+; scalar differential values, while providing an interface that can
+; handle arrays as large as the maximum allowed by IDL. If the user
+; supplies separate values for each, this function will return a 
+; dictionary with keys (x,y[,z]); if the user supplies a vector of
+; differentials, this function will return a dictionary with keys
+; [x1,x2,...,xN].
 ;-
-function gradient, f
+function gradient, f, $
+                   dx=dx,dy=dy,dz=dz
 
-  ;; gradf = make_array([size(f,/dim),size(f,/n_dim)],type=size(f,/type),value=0)
+  ;;==Get size of input array
+  fsize = size(f)
+
+  ;;==Defaults and gaurds
+  use_xyz = 0B
+  case n_elements(dx) of 
+     0: dx = make_array(size(f,/n_dim),value = 1.0)
+     1: begin
+        if n_elements(dy) eq 0 then begin
+           dy = dx
+           print, "[GRADIENT] Set dy = dx = ",strcompress(dx,/remove_all)
+        endif
+        if n_elements(dz) eq 0 then begin
+           dz = dx
+           print, "[GRADIENT] Set dz = dx = ",strcompress(dx,/remove_all)
+        endif
+        dx = [dx,dy,dz]
+        use_xyz = 1B
+     end
+     else: begin
+        if n_elements(dx) ne fsize[0] then begin
+           dx_in = dx
+           dx = fltarr(size(f,/n_dim))
+           dx[0:n_elements(dx_in)-1] = dx_in
+           dx[n_elements(dx_in):*] = 1.0
+           print, "[GRADIENT] Set remaining entries of dx to 1.0"
+        endif
+     end
+  endcase
+
+  ;;==Create a dictionary
   gradf = dictionary()
-  ;; switch size(f,/n_dim) of
-  ;;    8: 
-  ;;    7:
-  ;;    6: gradf.
-  ;;    5: gradf.v
-  ;;    4: gradf.u
-  ;;    3: gradf.z
-  ;;    2: gradf.y
-  ;;    1: gradf.x
-  ;; endswitch
+  
+  ;;==Set up coordinate keys
+  if use_xyz then coord = ['x','y','z'] $
+  else coord  = 'x'+strcompress(1+indgen(n_elements(dx)),/remove_all)
+
+  ;;==Set up the shift vectors
+  svec = make_array([2,size(f,/n_dim)],type=size(f,/type),value=0)
+  svec[0,0] = -1.0
+  svec[1,0] = +1.0
+
+  ;;==Calculate the gradient
+  for id=0,size(f,/n_dim)-1 do begin
+     gradf[coord[id]] = (shift(f,svec[0,*])-shift(f,svec[1,*]))/(2*dx[id])
+     svec[0,*] = shift(svec[0,*],1)
+     svec[1,*] = shift(svec[1,*],1)
+  endfor
 
   return, gradf
 end
