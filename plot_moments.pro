@@ -126,9 +126,9 @@ pro plot_moments, moments, $
 
      ;;==Save
      if keyword_set(raw_moments) then $
-        filename = path+path_sep()+dist_keys[id]+'-raw_moments.pdf' $
+        filename = path+path_sep()+dist_keys[id]+'_raw_moments.pdf' $
      else $
-        filename = path+path_sep()+dist_keys[id]+'-moments.pdf'
+        filename = path+path_sep()+dist_keys[id]+'_moments.pdf'
 
      image_save, plt,filename=filename
      plt = !NULL
