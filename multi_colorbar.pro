@@ -33,7 +33,7 @@ function multi_colorbar, img,type,width=width,height=height,buffer=buffer,_EXTRA
         d_ex.position = position
 
         ;;==Calculate tickmark values and labels
-        if ~d_ex.haskey('major') then major = 5
+        if ~d_ex.haskey('major') then d_ex.major = 5
         tickvalues = img[np-1].min_value[0] + $
                      (img[np-1].max_value[0]-img[np-1].min_value[0])* $
                      findgen(d_ex.major)/(d_ex.major-1)
