@@ -1,30 +1,4 @@
-<<<<<<< HEAD
-;+
-; Routine for producing single- or multi-panel 
-; images of EPPIC spatial data from a project 
-; dictionary or data array.
-;
-; NOTES
-; -- This function should remain independent of any project dictionary.
-;
-; TO DO
-; -- Check for consistency between panel_layout and panel_index.
-;-
-function multi_image, imgdata,xdata,ydata, $
-                      panel_index=panel_index, $
-                      panel_layout=panel_layout, $
-                      rgb_table=rgb_table, $
-                      min_value=min_value, $
-                      max_value=max_value, $
-                      xtitle=xtitle, $
-                      ytitle=ytitle, $
-                      xshow=xshow, $
-                      yshow=yshow, $
-                      xrange=xrange, $
-                      yrange=yrange
-=======
 function multi_image, imgdata,xdata,ydata,_EXTRA=ex
->>>>>>> new_pipeline
 
   ;;==Make sure image data exists
   if n_elements(imgdata) eq 0 then begin
