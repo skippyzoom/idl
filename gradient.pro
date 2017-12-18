@@ -14,7 +14,8 @@
 ; [x1,x2,...,xN].
 ;-
 function gradient, f, $
-                   dx=dx,dy=dy,dz=dz
+                   dx=dx,dy=dy,dz=dz, $
+                   verbose=verbose
 
   ;;==Get size of input array
   fsize = size(f)
@@ -26,11 +27,13 @@ function gradient, f, $
      1: begin
         if n_elements(dy) eq 0 then begin
            dy = dx
-           print, "[GRADIENT] Set dy = dx = ",strcompress(dx,/remove_all)
+           if keyword_set(verbose) then $
+              print, "[GRADIENT] Set dy = dx = ",strcompress(dx,/remove_all)
         endif
         if n_elements(dz) eq 0 then begin
            dz = dx
-           print, "[GRADIENT] Set dz = dx = ",strcompress(dx,/remove_all)
+           if keyword_set(verbose) then $
+              print, "[GRADIENT] Set dz = dx = ",strcompress(dx,/remove_all)
         endif
         dq = [dx,dy,dz]
         use_xyz = 1B
@@ -40,7 +43,8 @@ function gradient, f, $
            dq = fltarr(size(f,/n_dim))
            dq[0:n_elements(dx)-1] = dx
            dq[n_elements(dx):*] = 1.0
-           print, "[GRADIENT] Set remaining entries of dq to 1.0"
+           if keyword_set(verbose) then $
+              print, "[GRADIENT] Set remaining entries of dq to 1.0"
         endif
      end
   endcase
