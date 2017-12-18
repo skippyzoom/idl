@@ -36,7 +36,7 @@ pro eppic_basic, path, $
   ;;==Make sure the graphics directory exists
   if n_elements(directory) eq 0 then directory = './'
   spawn, 'mkdir -p '+directory
-  filepath = path+path_sep()+directory
+  filepath = expand_path(path+path_sep()+directory)
 
   ;;==Read in simulation parameters
   params = set_eppic_params(path=path)
