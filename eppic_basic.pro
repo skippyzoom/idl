@@ -11,7 +11,7 @@ pro eppic_basic, path, $
                  directory=directory, $
                  moments=moments, $
                  phi=phi, $
-                 den=den, $
+                 dens=den, $
                  denft=denft, $
                  all=all
 
@@ -19,7 +19,7 @@ pro eppic_basic, path, $
   if keyword_set(all) then begin
      moments = 1B
      phi = 1B
-     den = 1B
+     dens = 1B
      denft = 1B
   endif
 
