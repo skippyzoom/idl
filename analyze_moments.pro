@@ -89,6 +89,7 @@ function analyze_moments, path=path
            vypd1 = moments1[5,*]
            vzpd1 = moments1[9,*]
            Eyp = Ey0
+           Ezp = Ez0
         end
         (B0 eq By0): begin
            vxpd0 = moments0[1,*]
@@ -98,6 +99,7 @@ function analyze_moments, path=path
            vypd1 = -moments1[9,*]
            vzpd1 = moments1[5,*]
            Eyp = -Ez0
+           Ezp = By0
         end
         (B0 eq Bx0): begin
            vxpd0 = -moments0[9,*]
@@ -107,6 +109,7 @@ function analyze_moments, path=path
            vypd1 = moments1[5,*]
            vzpd1 = moments1[1,*]
            Eyp = Ey0
+           Ezp = Ex0
         end
      endcase
                                 ;--------;
@@ -235,7 +238,8 @@ function analyze_moments, path=path
 
         ;;==Simulated values
         ;;--Collision frequencies and Psi
-        nu0 = wc0*vypd0/vxpd0               ;From Hall drift
+        ;; nu0 = wc0*vypd0/vxpd0               ;From Hall drift
+        nu0 = (Ezp/vzpd0)*(qd0/md0)         ;From parallel drift
         nu1 = (Eyp/vypd1)*(qd1/md1)         ;From Ped drift
         ;; nu0 = 0.5*qd0*Eyp/(md0*vypd0)*(1 + sqrt(1-(2*md0*vypd0*wc0/(qd0*Eyp))^2))
         ;; nu1 = 0.5*qd1*Eyp/(md1*vypd1)*(1 + sqrt(1-(2*md1*vypd1*wc1/(qd1*Eyp))^2))
