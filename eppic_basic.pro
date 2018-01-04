@@ -7,7 +7,7 @@
 ;
 ; Created on 11Dec2017 (may)
 ;-
-pro eppic_basic, path, $
+pro eppic_basic, path=path, $
                  directory=directory, $
                  moments=moments, $
                  phi=phi, $
@@ -24,6 +24,7 @@ pro eppic_basic, path, $
   endif
 
   ;;==Navigate to working directory
+  if n_elements(path) eq 0 then path = './'
   cd, path
 
   ;;==Echo working directory
