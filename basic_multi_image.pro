@@ -67,9 +67,9 @@ pro basic_multi_image, data_name, $
      1: nx = data_size[1]
   endswitch
 
-  ;;==Check image dimensions
-  case n_dims-1 of
-     3: begin
+  ;;==Check data dimensions (space and time)
+  case n_dims of
+     4: begin
 
         ;;==Create a list of 2-D planes for 3-D data
         planes = origin.keys()
@@ -144,8 +144,11 @@ pro basic_multi_image, data_name, $
         endfor ;;-->Planes
 
      end
-     2: begin
+     3: begin
      end
+     else: print, "[BASIC_MULTI_IMAGE] Incorrect number of dimensions ("+ $
+                  strcompress(n_dims,/remove_all)+ $
+                  ", including time) to make an image."
   endcase ;;-->Dimensions
 
 end
