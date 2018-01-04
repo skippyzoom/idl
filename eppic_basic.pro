@@ -83,7 +83,7 @@ pro eppic_basic, path=path, $
   endif
 
   ;;==Densities
-  if keyword_set(den) then begin
+  if keyword_set(dens) then begin
      for id=0,params.ndist-1 do begin
         dist = strcompress(id,/remove_all)
         data['Density (dist '+dist+')'] = dictionary('name','den'+dist, $
