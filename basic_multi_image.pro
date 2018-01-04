@@ -145,10 +145,59 @@ pro basic_multi_image, data_name, $
 
      end
      3: begin
+
+        ;;==Remove singleton dimension
+        data = reform(data)
+
+        ;;==Calculate forward/inverse FFT, if requested
+        if keyword_set(fft_direction) then begin
+           for it=0,nt-1 do begin
+              data[*,*,it] = real_part(fft(data[*,*,it], $
+                                           fft_direction,/overwrite))
+           endfor
+        endif
+
+        ;;==Loop over time steps
+        for it=0,nt-1 do begin
+
+           ;;==Create image
+           img = image(rotate(data[*,*,it],rotate_direction), $
+                       /buffer, $
+                       layout = layout[*,it], $
+                       rgb_table = rgb_table, $
+                       current = (it gt 0), $
+                       axis_style = 2, $
+                       title = title[it], $
+                       font_size = font_size, $
+                       font_name = font_name)
+           if keyword_set(min_value) then img.min_value = min_value
+           if keyword_set(max_value) then img.max_value = max_value
+
+           ;;==Add a colorbar
+           clr = colorbar(target = img, $
+                          orientation = 1, $
+                          textpos = 1, $
+                          font_name = 'Times')
+           clr.scale, 0.25,0.50
+           clr.translate, -0.25,0.0,/normal
+
+           ;;==Add path label
+           txt = text(0.50,0.98,path, $
+                      alignment = 0.5, $
+                      target = img, $
+                      font_name = font_name, $
+                      font_size = font_size)
+
+        endfor ;;-->Time steps
+
+        ;;==Save the image
+        image_save, img,filename = filepath+path_sep()+filename
+
      end
      else: print, "[BASIC_MULTI_IMAGE] Incorrect number of dimensions ("+ $
                   strcompress(n_dims,/remove_all)+ $
                   ", including time) to make an image."
+
   endcase ;;-->Dimensions
 
 end
