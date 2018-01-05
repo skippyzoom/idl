@@ -8,21 +8,11 @@
 ;-
 pro eppic_full, path=path, $
                 directory=directory, $
-                moments=moments, $
-                phi=phi, $
-                emag=emag, $
-                den=den, $
-                denft=denft, $
-                all=all
+                target=target
 
   ;;==Defaults and guards
-  if keyword_set(all) then begin
-     moments = 1B
-     phi = 1B
-     emag = 1B
-     den = 1B
-     denft = 1B
-  endif
+  ;; if n_elements(target) eq 1 && strcmp(target,'all',3) then $
+  ;;    target = ['moments','emag','phi','den0','den1','denft0','denft1']
 
   ;;==Navigate to working directory
   if n_elements(path) eq 0 then path = './'
@@ -82,159 +72,44 @@ pro eppic_full, path=path, $
                             buffer = [0.00,0.10])
 
   ;;==Declare data ranges for spatial data
-  xrng = [0,grid.nx-1]
-  yrng = [0,grid.ny-1]
-  zrng = [0,grid.nz-1]
-  xctr = grid.nx/2
-  yctr = grid.ny/2
-  zctr = grid.nz/2
+  rngs = [[0,grid.nx-1], $
+            [grid.ny/2,grid.ny-1], $
+            [0,grid.nz-1]]
+  ctrs = [grid.nx/2,grid.ny/2,grid.nz/2]
+  vecs = {x:grid.x, y:grid.y, z:grid.z}
+  xyz = [1,0,2]
+
+  ;;==Pack info dictionary
+  info = dictionary()
+  info['xrng'] = rngs[*,xyz[0]]
+  info['yrng'] = rngs[*,xyz[1]]
+  info['zrng'] = rngs[*,xyz[2]]
+  info['xctr'] = ctrs[xyz[0]]
+  info['yctr'] = ctrs[xyz[1]]
+  info['zctr'] = ctrs[xyz[2]]
+  info['xvec'] = vecs.(xyz[0])
+  info['yvec'] = vecs.(xyz[1])
+  info['zvec'] = vecs.(xyz[2])
+  info['xyz'] = xyz
+  info['params'] = params
+  info['position'] = position
+  info['font_name'] = font_name
+  info['path'] = path
+  info['filepath'] = filepath
+  info['planes'] = planes
+  info['timestep'] = timestep
+
+  ;-->Ignore target for now. Make all images. (DEV)
 
   ;;==Create images of electrostatic potential
-  if keyword_set(phi) then begin
-     ct = get_custom_ct(1)
-     rgb_table = [[ct.r],[ct.g],[ct.b]]
-     if ~keyword_set(phi_exists) then begin
-        data_name = 'phi'
-        data = (load_eppic_data(data_name,path=path,timestep=timestep))[data_name]
-        phi_exists = 1B
-     endif
-     for ip=0,n_planes-1 do begin
-        case 1B of
-           strcmp(planes[ip],'xy'): begin
-              imgdata = data[xrng[0]:xrng[1],yrng[0]:yrng[1],zctr,*]
-              xdata = grid.x[xrng[0]:xrng[1]]
-              ydata = grid.y[yrng[0]:yrng[1]]
-              grad_dx = grid.dx
-              grad_dy = grid.dy
-           end
-           strcmp(planes[ip],'xz'): begin
-              imgdata = data[xrng[0]:xrng[1],yctr,zrng[0]:zrng[1],*]
-              xdata = grid.x[xrng[0]:xrng[1]]
-              ydata = grid.z[zrng[0]:zrng[1]]
-              grad_dx = grid.dx
-              grad_dy = grid.dz
-           end
-           strcmp(planes[ip],'yz'): begin
-              imgdata = data[xctr,yrng[0]:yrng[1],zrng[0]:zrng[1],*]
-              ydata = grid.y[yrng[0]:yrng[1]]
-              xdata = grid.z[zrng[0]:zrng[1]]
-              grad_dx = grid.dy
-              grad_dy = grid.dz
-           end
-        endcase
-        imgdata = reform(imgdata)
-        min_value = -max(abs(imgdata))
-        max_value = +max(abs(imgdata))
-        img = multi_image(imgdata,xdata,ydata, $
-                          position = position, $
-                          axis_style = axis_style, $
-                          rgb_table = rgb_table, $
-                          min_value = min_value, $
-                          max_value = max_value)
-        img = multi_colorbar(img,'global', $
-                             width = 0.0225, $
-                             height = 0.40, $
-                             buffer = 0.03, $
-                             orientation = 1, $
-                             textpos = 1, $
-                             tickdir = 1, $
-                             ticklen = 0.2, $
-                             major = 7, $
-                             font_name = font_name, $
-                             font_size = 8.0)
-        txt = text(0.00,0.05,path, $
-                   alignment = 0.0, $
-                   target = img, $
-                   font_name = font_name, $
-                   font_size = 5.0)
-        filename = data_name+'_'+planes[ip]+'.pdf'
-        image_save, img[0],filename=filepath+path_sep()+filename
-     endfor ;;n_planes
-  endif ;;phi
-
-  ;;==Create images of electric field
-  if keyword_set(emag) then begin
-     rgb_table = 3
-     if ~keyword_set(phi_exists) then begin
-        data_name = 'phi'
-        data = (load_eppic_data(data_name,path=path,timestep=timestep))[data_name]
-        phi_exists = 1B
-     endif
-     for ip=0,n_planes-1 do begin
-        case 1B of
-           strcmp(planes[ip],'xy'): begin
-              imgdata = data[xrng[0]:xrng[1],yrng[0]:yrng[1],zctr,*]
-              xdata = grid.x[xrng[0]:xrng[1]]
-              ydata = grid.y[yrng[0]:yrng[1]]
-              dx = grid.dx
-              dy = grid.dy
-              Ex0 = params.Ex0_external
-              Ey0 = params.Ey0_external
-           end
-           strcmp(planes[ip],'xz'): begin
-              imgdata = data[xrng[0]:xrng[1],yctr,zrng[0]:zrng[1],*]
-              xdata = grid.x[xrng[0]:xrng[1]]
-              ydata = grid.z[zrng[0]:zrng[1]]
-              dx = grid.dx
-              dy = grid.dz
-              Ex0 = params.Ex0_external
-              Ey0 = params.Ez0_external
-           end
-           strcmp(planes[ip],'yz'): begin
-              imgdata = data[xctr,yrng[0]:yrng[1],zrng[0]:zrng[1],*]
-              ydata = grid.y[yrng[0]:yrng[1]]
-              xdata = grid.z[zrng[0]:zrng[1]]
-              dx = grid.dy
-              dy = grid.dz
-              Ex0 = params.Ey0_external
-              Ey0 = params.Ez0_external
-           end
-        endcase
-        imgdata = reform(imgdata)
-        ;; imgdata = smooth(imgdata,[0.5/dx,0.5/dy,1],/edge_wrap)
-        efield = dictionary()
-        for it=0,nt-1 do begin
-           gradf = gradient(imgdata[*,*,it],dx=dx*params.nout_avg,dy=dy*params.nout_avg)
-           efield.x = -1.0*gradf.x + Ex0
-           efield.y = -1.0*gradf.y + Ey0
-           ;; efield.x = -1.0*gradf.x
-           ;; efield.y = -1.0*gradf.y
-           imgdata[*,*,it] = sqrt(efield.x^2 + efield.y^2)
-        endfor
-        min_value = 0
-        max_value = max(imgdata)
-        img = multi_image(imgdata,xdata,ydata, $
-                          position = position, $
-                          axis_style = axis_style, $
-                          rgb_table = rgb_table, $
-                          min_value = min_value, $
-                          max_value = max_value)
-        img = multi_colorbar(img,'global', $
-                             width = 0.0225, $
-                             height = 0.40, $
-                             buffer = 0.03, $
-                             orientation = 1, $
-                             textpos = 1, $
-                             tickdir = 1, $
-                             ticklen = 0.2, $
-                             major = 7, $
-                             font_name = font_name, $
-                             font_size = 8.0)
-        txt = text(0.00,0.05,path, $
-                   alignment = 0.0, $
-                   target = img, $
-                   font_name = font_name, $
-                   font_size = 5.0)
-        filename = 'emag_'+planes[ip]+'.pdf'
-        image_save, img[0],filename=filepath+path_sep()+filename
-     endfor ;;n_planes
-  endif ;;emag
+  eppic_full_phi, info
 
   ;;==Free memory
   if keyword_set(phi_exists) then data = !NULL
 
-  ;;==Create images of electrostatic potential
-  if keyword_set(den) then begin
+IF 0 THEN BEGIN
+  ;;==Create images of density
+  if string_exist(target,'den',3) then begin
      rgb_table = 5
      n_dist = params.ndist
      for id=0,n_dist-1 do begin
@@ -314,7 +189,7 @@ pro eppic_full, path=path, $
   zctr = 0
 
   ;;==Create images of Fourier-transformed density
-  if keyword_set(denft) then begin
+  if string_exists(target,'denft') then begin
      rgb_table = 39
      n_dist = params.ndist
      for id=0,n_dist-1 do begin
@@ -395,5 +270,7 @@ pro eppic_full, path=path, $
         data = !NULL
      endfor ;;n_dist
   endif ;;denft
+
+ENDIF ;SKIP
 
 end
