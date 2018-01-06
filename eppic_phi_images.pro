@@ -23,9 +23,6 @@ pro eppic_phi_images, info
      ;;==Set imaging flag
      image_data_exists = 0B
 
-     ;;==Create a hash for filenames
-     filename = hash(['phi','emag'])
-
      ;;==Loop over 2-D image planes
      n_planes = (n_dims eq 4) ? n_elements(info.planes) : 1
      for ip=0,n_planes-1 do begin
@@ -77,9 +74,8 @@ pro eppic_phi_images, info
               ;;==Update imaging flag
               image_data_exists = 1B
 
-              ;;==Store filenames
-              filename['phi'] = 'phi_'+info.planes[ip]+'.pdf'
-              filename['emag'] = 'emag_'+info.planes[ip]+'.pdf'
+              ;;==Save string for filenames
+              plane_string = '_'+info.planes[ip]
 
            end
            3: begin
@@ -102,9 +98,8 @@ pro eppic_phi_images, info
               ;;==Update imaging flag
               image_data_exists = 1B
 
-              ;;==Store filenames
-              filename['phi'] = 'phi.pdf'
-              filename['emag'] = 'emag.pdf'
+              ;;==Save string for filenames
+              plane_string = ''
 
            end
            else: print, "[EPPIC_PHI_IMAGES] Currently set up for 2 or 3 spatial dimensions."
@@ -158,7 +153,8 @@ pro eppic_phi_images, info
                       font_size = 5.0)
 
            ;;==Save image
-           image_save, img[0],filename=info.filepath+path_sep()+filename['phi']
+           image_save, img[0],filename=info.filepath+path_sep()+ $
+                       'phi'+plane_string+'.pdf'
 
                                 ;---------;
                                 ; E field ;
@@ -223,7 +219,8 @@ pro eppic_phi_images, info
                       font_size = 5.0)
 
            ;;==Save image
-           image_save, img[0],filename=info.filepath+path_sep()+filename['emag']           
+           image_save, img[0],filename=info.filepath+path_sep()+ $
+                       'emag'+plane_string+'.pdf'
 
         endif ;;--image_data_exists
      endfor   ;;--n_planes

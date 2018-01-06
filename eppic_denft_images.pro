@@ -81,8 +81,8 @@ pro eppic_denft_images, info
                  ;;==Update imaging flag
                  image_data_exists = 1B
 
-                 ;;==Store filename
-                 filename = dist_name+'_'+info.planes[ip]+'.pdf'
+                 ;;==Save string for filenames
+                 plane_string = '_'+info.planes[ip]
 
               end
               3: begin
@@ -107,8 +107,8 @@ pro eppic_denft_images, info
                  ;;==Update imaging flag
                  image_data_exists = 1B
 
-                 ;;==Store filenames
-                 filename = dist_name+'.pdf'
+                 ;;==Save string for filenames
+                 plane_string = ''
 
               end
               else: print, "[EPPIC_DENFT_IMAGES] Data must have 2 or 3 spatial dimensions."
@@ -163,7 +163,8 @@ pro eppic_denft_images, info
                          font_size = 5.0)
 
               ;;==Save image
-              image_save, img[0],filename=info.filepath+path_sep()+filename
+              image_save, img[0],filename=info.filepath+path_sep()+ $
+                          dist_name+plane_string+'.pdf'
 
            endif ;;--image_data_exists
         endfor   ;;--n_planes
