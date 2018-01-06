@@ -1,11 +1,12 @@
 ;+
-; This routine makes images from EPPIC den data. 
-; Other images that require den should go here.
+; This routine makes images from EPPIC denft data. 
+; Other images that require denft should go here.
 ;-
-pro eppic_den_images, info
+pro eppic_denft_images, info
 
   ;;==Unpack info dictionary
   params = info.params
+  grid = info.grid
   position = info.position
   font_name = info.font_name
   path = info.path
@@ -16,7 +17,7 @@ pro eppic_den_images, info
   ;;==Loop over available distributions
   n_dist = params.ndist
   for id=0,n_dist-1 do begin
-     dist_name = 'den'+strcompress(id,/remove_all)
+     dist_name = 'denft'+strcompress(id,/remove_all)
 
      ;;==Read data
      data = (load_eppic_data(dist_name,path=path,timestep=timestep))[dist_name]
@@ -52,26 +53,40 @@ pro eppic_den_images, info
                  case 1B of 
                     strcmp(planes[ip],'xy') || strcmp(planes[ip],'yx'): begin
                        imgplane = reform(data[*,*,info.zctr,*])
-                       xdata = info.xvec
-                       ydata = info.yvec
+                       len = grid.nx*params.nout_avg
+                       tmp = findgen(len)-0.5*len
+                       xdata = (2*!pi/(grid.dx*len))*tmp
+                       len = grid.ny*params.nout_avg
+                       tmp = findgen(len)-0.5*len
+                       ydata = (2*!pi/(grid.dy*len))*tmp
                        xrng = info.xrng
                        yrng = info.yrng
                     end
                     strcmp(planes[ip],'xz') || strcmp(planes[ip],'zx'): begin
                        imgplane = reform(data[*,info.yctr,*,*])
-                       xdata = info.xvec
-                       ydata = info.zvec
+                       len = grid.nx*params.nout_avg
+                       tmp = findgen(len)-0.5*len
+                       xdata = (2*!pi/(grid.dx*len))*tmp
+                       len = grid.nz*params.nout_avg
+                       tmp = findgen(len)-0.5*len
+                       ydata = (2*!pi/(grid.dz*len))*tmp
                        xrng = info.xrng
                        yrng = info.zrng
                     end
                     strcmp(planes[ip],'yz') || strcmp(planes[ip],'zy'): begin
                        imgplane = reform(data[info.xctr,*,*,*])
-                       xdata = info.yvec
-                       ydata = info.zvec
+                       len = grid.ny*params.nout_avg
+                       tmp = findgen(len)-0.5*len
+                       xdata = (2*!pi/(grid.dy*len))*tmp
+                       len = grid.nz*params.nout_avg
+                       tmp = findgen(len)-0.5*len
+                       ydata = (2*!pi/(grid.dz*len))*tmp
                        xrng = info.yrng
                        yrng = info.zrng
                     end
                  endcase
+                 tmp = !NULL
+                 len = !NULL
 
                  ;;==Update imaging flag
                  image_data_exists = 1B
@@ -88,10 +103,16 @@ pro eppic_den_images, info
 
                  ;;==Set up 2-D image
                  imgplane = reform(data)
-                 xdata = info.xvec
-                 ydata = info.yvec
+                 len = grid.nx*params.nout_avg
+                 tmp = findgen(len)-0.5*len
+                 xdata = (2*!pi/(grid.dx*len))*tmp
+                 len = grid.ny*params.nout_avg
+                 tmp = findgen(len)-0.5*len
+                 ydata = (2*!pi/(grid.dy*len))*tmp
                  xrng = info.xrng
                  yrng = info.yrng
+                 tmp = !NULL
+                 len = !NULL
 
                  ;;==Update imaging flag
                  image_data_exists = 1B
@@ -100,7 +121,7 @@ pro eppic_den_images, info
                  filename = dist_name+'.pdf'
 
               end
-              else: print, "[EPPIC_DEN_IMAGES] Currently set up for 2 or 3 spatial dimensions."
+              else: print, "[EPPIC_DENFT_IMAGES] Data must have 2 or 3 spatial dimensions."
            endcase
 
            if image_data_exists then begin
@@ -111,14 +132,20 @@ pro eppic_den_images, info
 
               ;;==Extract subimage
               imgdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
+              imgdata = real_part(imgdata)
+              imgdata = 10*alog10((imgdata/max(imgdata))^2)
+              imgsize = size(imgdata,/dim)
+              imgdata = shift(imgdata,imgsize[0]/2,imgsize[1]/2,0)
 
               ;;==Set up graphics parameters
-              rgb_table = 5
-              min_value = -max(abs(imgdata))
-              max_value = +max(abs(imgdata))
+              rgb_table = 39
+              min_value = min(imgdata,/nan)
+              max_value = max(imgdata,/nan)
 
               ;;==Create image
               img = multi_image(imgdata,xdata,ydata, $
+                                xrange = [-2*!pi,2*!pi], $
+                                yrange = [0,2*!pi], $
                                 position = position, $
                                 axis_style = axis_style, $
                                 rgb_table = rgb_table, $
@@ -151,7 +178,7 @@ pro eppic_den_images, info
            endif ;;--image_data_exists
         endfor   ;;--n_planes
      endif $     ;;--n_dims gt 2
-     else print, "[EPPIC_DEN_IMAGES] Could not create an image."
+     else print, "[EPPIC_DENFT_IMAGES] Could not create an image."
 
   endfor ;;n_dist
 end

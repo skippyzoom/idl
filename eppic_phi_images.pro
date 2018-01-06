@@ -26,200 +26,207 @@ pro eppic_phi_images, info
      1: nx = data_size[1]
   endswitch
 
-  ;;==Declare/reset imaging flag
-  data_is_okay = 0B
+  ;;==Check dimensions
+  if n_dims gt 2 then begin
 
-  ;;==Create a hash for filenames
-  filename = hash(['phi','emag'])
+     ;;==Set imaging flag
+     image_data_exists = 0B
 
-  case n_dims of 
-     4: begin
+     ;;==Create a hash for filenames
+     filename = hash(['phi','emag'])
 
-        ;;==Transpose data
-        if n_elements(info.xyz) eq 2 then info.xyz = [info.xyz,2]
-        data = transpose(data,[info.xyz,3])
+     ;;==Loop over 2-D image planes
+     n_planes = (n_dims eq 4) ? n_elements(planes) : 1
+     for ip=0,n_planes-1 do begin
 
-        ;;==Set up 2-D image
-        n_planes = n_elements(planes)
-        for ip=0,n_planes-1 do begin
-           case 1B of 
-              strcmp(planes[ip],'xy'): begin
-                 imgplane = reform(data[*,*,info.zctr,*])
-                 xdata = info.xvec
-                 ydata = info.yvec
-                 xrng = info.xrng
-                 yrng = info.yrng
-                 dx = params.dx
-                 dy = params.dy
-                 Ex0 = params.Ex0_external
-                 Ey0 = params.Ey0_external
-              end
-              strcmp(planes[ip],'xz'): begin
-                 imgplane = reform(data[*,info.yctr,*,*])
-                 xdata = info.xvec
-                 ydata = info.zvec
-                 xrng = info.xrng
-                 yrng = info.zrng
-                 dx = params.dx
-                 dy = params.dz
-                 Ex0 = params.Ex0_external
-                 Ey0 = params.Ez0_external
-              end
-              strcmp(planes[ip],'yz'): begin
-                 imgplane = reform(data[info.xctr,*,*,*])
-                 xdata = info.yvec
-                 ydata = info.zvec
-                 xrng = info.yrng
-                 yrng = info.zrng
-                 dx = params.dy
-                 dy = params.dz
-                 Ex0 = params.Ey0_external
-                 Ey0 = params.Ez0_external
-              end
-           endcase
+        case n_dims of 
+           4: begin
 
-           ;;==Update imaging flag
-           data_is_okay = 1B
+              ;;==Transpose data
+              if n_elements(info.xyz) eq 2 then info.xyz = [info.xyz,2]
+              data = transpose(data,[info.xyz,3])
 
-           ;;==Store filenames
-           filename['phi'] = 'phi_'+planes[ip]+'.pdf'
-           filename['emag'] = 'emag_'+planes[ip]+'.pdf'
+              ;;==Set up 2-D image
+              case 1B of 
+                 strcmp(planes[ip],'xy') || strcmp(planes[ip],'yx'): begin
+                    imgplane = reform(data[*,*,info.zctr,*])
+                    xdata = info.xvec
+                    ydata = info.yvec
+                    xrng = info.xrng
+                    yrng = info.yrng
+                    dx = params.dx
+                    dy = params.dy
+                    Ex0 = params.Ex0_external
+                    Ey0 = params.Ey0_external
+                 end
+                 strcmp(planes[ip],'xz') || strcmp(planes[ip],'zx'): begin
+                    imgplane = reform(data[*,info.yctr,*,*])
+                    xdata = info.xvec
+                    ydata = info.zvec
+                    xrng = info.xrng
+                    yrng = info.zrng
+                    dx = params.dx
+                    dy = params.dz
+                    Ex0 = params.Ex0_external
+                    Ey0 = params.Ez0_external
+                 end
+                 strcmp(planes[ip],'yz') || strcmp(planes[ip],'zy'): begin
+                    imgplane = reform(data[info.xctr,*,*,*])
+                    xdata = info.yvec
+                    ydata = info.zvec
+                    xrng = info.yrng
+                    yrng = info.zrng
+                    dx = params.dy
+                    dy = params.dz
+                    Ex0 = params.Ey0_external
+                    Ey0 = params.Ez0_external
+                 end
+              endcase
 
-        endfor ;;n_planes
-     end
-     3: begin
+              ;;==Update imaging flag
+              image_data_exists = 1B
 
-        ;;==Transpose data
-        if n_elements(info.xyz) gt 2 then info.xyz = info.xyz[0:1]
-        data = transpose(data,[info.xyz,2])        
+              ;;==Store filenames
+              filename['phi'] = 'phi_'+planes[ip]+'.pdf'
+              filename['emag'] = 'emag_'+planes[ip]+'.pdf'
 
-        ;;==Set up 2-D image
-        imgplane = reform(data)
-        xdata = info.xvec
-        ydata = info.yvec
-        xrng = info.xrng
-        yrng = info.yrng
-        dx = params.dx
-        dy = params.dy
-        Ex0 = params.Ex0_external
-        Ey0 = params.Ey0_external        
+           end
+           3: begin
 
-        ;;==Update imaging flag
-        data_is_okay = 1B
+              ;;==Transpose data
+              if n_elements(info.xyz) gt 2 then info.xyz = info.xyz[0:1]
+              data = transpose(data,[info.xyz,2])        
 
-        ;;==Store filenames
-        filename['phi'] = 'phi.pdf'
-        filename['emag'] = 'emag.pdf'
+              ;;==Set up 2-D image
+              imgplane = reform(data)
+              xdata = info.xvec
+              ydata = info.yvec
+              xrng = info.xrng
+              yrng = info.yrng
+              dx = params.dx
+              dy = params.dy
+              Ex0 = params.Ex0_external
+              Ey0 = params.Ey0_external        
 
-     end
-     else: print, "[EPPIC_PHI_IMAGES] Data must have 2 or 3 spatial dimensions."
-  endcase
+              ;;==Update imaging flag
+              image_data_exists = 1B
 
-  if data_is_okay then begin
-     ;;==Extract axis subsets
-     xdata = xdata[xrng[0]:xrng[1]]
-     ydata = ydata[yrng[0]:yrng[1]]
+              ;;==Store filenames
+              filename['phi'] = 'phi.pdf'
+              filename['emag'] = 'emag.pdf'
+
+           end
+           else: print, "[EPPIC_PHI_IMAGES] Currently set up for 2 or 3 spatial dimensions."
+        endcase
+
+        if image_data_exists then begin
+
+           ;;==Extract axis subsets
+           xdata = xdata[xrng[0]:xrng[1]]
+           ydata = ydata[yrng[0]:yrng[1]]
 
                                 ;-----------;
                                 ; phi image ;
                                 ;-----------;
 
-     ;;==Extract subimage
-     imgdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
+           ;;==Extract subimage
+           imgdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
 
-     ;;==Set up graphics parameters
-     ct = get_custom_ct(1)
-     rgb_table = [[ct.r],[ct.g],[ct.b]]
-     min_value = -max(abs(imgdata))
-     max_value = +max(abs(imgdata))
+           ;;==Set up graphics parameters
+           ct = get_custom_ct(1)
+           rgb_table = [[ct.r],[ct.g],[ct.b]]
+           min_value = -max(abs(imgdata))
+           max_value = +max(abs(imgdata))
 
-     ;;==Create image
-     img = multi_image(imgdata,xdata,ydata, $
-                       position = position, $
-                       axis_style = axis_style, $
-                       rgb_table = rgb_table, $
-                       min_value = min_value, $
-                       max_value = max_value)
+           ;;==Create image
+           img = multi_image(imgdata,xdata,ydata, $
+                             position = position, $
+                             axis_style = axis_style, $
+                             rgb_table = rgb_table, $
+                             min_value = min_value, $
+                             max_value = max_value)
 
-     ;;==Add colorbar(s)
-     img = multi_colorbar(img,'global', $
-                          width = 0.0225, $
-                          height = 0.40, $
-                          buffer = 0.03, $
-                          orientation = 1, $
-                          textpos = 1, $
-                          tickdir = 1, $
-                          ticklen = 0.2, $
-                          major = 7, $
-                          font_name = font_name, $
-                          font_size = 8.0)
+           ;;==Add colorbar(s)
+           img = multi_colorbar(img,'global', $
+                                width = 0.0225, $
+                                height = 0.40, $
+                                buffer = 0.03, $
+                                orientation = 1, $
+                                textpos = 1, $
+                                tickdir = 1, $
+                                ticklen = 0.2, $
+                                major = 7, $
+                                font_name = font_name, $
+                                font_size = 8.0)
 
-     ;;==Add path label
-     txt = text(0.00,0.05,path, $
-                alignment = 0.0, $
-                target = img, $
-                font_name = font_name, $
-                font_size = 5.0)
+           ;;==Add path label
+           txt = text(0.00,0.05,path, $
+                      alignment = 0.0, $
+                      target = img, $
+                      font_name = font_name, $
+                      font_size = 5.0)
 
-     ;;==Save image
-     image_save, img[0],filename=filepath+path_sep()+filename['phi']
+           ;;==Save image
+           image_save, img[0],filename=filepath+path_sep()+filename['phi']
 
                                 ;------------;
                                 ; emag image ;
                                 ;------------;
 
-     ;;==Calculate |E|
-     ;; imgplane = smooth(imgplane,[0.5/dx,0.5/dy,1],/edge_wrap)
-     efield = dictionary()
-     for it=0,nt-1 do begin
-        gradf = gradient(imgplane[*,*,it],dx=dx*params.nout_avg,dy=dy*params.nout_avg)
-        efield.x = -1.0*gradf.x + params.Ex0_external
-        efield.y = -1.0*gradf.y + params.Ey0_external
-        ;; efield.x = -1.0*gradf.x
-        ;; efield.y = -1.0*gradf.y
-        imgplane[*,*,it] = sqrt(efield.x^2 + efield.y^2)
-     endfor
+           ;;==Calculate |E|
+           ;; imgplane = smooth(imgplane,[0.5/dx,0.5/dy,1],/edge_wrap)
+           efield = dictionary()
+           for it=0,nt-1 do begin
+              gradf = gradient(imgplane[*,*,it],dx=dx*params.nout_avg,dy=dy*params.nout_avg)
+              efield.x = -1.0*gradf.x + params.Ex0_external
+              efield.y = -1.0*gradf.y + params.Ey0_external
+              ;; efield.x = -1.0*gradf.x
+              ;; efield.y = -1.0*gradf.y
+              imgplane[*,*,it] = sqrt(efield.x^2 + efield.y^2)
+           endfor
 
-     ;;==Extract subimage
-     imgdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
+           ;;==Extract subimage
+           imgdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
 
-     ;;==Set up graphics parameters
-     rgb_table = 3
-     min_value = 0
-     max_value = max(imgdata)
+           ;;==Set up graphics parameters
+           rgb_table = 3
+           min_value = 0
+           max_value = max(imgdata)
 
-     ;;==Create image
-     img = multi_image(imgdata,xdata,ydata, $
-                       position = position, $
-                       axis_style = axis_style, $
-                       rgb_table = rgb_table, $
-                       min_value = min_value, $
-                       max_value = max_value)
+           ;;==Create image
+           img = multi_image(imgdata,xdata,ydata, $
+                             position = position, $
+                             axis_style = axis_style, $
+                             rgb_table = rgb_table, $
+                             min_value = min_value, $
+                             max_value = max_value)
 
-     ;;==Add colorbar(s)
-     img = multi_colorbar(img,'global', $
-                          width = 0.0225, $
-                          height = 0.40, $
-                          buffer = 0.03, $
-                          orientation = 1, $
-                          textpos = 1, $
-                          tickdir = 1, $
-                          ticklen = 0.2, $
-                          major = 7, $
-                          font_name = font_name, $
-                          font_size = 8.0)
+           ;;==Add colorbar(s)
+           img = multi_colorbar(img,'global', $
+                                width = 0.0225, $
+                                height = 0.40, $
+                                buffer = 0.03, $
+                                orientation = 1, $
+                                textpos = 1, $
+                                tickdir = 1, $
+                                ticklen = 0.2, $
+                                major = 7, $
+                                font_name = font_name, $
+                                font_size = 8.0)
 
-     ;;==Add path label
-     txt = text(0.00,0.05,path, $
-                alignment = 0.0, $
-                target = img, $
-                font_name = font_name, $
-                font_size = 5.0)
+           ;;==Add path label
+           txt = text(0.00,0.05,path, $
+                      alignment = 0.0, $
+                      target = img, $
+                      font_name = font_name, $
+                      font_size = 5.0)
 
-     ;;==Save image
-     image_save, img[0],filename=filepath+path_sep()+filename['emag']
+           ;;==Save image
+           image_save, img[0],filename=filepath+path_sep()+filename['emag']
 
-  endif $ ;;data_is_okay
+        endif ;;--image_data_exists
+     endfor   ;;--n_planes
+  endif $     ;;--n_dims gt 2
   else print, "[EPPIC_PHI_IMAGES] Could not create an image."
 
 end
