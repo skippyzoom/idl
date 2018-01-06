@@ -4,17 +4,8 @@
 ;-
 pro eppic_phi_images, info
 
-  ;;==Unpack info dictionary
-  params = info.params
-  position = info.position
-  font_name = info.font_name
-  path = info.path
-  filepath = info.filepath
-  planes = info.planes
-  timestep = info.timestep
-
   ;;==Read data
-  data = (load_eppic_data('phi',path=path,timestep=timestep))['phi']
+  data = (load_eppic_data('phi',path=info.path,timestep=info.timestep))['phi']
 
   ;;==Get data dimensions
   data_size = size(data)
@@ -36,7 +27,7 @@ pro eppic_phi_images, info
      filename = hash(['phi','emag'])
 
      ;;==Loop over 2-D image planes
-     n_planes = (n_dims eq 4) ? n_elements(planes) : 1
+     n_planes = (n_dims eq 4) ? n_elements(info.planes) : 1
      for ip=0,n_planes-1 do begin
 
         case n_dims of 
@@ -48,38 +39,38 @@ pro eppic_phi_images, info
 
               ;;==Set up 2-D image
               case 1B of 
-                 strcmp(planes[ip],'xy') || strcmp(planes[ip],'yx'): begin
+                 strcmp(info.planes[ip],'xy') || strcmp(info.planes[ip],'yx'): begin
                     imgplane = reform(data[*,*,info.zctr,*])
                     xdata = info.xvec
                     ydata = info.yvec
                     xrng = info.xrng
                     yrng = info.yrng
-                    dx = params.dx
-                    dy = params.dy
-                    Ex0 = params.Ex0_external
-                    Ey0 = params.Ey0_external
+                    dx = info.params.dx
+                    dy = info.params.dy
+                    Ex0 = info.params.Ex0_external
+                    Ey0 = info.params.Ey0_external
                  end
-                 strcmp(planes[ip],'xz') || strcmp(planes[ip],'zx'): begin
+                 strcmp(info.planes[ip],'xz') || strcmp(info.planes[ip],'zx'): begin
                     imgplane = reform(data[*,info.yctr,*,*])
                     xdata = info.xvec
                     ydata = info.zvec
                     xrng = info.xrng
                     yrng = info.zrng
-                    dx = params.dx
-                    dy = params.dz
-                    Ex0 = params.Ex0_external
-                    Ey0 = params.Ez0_external
+                    dx = info.params.dx
+                    dy = info.params.dz
+                    Ex0 = info.params.Ex0_external
+                    Ey0 = info.params.Ez0_external
                  end
-                 strcmp(planes[ip],'yz') || strcmp(planes[ip],'zy'): begin
+                 strcmp(info.planes[ip],'yz') || strcmp(info.planes[ip],'zy'): begin
                     imgplane = reform(data[info.xctr,*,*,*])
                     xdata = info.yvec
                     ydata = info.zvec
                     xrng = info.yrng
                     yrng = info.zrng
-                    dx = params.dy
-                    dy = params.dz
-                    Ex0 = params.Ey0_external
-                    Ey0 = params.Ez0_external
+                    dx = info.params.dy
+                    dy = info.params.dz
+                    Ex0 = info.params.Ey0_external
+                    Ey0 = info.params.Ez0_external
                  end
               endcase
 
@@ -87,8 +78,8 @@ pro eppic_phi_images, info
               image_data_exists = 1B
 
               ;;==Store filenames
-              filename['phi'] = 'phi_'+planes[ip]+'.pdf'
-              filename['emag'] = 'emag_'+planes[ip]+'.pdf'
+              filename['phi'] = 'phi_'+info.planes[ip]+'.pdf'
+              filename['emag'] = 'emag_'+info.planes[ip]+'.pdf'
 
            end
            3: begin
@@ -103,10 +94,10 @@ pro eppic_phi_images, info
               ydata = info.yvec
               xrng = info.xrng
               yrng = info.yrng
-              dx = params.dx
-              dy = params.dy
-              Ex0 = params.Ex0_external
-              Ey0 = params.Ey0_external        
+              dx = info.params.dx
+              dy = info.params.dy
+              Ex0 = info.params.Ex0_external
+              Ey0 = info.params.Ey0_external        
 
               ;;==Update imaging flag
               image_data_exists = 1B
@@ -140,7 +131,7 @@ pro eppic_phi_images, info
 
            ;;==Create image
            img = multi_image(imgdata,xdata,ydata, $
-                             position = position, $
+                             position = info.position, $
                              axis_style = axis_style, $
                              rgb_table = rgb_table, $
                              min_value = min_value, $
@@ -156,18 +147,18 @@ pro eppic_phi_images, info
                                 tickdir = 1, $
                                 ticklen = 0.2, $
                                 major = 7, $
-                                font_name = font_name, $
+                                font_name = info.font_name, $
                                 font_size = 8.0)
 
            ;;==Add path label
-           txt = text(0.00,0.05,path, $
+           txt = text(0.00,0.05,info.path, $
                       alignment = 0.0, $
                       target = img, $
-                      font_name = font_name, $
+                      font_name = info.font_name, $
                       font_size = 5.0)
 
            ;;==Save image
-           image_save, img[0],filename=filepath+path_sep()+filename['phi']
+           image_save, img[0],filename=info.filepath+path_sep()+filename['phi']
 
                                 ;------------;
                                 ; emag image ;
@@ -177,9 +168,9 @@ pro eppic_phi_images, info
            ;; imgplane = smooth(imgplane,[0.5/dx,0.5/dy,1],/edge_wrap)
            efield = dictionary()
            for it=0,nt-1 do begin
-              gradf = gradient(imgplane[*,*,it],dx=dx*params.nout_avg,dy=dy*params.nout_avg)
-              efield.x = -1.0*gradf.x + params.Ex0_external
-              efield.y = -1.0*gradf.y + params.Ey0_external
+              gradf = gradient(imgplane[*,*,it],dx=dx*info.params.nout_avg,dy=dy*info.params.nout_avg)
+              efield.x = -1.0*gradf.x + info.params.Ex0_external
+              efield.y = -1.0*gradf.y + info.params.Ey0_external
               ;; efield.x = -1.0*gradf.x
               ;; efield.y = -1.0*gradf.y
               imgplane[*,*,it] = sqrt(efield.x^2 + efield.y^2)
@@ -195,7 +186,7 @@ pro eppic_phi_images, info
 
            ;;==Create image
            img = multi_image(imgdata,xdata,ydata, $
-                             position = position, $
+                             position = info.position, $
                              axis_style = axis_style, $
                              rgb_table = rgb_table, $
                              min_value = min_value, $
@@ -211,18 +202,18 @@ pro eppic_phi_images, info
                                 tickdir = 1, $
                                 ticklen = 0.2, $
                                 major = 7, $
-                                font_name = font_name, $
+                                font_name = info.font_name, $
                                 font_size = 8.0)
 
            ;;==Add path label
-           txt = text(0.00,0.05,path, $
+           txt = text(0.00,0.05,info.path, $
                       alignment = 0.0, $
                       target = img, $
-                      font_name = font_name, $
+                      font_name = info.font_name, $
                       font_size = 5.0)
 
            ;;==Save image
-           image_save, img[0],filename=filepath+path_sep()+filename['emag']
+           image_save, img[0],filename=info.filepath+path_sep()+filename['emag']
 
         endif ;;--image_data_exists
      endfor   ;;--n_planes

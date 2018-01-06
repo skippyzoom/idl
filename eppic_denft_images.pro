@@ -4,23 +4,13 @@
 ;-
 pro eppic_denft_images, info
 
-  ;;==Unpack info dictionary
-  params = info.params
-  grid = info.grid
-  position = info.position
-  font_name = info.font_name
-  path = info.path
-  filepath = info.filepath
-  planes = info.planes
-  timestep = info.timestep
-
   ;;==Loop over available distributions
-  n_dist = params.ndist
+  n_dist = info.params.ndist
   for id=0,n_dist-1 do begin
      dist_name = 'denft'+strcompress(id,/remove_all)
 
      ;;==Read data
-     data = (load_eppic_data(dist_name,path=path,timestep=timestep))[dist_name]
+     data = (load_eppic_data(dist_name,path=info.path,timestep=info.timestep))[dist_name]
 
      ;;==Get data dimensions
      data_size = size(data)
@@ -39,7 +29,7 @@ pro eppic_denft_images, info
         image_data_exists = 0B
 
         ;;==Loop over 2-D image planes
-        n_planes = (n_dims eq 4) ? n_elements(planes) : 1
+        n_planes = (n_dims eq 4) ? n_elements(info.planes) : 1
         for ip=0,n_planes-1 do begin
 
            case n_dims of 
@@ -51,36 +41,36 @@ pro eppic_denft_images, info
 
                  ;;==Set up 2-D image
                  case 1B of 
-                    strcmp(planes[ip],'xy') || strcmp(planes[ip],'yx'): begin
+                    strcmp(info.planes[ip],'xy') || strcmp(info.planes[ip],'yx'): begin
                        imgplane = reform(data[*,*,info.zctr,*])
-                       len = grid.nx*params.nout_avg
+                       len = info.grid.nx*info.params.nout_avg
                        tmp = findgen(len)-0.5*len
-                       xdata = (2*!pi/(grid.dx*len))*tmp
-                       len = grid.ny*params.nout_avg
+                       xdata = (2*!pi/(info.grid.dx*len))*tmp
+                       len = info.grid.ny*info.params.nout_avg
                        tmp = findgen(len)-0.5*len
-                       ydata = (2*!pi/(grid.dy*len))*tmp
+                       ydata = (2*!pi/(info.grid.dy*len))*tmp
                        xrng = info.xrng
                        yrng = info.yrng
                     end
-                    strcmp(planes[ip],'xz') || strcmp(planes[ip],'zx'): begin
+                    strcmp(info.planes[ip],'xz') || strcmp(info.planes[ip],'zx'): begin
                        imgplane = reform(data[*,info.yctr,*,*])
-                       len = grid.nx*params.nout_avg
+                       len = info.grid.nx*info.params.nout_avg
                        tmp = findgen(len)-0.5*len
-                       xdata = (2*!pi/(grid.dx*len))*tmp
-                       len = grid.nz*params.nout_avg
+                       xdata = (2*!pi/(info.grid.dx*len))*tmp
+                       len = info.grid.nz*info.params.nout_avg
                        tmp = findgen(len)-0.5*len
-                       ydata = (2*!pi/(grid.dz*len))*tmp
+                       ydata = (2*!pi/(info.grid.dz*len))*tmp
                        xrng = info.xrng
                        yrng = info.zrng
                     end
-                    strcmp(planes[ip],'yz') || strcmp(planes[ip],'zy'): begin
+                    strcmp(info.planes[ip],'yz') || strcmp(info.planes[ip],'zy'): begin
                        imgplane = reform(data[info.xctr,*,*,*])
-                       len = grid.ny*params.nout_avg
+                       len = info.grid.ny*info.params.nout_avg
                        tmp = findgen(len)-0.5*len
-                       xdata = (2*!pi/(grid.dy*len))*tmp
-                       len = grid.nz*params.nout_avg
+                       xdata = (2*!pi/(info.grid.dy*len))*tmp
+                       len = info.grid.nz*info.params.nout_avg
                        tmp = findgen(len)-0.5*len
-                       ydata = (2*!pi/(grid.dz*len))*tmp
+                       ydata = (2*!pi/(info.grid.dz*len))*tmp
                        xrng = info.yrng
                        yrng = info.zrng
                     end
@@ -92,7 +82,7 @@ pro eppic_denft_images, info
                  image_data_exists = 1B
 
                  ;;==Store filename
-                 filename = dist_name+'_'+planes[ip]+'.pdf'
+                 filename = dist_name+'_'+info.planes[ip]+'.pdf'
 
               end
               3: begin
@@ -103,12 +93,12 @@ pro eppic_denft_images, info
 
                  ;;==Set up 2-D image
                  imgplane = reform(data)
-                 len = grid.nx*params.nout_avg
+                 len = info.grid.nx*info.params.nout_avg
                  tmp = findgen(len)-0.5*len
-                 xdata = (2*!pi/(grid.dx*len))*tmp
-                 len = grid.ny*params.nout_avg
+                 xdata = (2*!pi/(info.grid.dx*len))*tmp
+                 len = info.grid.ny*info.params.nout_avg
                  tmp = findgen(len)-0.5*len
-                 ydata = (2*!pi/(grid.dy*len))*tmp
+                 ydata = (2*!pi/(info.grid.dy*len))*tmp
                  xrng = info.xrng
                  yrng = info.yrng
                  tmp = !NULL
@@ -146,7 +136,7 @@ pro eppic_denft_images, info
               img = multi_image(imgdata,xdata,ydata, $
                                 xrange = [-2*!pi,2*!pi], $
                                 yrange = [0,2*!pi], $
-                                position = position, $
+                                position = info.position, $
                                 axis_style = axis_style, $
                                 rgb_table = rgb_table, $
                                 min_value = min_value, $
@@ -162,18 +152,18 @@ pro eppic_denft_images, info
                                    tickdir = 1, $
                                    ticklen = 0.2, $
                                    major = 7, $
-                                   font_name = font_name, $
+                                   font_name = info.font_name, $
                                    font_size = 8.0)
 
               ;;==Add path label
-              txt = text(0.00,0.05,path, $
+              txt = text(0.00,0.05,info.path, $
                          alignment = 0.0, $
                          target = img, $
-                         font_name = font_name, $
+                         font_name = info.font_name, $
                          font_size = 5.0)
 
               ;;==Save image
-              image_save, img[0],filename=filepath+path_sep()+filename
+              image_save, img[0],filename=info.filepath+path_sep()+filename
 
            endif ;;--image_data_exists
         endfor   ;;--n_planes

@@ -33,17 +33,13 @@ pro eppic_full, path=path, $
                                 ;-------------------------------;
                                 ; 1-D plots of velocity moments ;
                                 ;-------------------------------;
-  if keyword_set(moments) then begin
+  ;;==Read in data
+  moments = analyze_moments(path=path)
 
-     ;;==Read in data
-     moments = analyze_moments(path=path)
-
-     ;;==Create plots
-     plot_moments, moments,params=params, $
-                   path=filepath, $
-                   font_name=font_name,font_size=font_size
-
-  endif
+  ;;==Create plots
+  plot_moments, moments,params=params, $
+                path=filepath, $
+                font_name=font_name,font_size=font_size
 
                                 ;--------------------;
                                 ; 2-D images of data ;
