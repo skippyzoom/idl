@@ -137,7 +137,7 @@ pro eppic_denft_images, info
                                 xrange = [-2*!pi,2*!pi], $
                                 yrange = [0,2*!pi], $
                                 position = info.position, $
-                                axis_style = axis_style, $
+                                axis_style = info.axis_style, $
                                 rgb_table = rgb_table, $
                                 min_value = min_value, $
                                 max_value = max_value)

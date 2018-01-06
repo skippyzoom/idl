@@ -117,7 +117,7 @@ pro eppic_phi_images, info
            ydata = ydata[yrng[0]:yrng[1]]
 
                                 ;-----------;
-                                ; phi image ;
+                                ; Potential ;
                                 ;-----------;
 
            ;;==Extract subimage
@@ -132,7 +132,7 @@ pro eppic_phi_images, info
            ;;==Create image
            img = multi_image(imgdata,xdata,ydata, $
                              position = info.position, $
-                             axis_style = axis_style, $
+                             axis_style = info.axis_style, $
                              rgb_table = rgb_table, $
                              min_value = min_value, $
                              max_value = max_value)
@@ -160,22 +160,32 @@ pro eppic_phi_images, info
            ;;==Save image
            image_save, img[0],filename=info.filepath+path_sep()+filename['phi']
 
-                                ;------------;
-                                ; emag image ;
-                                ;------------;
+                                ;---------;
+                                ; E field ;
+                                ;---------;
 
            ;;==Calculate |E|
-           ;; imgplane = smooth(imgplane,[0.5/dx,0.5/dy,1],/edge_wrap)
-           efield = dictionary()
+           ;; ;; imgplane = smooth(imgplane,[0.5/dx,0.5/dy,1],/edge_wrap)
+           ;; efield = dictionary()
+           ;; for it=0,nt-1 do begin
+           ;;    gradf = gradient(imgplane[*,*,it],dx=dx*info.params.nout_avg,dy=dy*info.params.nout_avg)
+           ;;    efield.x = -1.0*gradf.x + info.params.Ex0_external
+           ;;    efield.y = -1.0*gradf.y + info.params.Ey0_external
+           ;;    ;; efield.x = -1.0*gradf.x
+           ;;    ;; efield.y = -1.0*gradf.y
+           ;;    imgplane[*,*,it] = sqrt(efield.x^2 + efield.y^2)
+           ;; endfor
+           efield = dictionary('x',fltarr(size(imgplane,/dim)), $
+                               'y',fltarr(size(imgplane,/dim)))
            for it=0,nt-1 do begin
               gradf = gradient(imgplane[*,*,it],dx=dx*info.params.nout_avg,dy=dy*info.params.nout_avg)
               efield.x = -1.0*gradf.x + info.params.Ex0_external
               efield.y = -1.0*gradf.y + info.params.Ey0_external
-              ;; efield.x = -1.0*gradf.x
-              ;; efield.y = -1.0*gradf.y
-              imgplane[*,*,it] = sqrt(efield.x^2 + efield.y^2)
+              
            endfor
 
+           imgdata = rms(imgplane,dim=2)
+           
            ;;==Extract subimage
            imgdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
 
@@ -187,7 +197,7 @@ pro eppic_phi_images, info
            ;;==Create image
            img = multi_image(imgdata,xdata,ydata, $
                              position = info.position, $
-                             axis_style = axis_style, $
+                             axis_style = info.axis_style, $
                              rgb_table = rgb_table, $
                              min_value = min_value, $
                              max_value = max_value)
@@ -213,11 +223,13 @@ pro eppic_phi_images, info
                       font_size = 5.0)
 
            ;;==Save image
-           image_save, img[0],filename=info.filepath+path_sep()+filename['emag']
+           image_save, img[0],filename=info.filepath+path_sep()+filename['emag']           
 
         endif ;;--image_data_exists
      endfor   ;;--n_planes
   endif $     ;;--n_dims gt 2
   else print, "[EPPIC_PHI_IMAGES] Could not create an image."
+
+  
 
 end

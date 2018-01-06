@@ -111,7 +111,7 @@ pro eppic_den_images, info
               ;;==Create image
               img = multi_image(imgdata,xdata,ydata, $
                                 position = info.position, $
-                                axis_style = axis_style, $
+                                axis_style = info.axis_style, $
                                 rgb_table = rgb_table, $
                                 min_value = min_value, $
                                 max_value = max_value)
