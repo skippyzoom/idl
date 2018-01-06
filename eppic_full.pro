@@ -102,10 +102,7 @@ pro eppic_full, path=path, $
   ;-->Ignore target for now. Make all images. (DEV)
 
   ;;==Create images of electrostatic potential
-  eppic_full_phi, info
-
-  ;;==Free memory
-  if keyword_set(phi_exists) then data = !NULL
+  eppic_phi_images, info
 
 IF 0 THEN BEGIN
   ;;==Create images of density
