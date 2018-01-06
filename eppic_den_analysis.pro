@@ -2,7 +2,7 @@
 ; This routine makes images from EPPIC den data. 
 ; Other images that require den should go here.
 ;-
-pro eppic_den_images, info
+pro eppic_den_analysis, info
 
   ;;==Loop over available distributions
   n_dist = info.params.ndist
@@ -101,15 +101,15 @@ pro eppic_den_images, info
               ydata = ydata[yrng[0]:yrng[1]]
 
               ;;==Extract subimage
-              imgdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
+              gdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
 
               ;;==Set up graphics parameters
               rgb_table = 5
-              min_value = -max(abs(imgdata))
-              max_value = +max(abs(imgdata))
+              min_value = -max(abs(gdata))
+              max_value = +max(abs(gdata))
 
               ;;==Create image
-              img = multi_image(imgdata,xdata,ydata, $
+              img = multi_image(gdata,xdata,ydata, $
                                 position = info.position, $
                                 axis_style = info.axis_style, $
                                 rgb_table = rgb_table, $

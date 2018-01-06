@@ -93,10 +93,10 @@ pro eppic_full, path=path, $
   info['timestep'] = timestep
 
   ;;==Create images from electrostatic potential
-  eppic_phi_images, info
-
+  eppic_phi_analysis, info
+STOP
   ;;==Create images from density
-  eppic_den_images, info
+  eppic_den_analysis, info
 
   ;;==Declare panel positions for spectral data
   position = multi_position(layout[*], $
@@ -133,6 +133,6 @@ pro eppic_full, path=path, $
   info['timestep'] = timestep
 
   ;;==Create images from FT density
-  eppic_denft_images, info
+  eppic_denft_analysis, info
 
 end

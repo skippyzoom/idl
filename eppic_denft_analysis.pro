@@ -2,7 +2,7 @@
 ; This routine makes images from EPPIC denft data. 
 ; Other images that require denft should go here.
 ;-
-pro eppic_denft_images, info
+pro eppic_denft_analysis, info
 
   ;;==Loop over available distributions
   n_dist = info.params.ndist
@@ -121,19 +121,19 @@ pro eppic_denft_images, info
               ydata = ydata[yrng[0]:yrng[1]]
 
               ;;==Extract subimage
-              imgdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
-              imgdata = real_part(imgdata)
-              imgdata = 10*alog10((imgdata/max(imgdata))^2)
-              imgsize = size(imgdata,/dim)
-              imgdata = shift(imgdata,imgsize[0]/2,imgsize[1]/2,0)
+              gdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
+              gdata = real_part(gdata)
+              gdata = 10*alog10((gdata/max(gdata))^2)
+              imgsize = size(gdata,/dim)
+              gdata = shift(gdata,imgsize[0]/2,imgsize[1]/2,0)
 
               ;;==Set up graphics parameters
               rgb_table = 39
-              min_value = min(imgdata,/nan)
-              max_value = max(imgdata,/nan)
+              min_value = min(gdata,/nan)
+              max_value = max(gdata,/nan)
 
               ;;==Create image
-              img = multi_image(imgdata,xdata,ydata, $
+              img = multi_image(gdata,xdata,ydata, $
                                 xrange = [-2*!pi,2*!pi], $
                                 yrange = [0,2*!pi], $
                                 position = info.position, $
