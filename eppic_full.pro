@@ -104,74 +104,10 @@ pro eppic_full, path=path, $
   ;;==Create images of electrostatic potential
   eppic_phi_images, info
 
-IF 0 THEN BEGIN
   ;;==Create images of density
-  if string_exist(target,'den',3) then begin
-     rgb_table = 5
-     n_dist = params.ndist
-     for id=0,n_dist-1 do begin
-        dist_name = 'dist'+strcompress(id,/remove_all)
-        if ~keyword_set(den_exists) then begin
-           data_name = 'den'+strcompress(id,/remove_all)
-           data = (load_eppic_data(data_name,path=path,timestep=timestep))[data_name]
-           ;; den_exists = 1B
-        endif
-        for ip=0,n_planes-1 do begin
-           case 1B of
-              strcmp(planes[ip],'xy'): begin
-                 imgdata = data[xrng[0]:xrng[1],yrng[0]:yrng[1],zctr,*]
-                 xdata = grid.x[xrng[0]:xrng[1]]
-                 ydata = grid.y[yrng[0]:yrng[1]]
-                 grad_dx = grid.dx
-                 grad_dy = grid.dy
-              end
-              strcmp(planes[ip],'xz'): begin
-                 imgdata = data[xrng[0]:xrng[1],yctr,zrng[0]:zrng[1],*]
-                 xdata = grid.x[xrng[0]:xrng[1]]
-                 ydata = grid.z[zrng[0]:zrng[1]]
-                 grad_dx = grid.dx
-                 grad_dy = grid.dz
-              end
-              strcmp(planes[ip],'yz'): begin
-                 imgdata = data[xctr,yrng[0]:yrng[1],zrng[0]:zrng[1],*]
-                 ydata = grid.y[yrng[0]:yrng[1]]
-                 xdata = grid.z[zrng[0]:zrng[1]]
-                 grad_dx = grid.dy
-                 grad_dy = grid.dz
-              end
-           endcase
-           imgdata = reform(imgdata)
-           min_value = -max(abs(imgdata))
-           max_value = +max(abs(imgdata))
-           img = multi_image(imgdata,xdata,ydata, $
-                             position = position, $
-                             axis_style = axis_style, $
-                             rgb_table = rgb_table, $
-                             min_value = min_value, $
-                             max_value = max_value)
-           img = multi_colorbar(img,'global', $
-                                width = 0.0225, $
-                                height = 0.40, $
-                                buffer = 0.03, $
-                                orientation = 1, $
-                                textpos = 1, $
-                                tickdir = 1, $
-                                ticklen = 0.2, $
-                                major = 7, $
-                                font_name = font_name, $
-                                font_size = 8.0)
-           txt = text(0.00,0.05,path, $
-                      alignment = 0.0, $
-                      target = img, $
-                      font_name = font_name, $
-                      font_size = 5.0)
-           filename = data_name+'_'+planes[ip]+'.pdf'
-           image_save, img[0],filename=filepath+path_sep()+filename
-        endfor ;;n_planes
-        data = !NULL
-     endfor ;;n_dist
-  endif ;;den
+  eppic_den_images, info
 
+IF 0 THEN BEGIN
   ;;==Declare panel positions for spectral data
   position = multi_position(layout[*], $
                             edges = [0.12,0.10,0.80,0.80], $

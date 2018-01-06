@@ -1,6 +1,6 @@
 ;+
-; Routine to plot electrostatic potential
-; for eppic_full.pro
+; This routine makes images from EPPIC phi data. 
+; Other images that require phi should go here.
 ;-
 pro eppic_phi_images, info
 
@@ -25,6 +25,9 @@ pro eppic_phi_images, info
      2: ny = data_size[2]
      1: nx = data_size[1]
   endswitch
+
+  ;;==Declare/reset imaging flag
+  data_is_okay = 0B
 
   ;;==Create a hash for filenames
   filename = hash(['phi','emag'])
@@ -75,11 +78,14 @@ pro eppic_phi_images, info
               end
            endcase
 
+           ;;==Update imaging flag
+           data_is_okay = 1B
+
            ;;==Store filenames
            filename['phi'] = 'phi_'+planes[ip]+'.pdf'
            filename['emag'] = 'emag_'+planes[ip]+'.pdf'
 
-        endfor
+        endfor ;;n_planes
      end
      3: begin
 
@@ -98,6 +104,9 @@ pro eppic_phi_images, info
         Ex0 = params.Ex0_external
         Ey0 = params.Ey0_external        
 
+        ;;==Update imaging flag
+        data_is_okay = 1B
+
         ;;==Store filenames
         filename['phi'] = 'phi.pdf'
         filename['emag'] = 'emag.pdf'
@@ -106,107 +115,111 @@ pro eppic_phi_images, info
      else: print, "[EPPIC_PHI_IMAGES] Data must have 2 or 3 spatial dimensions."
   endcase
 
-  ;;==Extract axis subsets
-  xdata = xdata[xrng[0]:xrng[1]]
-  ydata = ydata[yrng[0]:yrng[1]]
+  if data_is_okay then begin
+     ;;==Extract axis subsets
+     xdata = xdata[xrng[0]:xrng[1]]
+     ydata = ydata[yrng[0]:yrng[1]]
 
                                 ;-----------;
                                 ; phi image ;
                                 ;-----------;
 
-  ;;==Extract subimage
-  imgdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
+     ;;==Extract subimage
+     imgdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
 
-  ;;==Set up graphics parameters
-  ct = get_custom_ct(1)
-  rgb_table = [[ct.r],[ct.g],[ct.b]]
-  min_value = -max(abs(imgdata))
-  max_value = +max(abs(imgdata))
+     ;;==Set up graphics parameters
+     ct = get_custom_ct(1)
+     rgb_table = [[ct.r],[ct.g],[ct.b]]
+     min_value = -max(abs(imgdata))
+     max_value = +max(abs(imgdata))
 
-  ;;==Create image
-  img = multi_image(imgdata,xdata,ydata, $
-                    position = position, $
-                    axis_style = axis_style, $
-                    rgb_table = rgb_table, $
-                    min_value = min_value, $
-                    max_value = max_value)
+     ;;==Create image
+     img = multi_image(imgdata,xdata,ydata, $
+                       position = position, $
+                       axis_style = axis_style, $
+                       rgb_table = rgb_table, $
+                       min_value = min_value, $
+                       max_value = max_value)
 
-  ;;==Add colorbar(s)
-  img = multi_colorbar(img,'global', $
-                       width = 0.0225, $
-                       height = 0.40, $
-                       buffer = 0.03, $
-                       orientation = 1, $
-                       textpos = 1, $
-                       tickdir = 1, $
-                       ticklen = 0.2, $
-                       major = 7, $
-                       font_name = font_name, $
-                       font_size = 8.0)
+     ;;==Add colorbar(s)
+     img = multi_colorbar(img,'global', $
+                          width = 0.0225, $
+                          height = 0.40, $
+                          buffer = 0.03, $
+                          orientation = 1, $
+                          textpos = 1, $
+                          tickdir = 1, $
+                          ticklen = 0.2, $
+                          major = 7, $
+                          font_name = font_name, $
+                          font_size = 8.0)
 
-  ;;==Add path label
-  txt = text(0.00,0.05,path, $
-             alignment = 0.0, $
-             target = img, $
-             font_name = font_name, $
-             font_size = 5.0)
+     ;;==Add path label
+     txt = text(0.00,0.05,path, $
+                alignment = 0.0, $
+                target = img, $
+                font_name = font_name, $
+                font_size = 5.0)
 
-  ;;==Save image
-  image_save, img[0],filename=filepath+path_sep()+filename['phi']
+     ;;==Save image
+     image_save, img[0],filename=filepath+path_sep()+filename['phi']
 
                                 ;------------;
                                 ; emag image ;
                                 ;------------;
 
-  ;;==Calculate |E|
-  ;; imgplane = smooth(imgplane,[0.5/dx,0.5/dy,1],/edge_wrap)
-  efield = dictionary()
-  for it=0,nt-1 do begin
-     gradf = gradient(imgplane[*,*,it],dx=dx*params.nout_avg,dy=dy*params.nout_avg)
-     efield.x = -1.0*gradf.x + params.Ex0_external
-     efield.y = -1.0*gradf.y + params.Ey0_external
-     ;; efield.x = -1.0*gradf.x
-     ;; efield.y = -1.0*gradf.y
-     imgplane[*,*,it] = sqrt(efield.x^2 + efield.y^2)
-  endfor
+     ;;==Calculate |E|
+     ;; imgplane = smooth(imgplane,[0.5/dx,0.5/dy,1],/edge_wrap)
+     efield = dictionary()
+     for it=0,nt-1 do begin
+        gradf = gradient(imgplane[*,*,it],dx=dx*params.nout_avg,dy=dy*params.nout_avg)
+        efield.x = -1.0*gradf.x + params.Ex0_external
+        efield.y = -1.0*gradf.y + params.Ey0_external
+        ;; efield.x = -1.0*gradf.x
+        ;; efield.y = -1.0*gradf.y
+        imgplane[*,*,it] = sqrt(efield.x^2 + efield.y^2)
+     endfor
 
-  ;;==Extract subimage
-  imgdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
+     ;;==Extract subimage
+     imgdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
 
-  ;;==Set up graphics parameters
-  rgb_table = 3
-  min_value = 0
-  max_value = max(imgdata)
+     ;;==Set up graphics parameters
+     rgb_table = 3
+     min_value = 0
+     max_value = max(imgdata)
 
-  ;;==Create image
-  img = multi_image(imgdata,xdata,ydata, $
-                    position = position, $
-                    axis_style = axis_style, $
-                    rgb_table = rgb_table, $
-                    min_value = min_value, $
-                    max_value = max_value)
+     ;;==Create image
+     img = multi_image(imgdata,xdata,ydata, $
+                       position = position, $
+                       axis_style = axis_style, $
+                       rgb_table = rgb_table, $
+                       min_value = min_value, $
+                       max_value = max_value)
 
-  ;;==Add colorbar(s)
-  img = multi_colorbar(img,'global', $
-                       width = 0.0225, $
-                       height = 0.40, $
-                       buffer = 0.03, $
-                       orientation = 1, $
-                       textpos = 1, $
-                       tickdir = 1, $
-                       ticklen = 0.2, $
-                       major = 7, $
-                       font_name = font_name, $
-                       font_size = 8.0)
+     ;;==Add colorbar(s)
+     img = multi_colorbar(img,'global', $
+                          width = 0.0225, $
+                          height = 0.40, $
+                          buffer = 0.03, $
+                          orientation = 1, $
+                          textpos = 1, $
+                          tickdir = 1, $
+                          ticklen = 0.2, $
+                          major = 7, $
+                          font_name = font_name, $
+                          font_size = 8.0)
 
-  ;;==Add path label
-  txt = text(0.00,0.05,path, $
-             alignment = 0.0, $
-             target = img, $
-             font_name = font_name, $
-             font_size = 5.0)
+     ;;==Add path label
+     txt = text(0.00,0.05,path, $
+                alignment = 0.0, $
+                target = img, $
+                font_name = font_name, $
+                font_size = 5.0)
 
-  ;;==Save image
-  image_save, img[0],filename=filepath+path_sep()+filename['emag']
+     ;;==Save image
+     image_save, img[0],filename=filepath+path_sep()+filename['emag']
+
+  endif $ ;;data_is_okay
+  else print, "[EPPIC_PHI_IMAGES] Could not create an image."
 
 end
