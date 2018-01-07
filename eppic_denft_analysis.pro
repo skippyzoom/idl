@@ -12,21 +12,37 @@ pro eppic_denft_analysis, info
      ;;==Read data
      data = (load_eppic_data(dist_name,path=info.path,timestep=info.timestep))[dist_name]
 
-     ;;==Get data dimensions
+     ;;==Get number of data dimensions
      data_size = size(data)
      n_dims = data_size[0]
-     nt = data_size[n_dims]
-     switch n_dims-1 of
-        3: nz = data_size[3]
-        2: ny = data_size[2]
-        1: nx = data_size[1]
-     endswitch
 
      ;;==Check dimensions
      if n_dims gt 2 then begin
 
         ;;==Set imaging flag
         image_data_exists = 0B
+
+        ;;==Transpose data
+        xyzt = info.xyz
+        case n_dims of
+           4: begin
+              if n_elements(info.xyz) eq 2 then xyzt = [info.xyz,[2,3]] $
+              else xyzt = [info.xyz,3]
+           end
+           3: begin
+              if n_elements(info.xyz) gt 2 then xyzt = [info.xyz[0:1],2]
+           end
+           else: xyzt = indgen(n_dims)
+        endcase
+        data = transpose(data,xyzt)
+
+        ;;==Get dimensions of transposed data
+        data_size = size(data)
+        switch n_dims-1 of
+           3: nz = data_size[3]
+           2: ny = data_size[2]
+           1: nx = data_size[1]
+        endswitch
 
         ;;==Loop over 2-D image planes
         n_planes = (n_dims eq 4) ? n_elements(info.planes) : 1
@@ -35,42 +51,26 @@ pro eppic_denft_analysis, info
            case n_dims of 
               4: begin
 
-                 ;;==Transpose data
-                 if n_elements(info.xyz) eq 2 then info.xyz = [info.xyz,2]
-                 data = transpose(data,[info.xyz,3])
-
                  ;;==Set up 2-D image
                  case 1B of 
                     strcmp(info.planes[ip],'xy') || strcmp(info.planes[ip],'yx'): begin
                        imgplane = reform(data[*,*,info.zctr,*])
-                       len = info.grid.nx*info.params.nout_avg
-                       tmp = findgen(len)-0.5*len
-                       xdata = (2*!pi/(info.grid.dx*len))*tmp
-                       len = info.grid.ny*info.params.nout_avg
-                       tmp = findgen(len)-0.5*len
-                       ydata = (2*!pi/(info.grid.dy*len))*tmp
+                       xdata = (2*!pi/(info.xdif*nx))*findgen(nx)-0.5*nx
+                       ydata = (2*!pi/(info.ydif*ny))*findgen(ny)-0.5*ny
                        xrng = info.xrng
                        yrng = info.yrng
                     end
                     strcmp(info.planes[ip],'xz') || strcmp(info.planes[ip],'zx'): begin
                        imgplane = reform(data[*,info.yctr,*,*])
-                       len = info.grid.nx*info.params.nout_avg
-                       tmp = findgen(len)-0.5*len
-                       xdata = (2*!pi/(info.grid.dx*len))*tmp
-                       len = info.grid.nz*info.params.nout_avg
-                       tmp = findgen(len)-0.5*len
-                       ydata = (2*!pi/(info.grid.dz*len))*tmp
+                       xdata = (2*!pi/(info.xdif*nx))*findgen(nx)-0.5*nx
+                       ydata = (2*!pi/(info.zdif*nz))*findgen(nz)-0.5*nz
                        xrng = info.xrng
                        yrng = info.zrng
                     end
                     strcmp(info.planes[ip],'yz') || strcmp(info.planes[ip],'zy'): begin
                        imgplane = reform(data[info.xctr,*,*,*])
-                       len = info.grid.ny*info.params.nout_avg
-                       tmp = findgen(len)-0.5*len
-                       xdata = (2*!pi/(info.grid.dy*len))*tmp
-                       len = info.grid.nz*info.params.nout_avg
-                       tmp = findgen(len)-0.5*len
-                       ydata = (2*!pi/(info.grid.dz*len))*tmp
+                       xdata = (2*!pi/(info.ydif*ny))*findgen(ny)-0.5*ny
+                       ydata = (2*!pi/(info.zdif*nz))*findgen(nz)-0.5*nz
                        xrng = info.yrng
                        yrng = info.zrng
                     end
@@ -87,18 +87,10 @@ pro eppic_denft_analysis, info
               end
               3: begin
 
-                 ;;==Transpose data
-                 if n_elements(info.xyz) gt 2 then info.xyz = info.xyz[0:1]
-                 data = transpose(data,[info.xyz,2])        
-
                  ;;==Set up 2-D image
                  imgplane = reform(data)
-                 len = info.grid.nx*info.params.nout_avg
-                 tmp = findgen(len)-0.5*len
-                 xdata = (2*!pi/(info.grid.dx*len))*tmp
-                 len = info.grid.ny*info.params.nout_avg
-                 tmp = findgen(len)-0.5*len
-                 ydata = (2*!pi/(info.grid.dy*len))*tmp
+                 xdata = (2*!pi/(info.xdif*nx))*findgen(nx)-0.5*nx
+                 ydata = (2*!pi/(info.ydif*ny))*findgen(ny)-0.5*ny
                  xrng = info.xrng
                  yrng = info.yrng
                  tmp = !NULL
@@ -116,55 +108,8 @@ pro eppic_denft_analysis, info
 
            if image_data_exists then begin
 
-              ;;==Extract axis subsets
-              xdata = xdata[xrng[0]:xrng[1]]
-              ydata = ydata[yrng[0]:yrng[1]]
-
-              ;;==Extract subimage
-              gdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
-              gdata = real_part(gdata)
-              gdata = 10*alog10((gdata/max(gdata))^2)
-              imgsize = size(gdata,/dim)
-              gdata = shift(gdata,imgsize[0]/2,imgsize[1]/2,0)
-
-              ;;==Set up graphics parameters
-              rgb_table = 39
-              min_value = min(gdata,/nan)
-              max_value = max(gdata,/nan)
-
-              ;;==Create image
-              img = multi_image(gdata,xdata,ydata, $
-                                xrange = [-2*!pi,2*!pi], $
-                                yrange = [0,2*!pi], $
-                                position = info.position, $
-                                axis_style = info.axis_style, $
-                                rgb_table = rgb_table, $
-                                min_value = min_value, $
-                                max_value = max_value)
-
-              ;;==Add colorbar(s)
-              img = multi_colorbar(img,'global', $
-                                   width = 0.0225, $
-                                   height = 0.40, $
-                                   buffer = 0.03, $
-                                   orientation = 1, $
-                                   textpos = 1, $
-                                   tickdir = 1, $
-                                   ticklen = 0.2, $
-                                   major = 7, $
-                                   font_name = info.font_name, $
-                                   font_size = 8.0)
-
-              ;;==Add path label
-              txt = text(0.00,0.05,info.path, $
-                         alignment = 0.0, $
-                         target = img, $
-                         font_name = info.font_name, $
-                         font_size = 5.0)
-
-              ;;==Save image
-              image_save, img[0],filename=info.filepath+path_sep()+ $
-                          dist_name+plane_string+'.pdf'
+              ;;==Create images of Fourier-transformed densities
+              denft_images, imgplane,xdata,ydata,xrng,yrng,dist_name,info,image_string=plane_string
 
            endif ;;--image_data_exists
         endfor   ;;--n_planes

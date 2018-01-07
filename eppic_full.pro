@@ -94,7 +94,7 @@ pro eppic_full, path=path, $
 
   ;;==Create images from electrostatic potential
   eppic_phi_analysis, info
-STOP
+
   ;;==Create images from density
   eppic_den_analysis, info
 
@@ -109,6 +109,7 @@ STOP
           [0,grid.nz*params.nout_avg-1]]
   ctrs = [0,0,0]
   vecs = {x:grid.x, y:grid.y, z:grid.z}
+  difs = [params.dx,params.dy,params.dz]
 
   ;;==Pack spectral-data info
   info = dictionary()
@@ -121,6 +122,9 @@ STOP
   info['xvec'] = vecs.(xyz[0])
   info['yvec'] = vecs.(xyz[1])
   info['zvec'] = vecs.(xyz[2])
+  info['xdif'] = difs[xyz[0]]
+  info['ydif'] = difs[xyz[1]]
+  info['zdif'] = difs[xyz[2]]
   info['xyz'] = xyz
   info['params'] = params
   info['grid'] = grid

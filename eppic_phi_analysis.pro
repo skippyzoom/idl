@@ -23,16 +23,26 @@ pro eppic_phi_analysis, info
      ;;==Set imaging flag
      image_data_exists = 0B
 
+     ;;==Transpose data
+     xyzt = info.xyz
+     case n_dims of
+        4: begin
+           if n_elements(info.xyz) eq 2 then xyzt = [info.xyz,[2,3]] $
+           else xyzt = [info.xyz,3]
+        end
+        3: begin
+           if n_elements(info.xyz) gt 2 then xyzt = [info.xyz[0:1],2]
+        end
+        else: xyzt = indgen(n_dims)
+     endcase
+     data = transpose(data,xyzt)
+
      ;;==Loop over 2-D image planes
      n_planes = (n_dims eq 4) ? n_elements(info.planes) : 1
      for ip=0,n_planes-1 do begin
 
         case n_dims of 
            4: begin
-
-              ;;==Transpose data
-              if n_elements(info.xyz) eq 2 then info.xyz = [info.xyz,2]
-              data = transpose(data,[info.xyz,3])
 
               ;;==Set up 2-D image
               case 1B of 
@@ -80,10 +90,6 @@ pro eppic_phi_analysis, info
            end
            3: begin
 
-              ;;==Transpose data
-              if n_elements(info.xyz) gt 2 then info.xyz = info.xyz[0:1]
-              data = transpose(data,[info.xyz,2])        
-
               ;;==Set up 2-D image
               imgplane = reform(data)
               xdata = info.xvec
@@ -109,10 +115,10 @@ pro eppic_phi_analysis, info
         if image_data_exists then begin
 
            ;;==Create images of electrostatic potential
-           potential_images, imgplane,xdata,ydata,info,image_string=plane_string
+           potential_images, imgplane,xdata,ydata,xrng,yrng,info,image_string=plane_string
 
            ;;==Create image of electric field
-           efield_images, imgplane,xdata,ydata,info,image_string=plane_string
+           efield_images, imgplane,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_string=plane_string
 
         endif ;;--image_data_exists
      endfor   ;;--n_planes

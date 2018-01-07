@@ -1,7 +1,7 @@
 ;+
-; Images of electrostatic potential
+; Images of density
 ;-
-pro potential_images, imgplane,xdata,ydata,xrng,yrng,info,image_string=image_string
+pro density_images, imgplane,xdata,ydata,xrng,yrng,dist_name,info,image_string=image_string
 
   ;;==Defaults and guards
   if n_elements(image_string) eq 0 then image_string = ''
@@ -14,8 +14,7 @@ pro potential_images, imgplane,xdata,ydata,xrng,yrng,info,image_string=image_str
   gdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
 
   ;;==Set up graphics parameters
-  ct = get_custom_ct(1)
-  rgb_table = [[ct.r],[ct.g],[ct.b]]
+  rgb_table = 5
   min_value = -max(abs(gdata))
   max_value = +max(abs(gdata))
 
@@ -49,6 +48,6 @@ pro potential_images, imgplane,xdata,ydata,xrng,yrng,info,image_string=image_str
 
   ;;==Save image
   image_save, img[0],filename=info.filepath+path_sep()+ $
-              'phi'+image_string+'.pdf'
+              dist_name+image_string+'.pdf'
 
 end

@@ -1,7 +1,7 @@
 ;+
 ; Images of electric field
 ;-
-pro efield_images, imgplane,xdata,ydata,info,image_string=image_string
+pro efield_images, imgplane,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_string=image_string
 
   ;;==Defaults and guards
   if n_elements(image_string) eq 0 then image_string = ''
@@ -32,7 +32,7 @@ pro efield_images, imgplane,xdata,ydata,info,image_string=image_string
   
   ;;==Save plot
   image_save, plt,filename=info.filepath+path_sep()+ $
-              'ex_mean_tf'+plane_string+'.pdf'
+              'ex_mean_tf'+image_string+'.pdf'
   
   ;;==Extract |E| subimage
   gdata = Er[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
@@ -72,6 +72,6 @@ pro efield_images, imgplane,xdata,ydata,info,image_string=image_string
 
   ;;==Save image
   image_save, img[0],filename=info.filepath+path_sep()+ $
-              'emag'+plane_string+'.pdf'
+              'emag'+image_string+'.pdf'
 
 end

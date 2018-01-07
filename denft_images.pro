@@ -1,7 +1,7 @@
 ;+
-; Images of electrostatic potential
+; Images of EPPIC Fourier-transformed density
 ;-
-pro potential_images, imgplane,xdata,ydata,xrng,yrng,info,image_string=image_string
+pro denft_images, imgplane,xdata,ydata,xrng,yrng,dist_name,info,image_string=image_string
 
   ;;==Defaults and guards
   if n_elements(image_string) eq 0 then image_string = ''
@@ -12,15 +12,20 @@ pro potential_images, imgplane,xdata,ydata,xrng,yrng,info,image_string=image_str
 
   ;;==Extract subimage
   gdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
+  gdata = real_part(gdata)
+  gdata = 10*alog10((gdata/max(gdata))^2)
+  imgsize = size(gdata,/dim)
+  gdata = shift(gdata,imgsize[0]/2,imgsize[1]/2,0)
 
   ;;==Set up graphics parameters
-  ct = get_custom_ct(1)
-  rgb_table = [[ct.r],[ct.g],[ct.b]]
-  min_value = -max(abs(gdata))
-  max_value = +max(abs(gdata))
+  rgb_table = 39
+  min_value = min(gdata,/nan)
+  max_value = max(gdata,/nan)
 
   ;;==Create image
   img = multi_image(gdata,xdata,ydata, $
+                    xrange = [-2*!pi,2*!pi], $
+                    yrange = [0,2*!pi], $
                     position = info.position, $
                     axis_style = info.axis_style, $
                     rgb_table = rgb_table, $
@@ -49,6 +54,7 @@ pro potential_images, imgplane,xdata,ydata,xrng,yrng,info,image_string=image_str
 
   ;;==Save image
   image_save, img[0],filename=info.filepath+path_sep()+ $
-              'phi'+image_string+'.pdf'
+              dist_name+image_string+'.pdf'
+
 
 end
