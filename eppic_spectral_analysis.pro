@@ -1,7 +1,7 @@
 ;+
-; This routine makes images from EPPIC spatial data. 
+; This routine makes images from EPPIC spectral data. 
 ;-
-pro eppic_spatial_analysis, info
+pro eppic_spectral_analysis, info
 
   ;;==Loop over requested data quantities
   for id=0,n_elements(info.data_names)-1 do begin
@@ -12,6 +12,12 @@ pro eppic_spatial_analysis, info
      ;;==Read data
      data = (load_eppic_data(data_name,path=info.path,timestep=info.timestep))[data_name]
 
+     if size(data,/n_dim) eq 0 then begin
+        ;;-->The read-in function couldn't find EPPIC FT data.
+        ;;   Read the spatial data and perform an FFT here.
+        ;;   Print a message to alert the user.
+     endif
+     
      ;;==Get data dimensions
      data_size = size(data)
      n_dims = data_size[0]
@@ -51,36 +57,24 @@ pro eppic_spatial_analysis, info
            case 1B of 
               strcmp(info.planes[ip],'xy') || strcmp(info.planes[ip],'yx'): begin
                  imgplane = reform(data[*,*,info.zctr,*])
-                 xdata = info.xvec
-                 ydata = info.yvec
+                 xdata = (2*!pi/(info.xdif*nx))*findgen(nx)-0.5*nx
+                 ydata = (2*!pi/(info.ydif*ny))*findgen(ny)-0.5*ny
                  xrng = info.xrng
                  yrng = info.yrng
-                 dx = info.params.dx
-                 dy = info.params.dy
-                 Ex0 = info.params.Ex0_external
-                 Ey0 = info.params.Ey0_external
               end
               strcmp(info.planes[ip],'xz') || strcmp(info.planes[ip],'zx'): begin
                  imgplane = reform(data[*,info.yctr,*,*])
-                 xdata = info.xvec
-                 ydata = info.zvec
+                 xdata = (2*!pi/(info.xdif*nx))*findgen(nx)-0.5*nx
+                 ydata = (2*!pi/(info.zdif*nz))*findgen(nz)-0.5*nz
                  xrng = info.xrng
                  yrng = info.zrng
-                 dx = info.params.dx
-                 dy = info.params.dz
-                 Ex0 = info.params.Ex0_external
-                 Ey0 = info.params.Ez0_external
               end
               strcmp(info.planes[ip],'yz') || strcmp(info.planes[ip],'zy'): begin
                  imgplane = reform(data[info.xctr,*,*,*])
-                 xdata = info.yvec
-                 ydata = info.zvec
+                 xdata = (2*!pi/(info.ydif*ny))*findgen(ny)-0.5*ny
+                 ydata = (2*!pi/(info.zdif*nz))*findgen(nz)-0.5*nz
                  xrng = info.yrng
                  yrng = info.zrng
-                 dx = info.params.dy
-                 dy = info.params.dz
-                 Ex0 = info.params.Ey0_external
-                 Ey0 = info.params.Ez0_external
               end
            endcase
 
@@ -88,22 +82,16 @@ pro eppic_spatial_analysis, info
            if data_is_2D then plane_string = '' $
            else plane_string = '_'+info.planes[ip]
 
-           ;;==Create images of densities
+           ;;==Create images of Fourier-transformed densities
            if strcmp(data_name,'den',3) then begin
-              density_images, imgplane,xdata,ydata,xrng,yrng,data_name,info,image_string=plane_string
+              denft_images, imgplane,xdata,ydata,xrng,yrng,data_name,info,image_string=plane_string
            endif
 
-           if strcmp(data_name,'phi') then begin
-              ;;==Create images of electrostatic potential
-              potential_images, imgplane,xdata,ydata,xrng,yrng,info,image_string=plane_string
-
-              ;;==Create images of electric field
-              efield_images, imgplane,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_string=plane_string
-           endif
         endfor   ;;--planes
      endif $     ;;--n_dims
      else print, "[EPPIC_PHI_IMAGES] Could not create an image."
 
   endfor ;;--data_names
+
 
 end
