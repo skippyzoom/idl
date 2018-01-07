@@ -16,6 +16,10 @@ pro eppic_spectral_analysis, info
         ;;-->The read-in function couldn't find EPPIC FT data.
         ;;   Read the spatial data and perform an FFT here.
         ;;   Print a message to alert the user.
+
+        ;;==Extract the name of the non-FT quantity
+        pos = strpos(data_name,'ft')
+        data_name = strmid(data_name,0,pos)+strmid(data_name,pos+2)
      endif
      
      ;;==Get data dimensions

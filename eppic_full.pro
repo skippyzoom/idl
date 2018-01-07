@@ -151,5 +151,6 @@ pro eppic_full, path=path, $
   ;; eppic_denft_analysis, info
 
   ;;-->NEED eppic_spectral_analysis
+  eppic_spectral_analysis, info
 
 end
