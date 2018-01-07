@@ -1,21 +1,21 @@
 ;+
 ; Images of electric field
 ;-
-pro efield_images, imgplane,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_string=image_string
+pro efield_images, pdata,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_string=image_string
 
   ;;==Defaults and guards
   if n_elements(image_string) eq 0 then image_string = ''
 
   ;;==Smooth 2-D plane
-  ;; imgplane = smooth(imgplane,[0.5/dx,0.5/dy,1],/edge_wrap)
+  ;; pdata = smooth(pdata,[0.5/dx,0.5/dy,1],/edge_wrap)
 
   ;;==Calculate E-field components
-  Ex = fltarr(size(imgplane,/dim))
-  Ey = fltarr(size(imgplane,/dim))
-  Er = fltarr(size(imgplane,/dim))
-  Et = fltarr(size(imgplane,/dim))
+  Ex = fltarr(size(pdata,/dim))
+  Ey = fltarr(size(pdata,/dim))
+  Er = fltarr(size(pdata,/dim))
+  Et = fltarr(size(pdata,/dim))
   for it=0,nt-1 do begin
-     gradf = gradient(imgplane[*,*,it],dx=dx*info.params.nout_avg,dy=dy*info.params.nout_avg)
+     gradf = gradient(pdata[*,*,it],dx=dx*info.params.nout_avg,dy=dy*info.params.nout_avg)
      Ex[*,*,it] = -1.0*gradf.x + info.params.Ex0_external
      Ey[*,*,it] = -1.0*gradf.y + info.params.Ey0_external
      Er[*,*,it] = sqrt(Ex[*,*,it]^2 + Ey[*,*,it]^2)

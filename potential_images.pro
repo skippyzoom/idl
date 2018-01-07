@@ -1,7 +1,7 @@
 ;+
 ; Images of electrostatic potential
 ;-
-pro potential_images, imgplane,xdata,ydata,xrng,yrng,info,image_string=image_string
+pro potential_images, pdata,xdata,ydata,xrng,yrng,info,image_string=image_string
 
   ;;==Defaults and guards
   if n_elements(image_string) eq 0 then image_string = ''
@@ -11,7 +11,7 @@ pro potential_images, imgplane,xdata,ydata,xrng,yrng,info,image_string=image_str
   ydata = ydata[yrng[0]:yrng[1]]
 
   ;;==Extract subimage
-  gdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
+  gdata = pdata[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
 
   ;;==Set up graphics parameters
   ct = get_custom_ct(1)

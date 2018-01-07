@@ -1,7 +1,7 @@
 ;+
 ; Images of EPPIC Fourier-transformed density
 ;-
-pro denft_images, imgplane,xdata,ydata,xrng,yrng,dist_name,info,image_string=image_string
+pro denft_images, pdata,xdata,ydata,xrng,yrng,dist_name,info,image_string=image_string
 
   ;;==Defaults and guards
   if n_elements(image_string) eq 0 then image_string = ''
@@ -11,7 +11,7 @@ pro denft_images, imgplane,xdata,ydata,xrng,yrng,dist_name,info,image_string=ima
   ydata = ydata[yrng[0]:yrng[1]]
 
   ;;==Extract subimage
-  gdata = imgplane[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
+  gdata = pdata[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
   gdata = real_part(gdata)
   gdata = 10*alog10((gdata/max(gdata))^2)
   imgsize = size(gdata,/dim)
