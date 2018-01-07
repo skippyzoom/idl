@@ -59,6 +59,9 @@ pro eppic_full, path=path, $
   ;;==Declare transpose for images
   xyz = [1,0,2]
 
+  ;;==Choose EPPIC spatial output quantities to analyze
+  data_names = list('phi','den0','den1')
+
   ;;==Declare panel positions for spatial data
   position = multi_position(layout[*], $
                             edges = [0.12,0.10,0.80,0.80], $
@@ -91,12 +94,19 @@ pro eppic_full, path=path, $
   info['filepath'] = filepath
   info['planes'] = planes
   info['timestep'] = timestep
+  info['data_names'] = data_names
 
-  ;;==Create images from electrostatic potential
-  eppic_phi_analysis, info
+  ;; ;;==Create images from electrostatic potential
+  ;; eppic_phi_analysis, info
 
-  ;;==Create images from density
-  eppic_den_analysis, info
+  ;; ;;==Create images from density
+  ;; eppic_den_analysis, info
+
+  ;;==Create images from spatial data
+  eppic_spatial_analysis, info
+
+  ;;==Choose EPPIC spectral output quantities to analyze
+  data_names = list('denft0','denft1')
 
   ;;==Declare panel positions for spectral data
   position = multi_position(layout[*], $
@@ -135,8 +145,11 @@ pro eppic_full, path=path, $
   info['filepath'] = filepath
   info['planes'] = planes
   info['timestep'] = timestep
+  info['data_names'] = data_names
 
   ;;==Create images from FT density
-  eppic_denft_analysis, info
+  ;; eppic_denft_analysis, info
+
+  ;;-->NEED eppic_spectral_analysis
 
 end
