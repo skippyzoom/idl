@@ -16,8 +16,10 @@ pro efield_images, pdata,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_strin
   Et = fltarr(size(pdata,/dim))
   for it=0,nt-1 do begin
      gradf = gradient(pdata[*,*,it],dx=dx*info.params.nout_avg,dy=dy*info.params.nout_avg)
-     Ex[*,*,it] = -1.0*gradf.x + info.params.Ex0_external
-     Ey[*,*,it] = -1.0*gradf.y + info.params.Ey0_external
+     ;; Ex[*,*,it] = -1.0*gradf.x + info.params.Ex0_external
+     ;; Ey[*,*,it] = -1.0*gradf.y + info.params.Ey0_external
+     Ex[*,*,it] = -1.0*gradf.x + Ex0
+     Ey[*,*,it] = -1.0*gradf.y + Ey0
      Er[*,*,it] = sqrt(Ex[*,*,it]^2 + Ey[*,*,it]^2)
      Et[*,*,it] = atan(Ey[*,*,it],Ex[*,*,it])
   endfor
@@ -40,7 +42,9 @@ pro efield_images, pdata,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_strin
   ;;==Set up graphics parameters
   rgb_table = 3
   min_value = 0
-  max_value = max(gdata)
+  ;; max_value = max(gdata)
+  ;; max_value = min([max(gdata),3*max(abs([Ex0,Ey0]))])
+  max_value = max(gdata[*,*,1:*])
 
   ;;==Create image
   img = multi_image(gdata,xdata,ydata, $
@@ -50,6 +54,14 @@ pro efield_images, pdata,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_strin
                     title = info.title, $
                     min_value = min_value, $
                     max_value = max_value)
+
+  ;;==Edit axes
+  nc = info.layout[0]
+  nr = info.layout[1]
+  for it=0,n_elements(info.timestep)-1 do begin
+     ax = img[it].axes
+     ax[1].hide = (it mod nc ne 0)
+  endfor
 
   ;;==Add colorbar(s)
   img = multi_colorbar(img,'global', $

@@ -27,6 +27,14 @@ pro density_images, pdata,xdata,ydata,xrng,yrng,dist_name,info,image_string=imag
                     min_value = min_value, $
                     max_value = max_value)
 
+  ;;==Edit axes
+  nc = info.layout[0]
+  nr = info.layout[1]
+  for it=0,n_elements(info.timestep)-1 do begin
+     ax = img[it].axes
+     ax[1].hide = (it mod nc ne 0)
+  endfor
+
   ;;==Add colorbar(s)
   img = multi_colorbar(img,'global', $
                        width = 0.0225, $
