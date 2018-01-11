@@ -73,22 +73,22 @@ pro eppic_spectral_analysis, info
            case 1B of 
               strcmp(info.planes[ip],'xy') || strcmp(info.planes[ip],'yx'): begin
                  imgplane = reform(data[*,*,info.zctr,*])
-                 xdata = (2*!pi/(info.xdif*nx))*findgen(nx)-0.5*nx
-                 ydata = (2*!pi/(info.ydif*ny))*findgen(ny)-0.5*ny
+                 xdata = (2*!pi/(info.xdif*nx))*(findgen(nx)-0.5*nx)
+                 ydata = (2*!pi/(info.ydif*ny))*(findgen(ny)-0.5*ny)
                  xrng = info.xrng
                  yrng = info.yrng
               end
               strcmp(info.planes[ip],'xz') || strcmp(info.planes[ip],'zx'): begin
                  imgplane = reform(data[*,info.yctr,*,*])
-                 xdata = (2*!pi/(info.xdif*nx))*findgen(nx)-0.5*nx
-                 ydata = (2*!pi/(info.zdif*nz))*findgen(nz)-0.5*nz
+                 xdata = (2*!pi/(info.xdif*nx))*(findgen(nx)-0.5*nx)
+                 ydata = (2*!pi/(info.zdif*nz))*(findgen(nz)-0.5*nz)
                  xrng = info.xrng
                  yrng = info.zrng
               end
               strcmp(info.planes[ip],'yz') || strcmp(info.planes[ip],'zy'): begin
                  imgplane = reform(data[info.xctr,*,*,*])
-                 xdata = (2*!pi/(info.ydif*ny))*findgen(ny)-0.5*ny
-                 ydata = (2*!pi/(info.zdif*nz))*findgen(nz)-0.5*nz
+                 xdata = (2*!pi/(info.ydif*ny))*(findgen(ny)-0.5*ny)
+                 ydata = (2*!pi/(info.zdif*nz))*(findgen(nz)-0.5*nz)
                  xrng = info.yrng
                  yrng = info.zrng
               end
@@ -101,8 +101,10 @@ pro eppic_spectral_analysis, info
            ;;==Transform spatial data
            if data_is_spatial then begin
               for it=0,nt-1 do begin
-                 data[*,*,*,it] = real_part(fft(data[*,*,*,it],/overwrite))
+                 ;; data[*,*,*,it] = real_part(fft(data[*,*,*,it],/overwrite))
+                 imgplane[*,*,it] = real_part(fft(imgplane[*,*,it],/overwrite))
               endfor              
+              data_name += 'fft'
            endif
 
            ;;==Create images of Fourier-transformed densities
