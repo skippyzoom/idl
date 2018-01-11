@@ -12,14 +12,20 @@ pro eppic_spectral_analysis, info
      ;;==Read data
      data = (load_eppic_data(data_name,path=info.path,timestep=info.timestep))[data_name]
 
+     ;;==Check successful read
+     data_is_spatial = 0B
      if size(data,/n_dim) eq 0 then begin
-        ;;-->The read-in function couldn't find EPPIC FT data.
-        ;;   Read the spatial data and perform an FFT here.
-        ;;   Print a message to alert the user.
 
         ;;==Extract the name of the non-FT quantity
         pos = strpos(data_name,'ft')
         data_name = strmid(data_name,0,pos)+strmid(data_name,pos+2)
+
+        ;;==Read data
+        data = (load_eppic_data(data_name,path=info.path,timestep=info.timestep))[data_name]
+
+        ;;==Check successful read
+        data_is_spatial = (size(data,/n_dim) ne 0) ? 1B : 0B
+
      endif
      
      ;;==Get data dimensions
@@ -86,6 +92,13 @@ pro eppic_spectral_analysis, info
            if data_is_2D then plane_string = '' $
            else plane_string = '_'+info.planes[ip]
 
+           ;;==Transform spatial data
+           if data_is_spatial then begin
+              for it=0,nt-1 do begin
+                 data[*,*,*,it] = real_part(fft(data[*,*,*,it],/overwrite))
+              endfor              
+           endif
+STOP
            ;;==Create images of Fourier-transformed densities
            if strcmp(data_name,'den',3) then begin
               denft_images, imgplane,xdata,ydata,xrng,yrng,data_name,info,image_string=plane_string

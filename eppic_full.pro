@@ -96,17 +96,12 @@ pro eppic_full, path=path, $
   info['timestep'] = timestep
   info['data_names'] = data_names
 
-  ;; ;;==Create images from electrostatic potential
-  ;; eppic_phi_analysis, info
-
-  ;; ;;==Create images from density
-  ;; eppic_den_analysis, info
-
   ;;==Create images from spatial data
   eppic_spatial_analysis, info
 
   ;;==Choose EPPIC spectral output quantities to analyze
-  data_names = list('denft0','denft1')
+  ;; data_names = list('denft0','denft1')
+  data_names = list('denft1')
 
   ;;==Declare panel positions for spectral data
   position = multi_position(layout[*], $
@@ -147,10 +142,7 @@ pro eppic_full, path=path, $
   info['timestep'] = timestep
   info['data_names'] = data_names
 
-  ;;==Create images from FT density
-  ;; eppic_denft_analysis, info
-
-  ;;-->NEED eppic_spectral_analysis
+  ;;==Create images from spectral data
   eppic_spectral_analysis, info
 
 end
