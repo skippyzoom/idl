@@ -21,6 +21,7 @@ pro density_images, pdata,xdata,ydata,xrng,yrng,dist_name,info,image_string=imag
   ;;==Create image
   img = multi_image(gdata,xdata,ydata, $
                     position = info.position, $
+                    title = info.title, $
                     axis_style = info.axis_style, $
                     rgb_table = rgb_table, $
                     min_value = min_value, $

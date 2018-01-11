@@ -47,6 +47,7 @@ pro efield_images, pdata,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_strin
                     position = info.position, $
                     axis_style = info.axis_style, $
                     rgb_table = rgb_table, $
+                    title = info.title, $
                     min_value = min_value, $
                     max_value = max_value)
 

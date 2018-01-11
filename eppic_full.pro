@@ -53,6 +53,8 @@ pro eppic_full, path=path, $
   nt = 9
   timestep = params.nout*(nt_max/(nt-1))*lindgen(nt)
   layout = [3,3]
+  str_time = string(1e3*params.dt*timestep,format='(f8.2)')
+  str_time = "t = "+strcompress(str_time,/remove_all)+" ms"
 
   ;;==Set global graphics preferences
   axis_style = 2
@@ -98,6 +100,7 @@ pro eppic_full, path=path, $
   info['filepath'] = filepath
   info['planes'] = planes
   info['timestep'] = timestep
+  info['title'] = str_time
   info['data_names'] = data_names
 
   ;;==Create images from spatial data
@@ -144,6 +147,7 @@ pro eppic_full, path=path, $
   info['filepath'] = filepath
   info['planes'] = planes
   info['timestep'] = timestep
+  info['title'] = str_time
   info['data_names'] = data_names
 
   ;;==Create images from spectral data

@@ -101,7 +101,6 @@ pro eppic_spectral_analysis, info
            ;;==Transform spatial data
            if data_is_spatial then begin
               for it=0,nt-1 do begin
-                 ;; data[*,*,*,it] = real_part(fft(data[*,*,*,it],/overwrite))
                  imgplane[*,*,it] = real_part(fft(imgplane[*,*,it],/overwrite))
               endfor              
               data_name += 'fft'

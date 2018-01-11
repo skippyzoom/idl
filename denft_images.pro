@@ -26,6 +26,7 @@ pro denft_images, pdata,xdata,ydata,xrng,yrng,dist_name,info,image_string=image_
   img = multi_image(gdata,xdata,ydata, $
                     xrange = [-2*!pi,2*!pi], $
                     yrange = [0,2*!pi], $
+                    title = info.title, $
                     position = info.position, $
                     axis_style = info.axis_style, $
                     rgb_table = rgb_table, $

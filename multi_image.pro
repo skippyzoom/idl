@@ -24,9 +24,15 @@ function multi_image, imgdata,xdata,ydata,_EXTRA=ex
            layout = intarr(3,nt)
            for it=0,nt-1 do layout[*,it] = [input[0],input[1],it+1]
         endif
-        ;; d_ex.remove, 'layout'
      endif
      if d_ex.haskey('position') then position = d_ex.position
+     if d_ex.haskey('title') then begin
+        case n_elements(d_ex.title) of
+           0: title = make_array(nt,value='')
+           1: title = make_array(nt,value=d_ex.title)
+           nt: title = d_ex.title
+        endcase
+     endif
 
      ;;==Declare image-handle array
      img = objarr(nt)
@@ -37,7 +43,7 @@ function multi_image, imgdata,xdata,ydata,_EXTRA=ex
         ;;==Insert current time step for user-defined keywords
         if n_elements(layout) ne 0 then d_ex.layout = layout[*,it]
         if n_elements(position) ne 0 then d_ex.position = position[*,it]
-        ;; ex = d_ex.tostruct()
+        if n_elements(title) ne 0 then d_ex.title = title[it]
 
         ;;==Create image panel(s)
         img[it] = image(imgdata[*,*,it],xdata,ydata, $

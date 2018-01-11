@@ -23,6 +23,7 @@ pro potential_images, pdata,xdata,ydata,xrng,yrng,info,image_string=image_string
   img = multi_image(gdata,xdata,ydata, $
                     position = info.position, $
                     axis_style = info.axis_style, $
+                    title = info.title, $
                     rgb_table = rgb_table, $
                     min_value = min_value, $
                     max_value = max_value)
