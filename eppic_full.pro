@@ -42,6 +42,10 @@ pro eppic_full, path=path, $
                 font_name=font_name,font_size=font_size
 
                                 ;--------------------;
+                                ; 2-D movies of data ;
+                                ;--------------------;
+
+                                ;--------------------;
                                 ; 2-D images of data ;
                                 ;--------------------;
 

@@ -28,7 +28,7 @@ pro eppic_spectral_analysis, info
 
      endif
      
-     ;;==Get data dimensions
+     ;;==Get data size and dimensions
      data_size = size(data)
      n_dims = data_size[0]
      nt = data_size[n_dims]
@@ -59,6 +59,12 @@ pro eppic_spectral_analysis, info
         n_xyzt = n_elements(xyzt)
         if n_xyzt lt 4 then xyzt = [xyzt,tmp[n_xyzt,*]]
         data = transpose(data,xyzt)
+
+        ;;==Get new dimensions
+        data_size = size(data)
+        nz = data_size[3]
+        ny = data_size[2]
+        nx = data_size[1]
 
         ;;==Loop over 2-D image planes
         for ip=0,n_elements(info.planes)-1 do begin
@@ -98,7 +104,7 @@ pro eppic_spectral_analysis, info
                  data[*,*,*,it] = real_part(fft(data[*,*,*,it],/overwrite))
               endfor              
            endif
-STOP
+
            ;;==Create images of Fourier-transformed densities
            if strcmp(data_name,'den',3) then begin
               denft_images, imgplane,xdata,ydata,xrng,yrng,data_name,info,image_string=plane_string
