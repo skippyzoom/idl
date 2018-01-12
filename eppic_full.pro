@@ -41,20 +41,16 @@ pro eppic_full, path=path, $
                 path=filepath, $
                 font_name=font_name,font_size=font_size
 
-                                ;--------------------;
-                                ; 2-D movies of data ;
-                                ;--------------------;
-
-                                ;--------------------;
-                                ; 2-D images of data ;
-                                ;--------------------;
+                                ;----------------------------;
+                                ; 2-D images of spatial data ;
+                                ;----------------------------;
 
   ;;==Choose time steps for images
   nt = 9
   timestep = params.nout*(nt_max/(nt-1))*lindgen(nt)
   layout = [3,3]
-  str_time = string(1e3*params.dt*timestep,format='(f8.2)')
-  str_time = "t = "+strcompress(str_time,/remove_all)+" ms"
+  string_time = string(1e3*params.dt*timestep,format='(f8.2)')
+  string_time = "t = "+strcompress(string_time,/remove_all)+" ms"
 
   ;;==Set global graphics preferences
   axis_style = 2
@@ -101,11 +97,15 @@ pro eppic_full, path=path, $
   info['filepath'] = filepath
   info['planes'] = planes
   info['timestep'] = timestep
-  info['title'] = str_time
+  info['title'] = string_time
   info['data_names'] = data_names
 
   ;;==Create images from spatial data
-  eppic_spatial_analysis, info
+  eppic_spatial_analysis, info,/movies
+
+                                ;-----------------------------;
+                                ; 2-D images of spectral data ;
+                                ;-----------------------------;
 
   ;;==Choose EPPIC spectral output quantities to analyze
   ;; data_names = list('denft0','denft1')
@@ -149,7 +149,7 @@ pro eppic_full, path=path, $
   info['filepath'] = filepath
   info['planes'] = planes
   info['timestep'] = timestep
-  info['title'] = str_time
+  info['title'] = string_time
   info['data_names'] = data_names
 
   ;;==Create images from spectral data
