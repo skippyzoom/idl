@@ -202,16 +202,22 @@ pro eppic_spatial_analysis, info,movies=movies
 
               ;;==Select color table
               case 1B of 
-                 strcmp(data_name,'den',3): rgb_table = 5
+                 strcmp(data_name,'den',3): begin
+                    rgb_table = 5
+                    min_value = -max(abs(imgplane))
+                    max_value = +max(abs(imgplane))
+                 end
                  strcmp(data_name,'phi'): begin
                     ct = get_custom_ct(1)
                     rgb_table = [[ct.r],[ct.g],[ct.b]]
+                    min_value = -max(abs(imgplane[*,*,1:*]))
+                    max_value = +max(abs(imgplane[*,*,1:*]))
                  end
               endcase
               
               ;;==Create movie
               filename = info.filepath+path_sep()+ $
-                         data_name+plane_string+'.mp4', $
+                         data_name+plane_string+'.mp4'
               data_movie, imgplane,xdata,ydata, $
                           filename = filename, $
                           title = string_time, $
