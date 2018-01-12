@@ -17,8 +17,6 @@
 ;    user does not pass in the dimensions keyword, this routine 
 ;    sets it to [xsize,ysize], where xsize and ysize are derived 
 ;    from the input data array.
-; -- This routine automatically scales the data image to 80% of 
-;    the expansion factor (expand).
 ;
 ; TO DO
 ; -- Use different image scale factors for movies with 
