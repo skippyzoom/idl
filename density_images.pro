@@ -5,6 +5,9 @@ pro density_images, pdata,xdata,ydata,xrng,yrng,dist_name,info,image_string=imag
 
   ;;==Defaults and guards
   if n_elements(image_string) eq 0 then image_string = ''
+  pdata_in = pdata
+  xdata_in = xdata
+  ydata_in = ydata
 
   ;;==Extract axis subsets
   xdata = xdata[xrng[0]:xrng[1]]
@@ -58,5 +61,10 @@ pro density_images, pdata,xdata,ydata,xrng,yrng,dist_name,info,image_string=imag
   ;;==Save image
   image_save, img[0],filename=info.filepath+path_sep()+ $
               dist_name+image_string+'.pdf'
+
+  ;;==Restore original data
+  pdata = pdata_in
+  xdata = xdata_in
+  ydata = ydata_in
 
 end

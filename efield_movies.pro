@@ -5,6 +5,9 @@ pro efield_movies, pdata,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_strin
 
   ;;==Defaults and guards
   if n_elements(image_string) eq 0 then image_string = ''
+  pdata_in = pdata
+  xdata_in = xdata
+  ydata_in = ydata
 
   ;;==Smooth 2-D plane
   ;; pdata = smooth(pdata,[0.5/dx,0.5/dy,1],/edge_wrap)
@@ -21,6 +24,10 @@ pro efield_movies, pdata,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_strin
      Er[*,*,it] = sqrt(Ex[*,*,it]^2 + Ey[*,*,it]^2)
      Et[*,*,it] = atan(Ey[*,*,it],Ex[*,*,it])
   endfor
+
+  ;;==Extract axis subsets
+  xdata = xdata[xrng[0]:xrng[1]]
+  ydata = ydata[yrng[0]:yrng[1]]
 
   ;;==Extract |E| subimage
   gdata = Er[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
@@ -49,5 +56,10 @@ pro efield_movies, pdata,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_strin
               max_value = max_value, $
               expand = 3, $
               rescale = 0.8
+
+  ;;==Restore original data
+  pdata = pdata_in
+  xdata = xdata_in
+  ydata = ydata_in
 
 end

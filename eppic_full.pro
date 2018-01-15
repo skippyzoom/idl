@@ -69,7 +69,7 @@ pro eppic_full, path=path, $
                             edges = [0.12,0.10,0.80,0.80], $
                             buffer = [0.00,0.10])
 
-  ;;==Declare data ranges for spatial data
+  ;;==Declare data ranges for spatial data image panels
   rngs = [[0,grid.nx-1], $
           [grid.ny/2,grid.ny-1], $
           [0,grid.nz-1]]
@@ -101,7 +101,7 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
 
   ;;==Create images from spatial data
-  eppic_spatial_analysis, info,/movies
+  eppic_spatial_analysis, info,movies=0B
 
                                 ;-----------------------------;
                                 ; 2-D images of spectral data ;

@@ -5,6 +5,9 @@ pro efield_images, pdata,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_strin
 
   ;;==Defaults and guards
   if n_elements(image_string) eq 0 then image_string = ''
+  pdata_in = pdata
+  xdata_in = xdata
+  ydata_in = ydata
 
   ;;==Smooth 2-D plane
   ;; pdata = smooth(pdata,[0.5/dx,0.5/dy,1],/edge_wrap)
@@ -25,16 +28,26 @@ pro efield_images, pdata,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_strin
   endfor
 
   ;;==Calculate vertical average of horizontal field
-  gdata = mean(Ex[*,*,nt-1],dim=2)
+  gdata = 1e3*mean(Ex[*,*,[0,nt/2,nt-1]],dim=2)
 
   ;;==Create plot
-  plt = plot(xdata,gdata,'k-', $
+  plt = plot(xdata,gdata[*,0],'k-', $
              axis_style = 1, $
+             xstyle = 1, $
+             xtitle = "Distance [m]", $
+             ytitle = "|E| [mV/m]", $
              /buffer)
-  
+  opl = plot(xdata,gdata[*,1],'b-', $
+             /overplot)
+  opl = plot(xdata,gdata[*,2],'r-', $
+             /overplot)
   ;;==Save plot
   image_save, plt,filename=info.filepath+path_sep()+ $
               'ex_mean_tf'+image_string+'.pdf'
+
+  ;;==Extract axis subsets
+  xdata = xdata[xrng[0]:xrng[1]]
+  ydata = ydata[yrng[0]:yrng[1]]
   
   ;;==Extract |E| subimage
   gdata = Er[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
@@ -86,5 +99,10 @@ pro efield_images, pdata,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_strin
   ;;==Save image
   image_save, img[0],filename=info.filepath+path_sep()+ $
               'emag'+image_string+'.pdf'
+
+  ;;==Restore original data
+  pdata = pdata_in
+  xdata = xdata_in
+  ydata = ydata_in
 
 end

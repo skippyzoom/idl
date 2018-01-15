@@ -5,6 +5,9 @@ pro potential_images, pdata,xdata,ydata,xrng,yrng,info,image_string=image_string
 
   ;;==Defaults and guards
   if n_elements(image_string) eq 0 then image_string = ''
+  pdata_in = pdata
+  xdata_in = xdata
+  ydata_in = ydata
 
   ;;==Extract axis subsets
   xdata = xdata[xrng[0]:xrng[1]]
@@ -59,5 +62,10 @@ pro potential_images, pdata,xdata,ydata,xrng,yrng,info,image_string=image_string
   ;;==Save image
   image_save, img[0],filename=info.filepath+path_sep()+ $
               'phi'+image_string+'.pdf'
+
+  ;;==Restore original data
+  pdata = pdata_in
+  xdata = xdata_in
+  ydata = ydata_in
 
 end
