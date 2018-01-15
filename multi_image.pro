@@ -31,6 +31,7 @@ function multi_image, imgdata,xdata,ydata,_EXTRA=ex
            0: title = make_array(nt,value='')
            1: title = make_array(nt,value=d_ex.title)
            nt: title = d_ex.title
+           else: title = !NULL
         endcase
      endif
 
