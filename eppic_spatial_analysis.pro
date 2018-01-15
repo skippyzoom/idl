@@ -200,32 +200,18 @@ pro eppic_spatial_analysis, info,movies=movies
                                    lindgen(nt), format='(f8.2)')
               string_time = "t = "+strcompress(string_time,/remove_all)+" ms"
 
-              ;;==Select color table
-              case 1B of 
-                 strcmp(data_name,'den',3): begin
-                    rgb_table = 5
-                    min_value = -max(abs(imgplane))
-                    max_value = +max(abs(imgplane))
-                 end
-                 strcmp(data_name,'phi'): begin
-                    ct = get_custom_ct(1)
-                    rgb_table = [[ct.r],[ct.g],[ct.b]]
-                    min_value = -max(abs(imgplane[*,*,1:*]))
-                    max_value = +max(abs(imgplane[*,*,1:*]))
-                 end
-              endcase
-              
-              ;;==Create movie
-              filename = info.filepath+path_sep()+ $
-                         data_name+plane_string+'.mp4'
-              data_movie, imgplane,xdata,ydata, $
-                          filename = filename, $
-                          title = string_time, $
-                          rgb_table = rgb_table, $
-                          min_value = min_value, $
-                          max_value = max_value, $
-                          expand = 3, $
-                          rescale = 0.8
+              ;;==Create movies of densities
+              if strcmp(data_name,'den',3) then begin
+                 density_movies, imgplane,xdata,ydata,xrng,yrng,data_name,info,image_string=plane_string
+              endif
+
+              if strcmp(data_name,'phi') then begin
+                 ;;==Create movies of electrostatic potential
+                 potential_movies, imgplane,xdata,ydata,xrng,yrng,info,image_string=plane_string
+
+                 ;;==Create movies of electric field
+                 efield_movies, imgplane,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_string=plane_string
+              endif
 
            endfor   ;;--planes
         endif $     ;;--n_dims
