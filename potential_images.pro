@@ -16,8 +16,6 @@ pro potential_images, pdata,xdata,ydata,xrng,yrng,info,image_string=image_string
   ;;==Set up graphics parameters
   ct = get_custom_ct(1)
   rgb_table = [[ct.r],[ct.g],[ct.b]]
-  ;; min_value = -max(abs(gdata))
-  ;; max_value = +max(abs(gdata))
   min_value = -max(abs(gdata[*,*,1:*]))
   max_value = +max(abs(gdata[*,*,1:*]))
 
