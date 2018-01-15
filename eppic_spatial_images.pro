@@ -87,6 +87,6 @@ pro eppic_spatial_images, pdata,xdata,ydata, $
      ydata = ydata_in
 
   endif $
-  else print, "[EPPIC_SPATIAL_IMAGES] pdata must have dimensions (x,y,t)"
+  else print, "[EPPIC_SPATIAL_IMAGES] pdata must have dimensions (x,y,t)."
 
 end
