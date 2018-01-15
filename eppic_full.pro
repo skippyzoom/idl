@@ -101,7 +101,10 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
 
   ;;==Create images from spatial data
-  eppic_spatial_analysis, info,movies=1B
+  eppic_spatial_analysis, info
+
+  ;;==Create movies from spatial data
+  eppic_spatial_analysis, info,/movies
 
                                 ;-----------------------------;
                                 ; 2-D images of spectral data ;
