@@ -1,41 +1,45 @@
-function get_custom_ct, ctNum
 ;+
 ; Store custom color tables here.
 ;
-; 1: red-blue (like IDL 70) + black at bottom
+; AVAILABLE TABLES:
+; 0: red-white-blue + black at bottom
+; 1: red-white-blue + black at bottom
+; 2: black-red-green-blue-black
+; 3: black-red-green-blue-white
 ;-
+function get_custom_ct, number,count=count
 
-ctVecs = {r:fltarr(256),g:fltarr(256),b:fltarr(256)}
-case ctNum of
-   1: begin
-      indices = [0,  1,128,255]
-      rValues = [0,  0,255,255]
-      gValues = [0,  0,255,  0]
-      bValues = [0,255,255,  0]
-      ctVecs.r = interpol(rValues, indices, findgen(256))
-      ctVecs.g = interpol(gValues, indices, findgen(256))
-      ctVecs.b = interpol(bValues, indices, findgen(256))
-   end
-   2: begin
-      indices = [0, 64,128,192,255]
-      rValues = [0,  0,  0,255,  0]
-      gValues = [0,  0,255,  0,  0]
-      bValues = [0,255,  0,  0,  0]
-      ctVecs.r = interpol(rValues, indices, findgen(256))
-      ctVecs.g = interpol(gValues, indices, findgen(256))
-      ctVecs.b = interpol(bValues, indices, findgen(256))
-   end
-   3: begin
-      indices = [0, 64,128,192,255]
-      rValues = [0,  0,  0,255,255]
-      gValues = [0,  0,255,  0,255]
-      bValues = [0,255,  0,  0,255]
-      ctVecs.r = interpol(rValues, indices, findgen(256))
-      ctVecs.g = interpol(gValues, indices, findgen(256))
-      ctVecs.b = interpol(bValues, indices, findgen(256))
-   end
-endcase
+  ;;==Build the list of available tables
+  tables = list()
+  tables.add, dictionary('i', [0,  1,128,255], $
+                         'r', [0,  0,255,255], $
+                         'g', [0,255,255,  0], $
+                         'b', [0,  0,255,  0])
+  tables.add, dictionary('i', [0,  1,128,255], $
+                         'r', [0,  0,255,255], $
+                         'g', [0,  0,255,  0], $
+                         'b', [0,255,255,  0])
+  tables.add, dictionary('i', [0, 64,128,192,255], $
+                         'r', [0,  0,  0,255,  0], $
+                         'g', [0,  0,255,  0,  0], $
+                         'b', [0,255,  0,  0,  0])
+  tables.add, dictionary('i', [0, 64,128,192,255], $
+                         'r', [0,  0,  0,255,255], $
+                         'g', [0,  0,255,  0,255], $
+                         'b', [0,255,  0,  0,255])
 
-return, ctVecs
+  ;;==Return the number of available tables
+  if keyword_set(count) then return, tables.count() $
+
+  else begin
+     ;;==Fill in the color-table dictionary
+     ct = dictionary(['r','g','b'])
+     ct.r = interpol(tables[number].r, tables[number].i, findgen(256))
+     ct.g = interpol(tables[number].g, tables[number].i, findgen(256))
+     ct.b = interpol(tables[number].b, tables[number].i, findgen(256))
+  
+     ;;==Return the requested color table as a struct
+     return, ct.tostruct()
+  endelse
 
 end
