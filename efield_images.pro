@@ -41,6 +41,15 @@ pro efield_images, pdata,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_strin
              /overplot)
   opl = plot(xdata,gdata[*,2],'r-', $
              /overplot)
+  ;; plt = plot(xdata,gdata[*,0],'k--', $
+  ;;            axis_style = 1, $
+  ;;            xstyle = 1, $
+  ;;            xtitle = "Distance [m]", $
+  ;;            ytitle = "|E| [mV/m]", $
+  ;;            /buffer)
+  ;; opl = plot(xdata,gdata[*,2],'k-', $
+  ;;            /overplot)
+
   ;;==Save plot
   image_save, plt,filename=info.filepath+path_sep()+ $
               'ex_mean_tf'+image_string+'.pdf'
