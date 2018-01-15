@@ -222,6 +222,8 @@ pro eppic_spatial_analysis, info,movies=movies
                           filename = filename, $
                           title = string_time, $
                           rgb_table = rgb_table, $
+                          min_value = min_value, $
+                          max_value = max_value, $
                           expand = 3, $
                           rescale = 0.8
 
