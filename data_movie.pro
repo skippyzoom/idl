@@ -79,7 +79,6 @@ pro data_movie, movdata,xdata,ydata, $
      if n_elements(expand) eq 0 then expand = 1.0
 
      ;;==Set up graphics parameters
-
      if keyword_set(xrange) then begin
         xtickvalues = [xrange[0],0.5*xrange[0],0,0.5*xrange[1],xrange[1]]
         xmajor = n_elements(xtickvalues)

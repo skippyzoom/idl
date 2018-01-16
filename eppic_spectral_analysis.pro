@@ -1,7 +1,7 @@
 ;+
 ; This routine makes images from EPPIC spectral data. 
 ;-
-pro eppic_spectral_analysis, info
+pro eppic_spectral_analysis, info,movies=movies
 
   ;;==Loop over requested data quantities
   for id=0,n_elements(info.data_names)-1 do begin
@@ -10,7 +10,10 @@ pro eppic_spectral_analysis, info
      data_name = info.data_names[id]
      
      ;;==Read data
-     data = (load_eppic_data(data_name,path=info.path,timestep=info.timestep))[data_name]
+     if keyword_set(movies) then $
+        data = (load_eppic_data(data_name,path=info.path))[data_name] $
+     else $
+        data = (load_eppic_data(data_name,path=info.path,timestep=info.timestep))[data_name]
 
      ;;==Check successful read
      data_is_spatial = 0B
@@ -21,7 +24,10 @@ pro eppic_spectral_analysis, info
         data_name = strmid(data_name,0,pos)+strmid(data_name,pos+2)
 
         ;;==Read data
-        data = (load_eppic_data(data_name,path=info.path,timestep=info.timestep))[data_name]
+        if keyword_set(movies) then $
+           data = (load_eppic_data(data_name,path=info.path))[data_name] $
+        else $
+           data = (load_eppic_data(data_name,path=info.path,timestep=info.timestep))[data_name]
 
         ;;==Check successful read
         data_is_spatial = (size(data,/n_dim) ne 0) ? 1B : 0B
@@ -107,9 +113,30 @@ pro eppic_spectral_analysis, info
            endif
 
            ;;==Create images of Fourier-transformed densities
-           if strcmp(data_name,'den',3) then begin
-              denft_images, imgplane,xdata,ydata,xrng,yrng,data_name,info,image_string=plane_string
-           endif
+           ;; if strcmp(data_name,'den',3) then begin
+           ;;    denft_images, imgplane,xdata,ydata,xrng,yrng,data_name,info,image_string=plane_string
+           ;; endif
+
+           ;;==Convert to dB and recenter
+           imgplane = real_part(imgplane)
+           imgplane /= max(imgplane)
+           imgplane = 10*alog10(imgplane^2)
+           imgplane = shift(imgplane,nx/2,ny/2,0)
+
+           ;;==Create images of Fourier-transformed densities
+           eppic_xyt_graphics, imgplane,xdata,ydata, $
+                               info, $
+                               xrng = xrng, $
+                               yrng = yrng, $
+                               xrange = [-2*!pi,2*!pi], $
+                               yrange = [-2*!pi,2*!pi], $
+                               rgb_table = 39, $
+                               min_value = min(imgplane,/nan), $
+                               max_value = max(imgplane,/nan), $
+                               data_name = data_name, $
+                               image_string = plane_string, $
+                               movie = keyword_set(movies)
+           
 
         endfor   ;;--planes
      endif $     ;;--n_dims

@@ -93,33 +93,33 @@ pro eppic_spatial_analysis, info,movies=movies
 
            ;;==Create graphics of densities
            if strcmp(data_name,'den',3) then begin
-              eppic_spatial_graphics, imgplane,xdata,ydata, $
-                                      info, $
-                                      xrng = xrng, $
-                                      yrng = yrng, $
-                                      rgb_table = 5, $
-                                      min_value = -max(abs(imgplane)), $
-                                      max_value = +max(abs(imgplane)), $
-                                      data_name = data_name, $
-                                      image_string = plane_string, $
-                                      movie = keyword_set(movies)
+              eppic_xyt_graphics, imgplane,xdata,ydata, $
+                                  info, $
+                                  xrng = xrng, $
+                                  yrng = yrng, $
+                                  rgb_table = 5, $
+                                  min_value = -max(abs(imgplane)), $
+                                  max_value = +max(abs(imgplane)), $
+                                  data_name = data_name, $
+                                  image_string = plane_string, $
+                                  movie = keyword_set(movies)
 
            endif
 
            if strcmp(data_name,'phi') then begin
+
               ;;==Create graphics of electrostatic potential
               ct = get_custom_ct(1)
-
-              eppic_spatial_graphics, imgplane,xdata,ydata, $
-                                      info, $
-                                      xrng = xrng, $
-                                      yrng = yrng, $
-                                      rgb_table = 70, $
-                                      min_value = -max(abs(imgplane[*,*,1:*])), $
-                                      max_value = +max(abs(imgplane[*,*,1:*])), $
-                                      data_name = data_name, $
-                                      image_string = plane_string, $
-                                      movie = keyword_set(movies)
+              eppic_xyt_graphics, imgplane,xdata,ydata, $
+                                  info, $
+                                  xrng = xrng, $
+                                  yrng = yrng, $
+                                  rgb_table = 70, $
+                                  min_value = -max(abs(imgplane[*,*,1:*])), $
+                                  max_value = +max(abs(imgplane[*,*,1:*])), $
+                                  data_name = data_name, $
+                                  image_string = plane_string, $
+                                  movie = keyword_set(movies)
 
               ;;==Calculate E-field components
               Ex = fltarr(size(imgplane,/dim))
@@ -137,47 +137,47 @@ pro eppic_spatial_analysis, info,movies=movies
               endfor
 
               ;;==Create graphics of electric field
-              eppic_spatial_graphics, Ex,xdata,ydata, $
-                                      info, $
-                                      xrng = xrng, $
-                                      yrng = yrng, $
-                                      rgb_table = 70, $
-                                      min_value = -max(abs(Ex[*,*,1:*])), $
-                                      max_value = +max(abs(Ex[*,*,1:*])), $
-                                      data_name = 'efield_x', $
-                                      image_string = plane_string, $
-                                      movie = keyword_set(movies)
-              eppic_spatial_graphics, Ey,xdata,ydata, $
-                                      info, $
-                                      xrng = xrng, $
-                                      yrng = yrng, $
-                                      rgb_table = 70, $
-                                      min_value = -max(abs(Ey[*,*,1:*])), $
-                                      max_value = +max(abs(Ey[*,*,1:*])), $
-                                      data_name = 'efield_y', $
-                                      image_string = plane_string, $
-                                      movie = keyword_set(movies)
-              eppic_spatial_graphics, Er,xdata,ydata, $
-                                      info, $
-                                      xrng = xrng, $
-                                      yrng = yrng, $
-                                      rgb_table = 3, $
-                                      min_value = 0, $
-                                      max_value = max(Er[*,*,1:*]), $
-                                      data_name = 'efield_r', $
-                                      image_string = plane_string, $
-                                      movie = keyword_set(movies)
+              eppic_xyt_graphics, Ex,xdata,ydata, $
+                                  info, $
+                                  xrng = xrng, $
+                                  yrng = yrng, $
+                                  rgb_table = 70, $
+                                  min_value = -max(abs(Ex[*,*,1:*])), $
+                                  max_value = +max(abs(Ex[*,*,1:*])), $
+                                  data_name = 'efield_x', $
+                                  image_string = plane_string, $
+                                  movie = keyword_set(movies)
+              eppic_xyt_graphics, Ey,xdata,ydata, $
+                                  info, $
+                                  xrng = xrng, $
+                                  yrng = yrng, $
+                                  rgb_table = 70, $
+                                  min_value = -max(abs(Ey[*,*,1:*])), $
+                                  max_value = +max(abs(Ey[*,*,1:*])), $
+                                  data_name = 'efield_y', $
+                                  image_string = plane_string, $
+                                  movie = keyword_set(movies)
+              eppic_xyt_graphics, Er,xdata,ydata, $
+                                  info, $
+                                  xrng = xrng, $
+                                  yrng = yrng, $
+                                  rgb_table = 3, $
+                                  min_value = 0, $
+                                  max_value = max(Er[*,*,1:*]), $
+                                  data_name = 'efield_r', $
+                                  image_string = plane_string, $
+                                  movie = keyword_set(movies)
               ct = get_custom_ct(2)
-              eppic_spatial_graphics, Et,xdata,ydata, $
-                                      info, $
-                                      xrng = xrng, $
-                                      yrng = yrng, $
-                                      rgb_table = [[ct.r],[ct.g],[ct.b]], $
-                                      min_value = -!pi, $
-                                      max_value = +!pi, $
-                                      data_name = 'efield_t', $
-                                      image_string = plane_string, $
-                                      movie = keyword_set(movies)
+              eppic_xyt_graphics, Et,xdata,ydata, $
+                                  info, $
+                                  xrng = xrng, $
+                                  yrng = yrng, $
+                                  rgb_table = [[ct.r],[ct.g],[ct.b]], $
+                                  min_value = -!pi, $
+                                  max_value = +!pi, $
+                                  data_name = 'efield_t', $
+                                  image_string = plane_string, $
+                                  movie = keyword_set(movies)
 
               ;;-->ADD plots (e.g., mean Ex)
            endif
