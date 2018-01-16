@@ -57,6 +57,7 @@ pro eppic_spectral_analysis, info,movies=movies
            data = reform(data,[nx,ny,1,nt])
            n_dims = size(data,/n_dim)
            info.planes = 'xy'
+           perp_to_B = 'xy'
         endif
 
         ;;==Transpose data

@@ -38,6 +38,7 @@ pro eppic_spatial_analysis, info,movies=movies
            data = reform(data,[nx,ny,1,nt])
            n_dims = size(data,/n_dim)
            info.planes = 'xy'
+           perp_to_B = 'xy'
         endif
 
         ;;==Transpose data
@@ -185,11 +186,15 @@ pro eppic_spatial_analysis, info,movies=movies
                                   /clip_y_axes, $
                                   movie = keyword_set(movies)
 
-              ;;-->ADD plots (e.g., mean Ex)
-           endif
-           
-        endfor   ;;--planes
-     endif $     ;;--n_dims
+              ;;==Make plots in the plane perpendicular to B
+              if strcmp(info.planes[ip],perp_to_B) then begin
+                 plot_efield_means, xdata,ydata,Ex[*,*,[0,nt/2,nt-1]],Ey[*,*,[0,nt/2,nt-1]], $
+                                    filename = info.filepath+path_sep()+'efield_H-means.pdf'
+
+              endif ;;--perp_to_B
+           endif    ;;--phi           
+        endfor      ;;--planes
+     endif $        ;;--n_dims
      else print, "[EPPIC_SPATIAL_ANALYSIS] Could not create an image."
 
   endfor ;;--data_names

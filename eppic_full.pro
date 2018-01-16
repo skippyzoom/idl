@@ -58,6 +58,9 @@ pro eppic_full, path=path, $
   ;;==Create a list of 2-D planes for 3-D data
   planes = ['xy','xz','yz']
 
+  ;;==Declare the plane perpendicular to B
+  perp_to_B = 'xy'
+
   ;;==Declare transpose for images
   xyz = [1,0,2]
 
@@ -101,7 +104,7 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
 
   ;;==Create images from spatial data
-  ;; eppic_spatial_analysis, info
+  eppic_spatial_analysis, info
 
   ;;==Create movies from spatial data
   ;; eppic_spatial_analysis, info,/movies
