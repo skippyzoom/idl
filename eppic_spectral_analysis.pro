@@ -140,7 +140,7 @@ pro eppic_spectral_analysis, info,movies=movies
 
         endfor   ;;--planes
      endif $     ;;--n_dims
-     else print, "[EPPIC_PHI_IMAGES] Could not create an image."
+     else print, "[EPPIC_SPECTRAL_ANALYSIS] Could not create an image."
 
   endfor ;;--data_names
 

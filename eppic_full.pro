@@ -158,4 +158,7 @@ pro eppic_full, path=path, $
   ;;==Create images from spectral data
   eppic_spectral_analysis, info
 
+  ;;==Create images from spectral data
+  eppic_spectral_analysis, info,/movies
+
 end
