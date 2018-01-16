@@ -45,7 +45,6 @@ pro data_movie, movdata,xdata,ydata, $
      print, "DATA_MOVIE: Please supply image array. No movie produced."
   endif $
   else begin
-     print, "DATA_MOVIE: Creating ",filename
 
      ;;==Get data dimensions
      movdata = reform(movdata)
@@ -83,7 +82,7 @@ pro data_movie, movdata,xdata,ydata, $
         xtickvalues = [xrange[0],0.5*xrange[0],0,0.5*xrange[1],xrange[1]]
         xmajor = n_elements(xtickvalues)
         xminor = 1
-        xtickname = plusminus_labels(xtickvalues/!pi,format='i')
+        xtickname = plusminus_labels(xtickvalues,format='i')
      endif else begin
         xmajor = 5
         xminor = 1
@@ -98,7 +97,7 @@ pro data_movie, movdata,xdata,ydata, $
         ytickvalues = [yrange[0],0.5*yrange[0],0,0.5*yrange[1],yrange[1]]
         ymajor = n_elements(ytickvalues)
         yminor = 1
-        ytickname = plusminus_labels(ytickvalues/!pi,format='i')
+        ytickname = plusminus_labels(ytickvalues,format='i')
      endif else begin
         ymajor = 5
         yminor = 1
@@ -112,6 +111,7 @@ pro data_movie, movdata,xdata,ydata, $
      aspect_ratio = 1.0
 
      ;;==Open video stream
+     print, "DATA_MOVIE: Creating ",filename
      video = idlffvideowrite(filename)
      stream = video.addvideostream(expand*dimensions[0], $
                                    expand*dimensions[1], $
