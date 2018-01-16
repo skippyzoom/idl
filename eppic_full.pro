@@ -117,7 +117,7 @@ pro eppic_full, path=path, $
   ;;==Declare panel positions for spectral data
   position = multi_position(layout[*], $
                             edges = [0.12,0.10,0.80,0.80], $
-                            buffer = [0.10,0.10])
+                            buffer = [0.01,0.0])
 
   ;;==Declare data ranges for spectral data
   rngs = [[0,grid.nx*params.nout_avg-1], $
@@ -159,6 +159,6 @@ pro eppic_full, path=path, $
   eppic_spectral_analysis, info
 
   ;;==Create images from spectral data
-  eppic_spectral_analysis, info,/movies
+  ;; eppic_spectral_analysis, info,/movies
 
 end

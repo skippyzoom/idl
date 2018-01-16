@@ -13,6 +13,10 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
                         yrange=yrange, $
                         data_name=data_name, $
                         image_string=image_string, $
+                        clip_x_axes=clip_x_axes, $
+                        clip_y_axes=clip_y_axes, $
+                        dimensions=dimensions, $
+                        colorbar_title=colorbar_title, $
                         movie=movie
 
   ;;==Get data size
@@ -67,6 +71,8 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
                     max_value = max_value, $
                     xrange = xrange, $
                     yrange = yrange, $
+                    dimensions = dimensions, $
+                    colorbar_title = colorbar_title, $
                     expand = 3, $
                     rescale = 0.8
 
@@ -85,12 +91,14 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
                           max_value = max_value)
 
         ;;==Edit axes
-        nc = info.layout[0]
-        nr = info.layout[1]
-        for it=0,n_elements(info.timestep)-1 do begin
-           ax = img[it].axes
-           ax[1].hide = (it mod nc ne 0)
-        endfor
+        if keyword_set(clip_y_axes) then begin
+           nc = info.layout[0]
+           nr = info.layout[1]
+           for it=0,n_elements(info.timestep)-1 do begin
+              ax = img[it].axes
+              ax[1].hide = (it mod nc ne 0)
+           endfor
+        endif
 
         ;;==Add colorbar(s)
         img = multi_colorbar(img,'global', $

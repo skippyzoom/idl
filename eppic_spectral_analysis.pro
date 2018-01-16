@@ -112,16 +112,19 @@ pro eppic_spectral_analysis, info,movies=movies
               data_name += 'fft'
            endif
 
-           ;;==Create images of Fourier-transformed densities
-           ;; if strcmp(data_name,'den',3) then begin
-           ;;    denft_images, imgplane,xdata,ydata,xrng,yrng,data_name,info,image_string=plane_string
-           ;; endif
-
-           ;;==Convert to dB and recenter
-           imgplane = real_part(imgplane)
-           imgplane /= max(imgplane)
-           imgplane = 10*alog10(imgplane^2)
+           ;;==Set up data
+           ;;--Extract the real part
+           imgplane = real_part(imgplane)^2
+           ;;--Recenter
            imgplane = shift(imgplane,nx/2,ny/2,0)
+           ;;--Zero the near-DC components (crude high-pass filter)
+           imgplane[nx/2-5:nx/2+5,ny/2-2:ny/2+2,*] = 0.0
+           ;;--Smooth
+           imgplane = smooth(imgplane,[5,5,1],/edge_wrap)
+           ;;--Normalize
+           imgplane = imgplane/max(imgplane)
+           ;;--Convert to dB
+           imgplane = 10*alog10(imgplane)
 
            ;;==Create images of Fourier-transformed densities
            eppic_xyt_graphics, imgplane,xdata,ydata, $
@@ -129,12 +132,15 @@ pro eppic_spectral_analysis, info,movies=movies
                                xrng = xrng, $
                                yrng = yrng, $
                                xrange = [-2*!pi,2*!pi], $
-                               yrange = [-2*!pi,2*!pi], $
+                               yrange = [0,2*!pi], $
                                rgb_table = 39, $
-                               min_value = min(imgplane,/nan), $
+                               min_value = max(imgplane,/nan)-30, $
                                max_value = max(imgplane,/nan), $
                                data_name = data_name, $
                                image_string = plane_string, $
+                               dimensions = [nx/2,ny], $
+                               /clip_y_axes, $
+                               colorbar_title = "Power [dB]", $
                                movie = keyword_set(movies)
            
 

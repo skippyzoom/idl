@@ -102,6 +102,7 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = +max(abs(imgplane)), $
                                   data_name = data_name, $
                                   image_string = plane_string, $
+                                  /clip_y_axes, $
                                   movie = keyword_set(movies)
 
            endif
@@ -119,6 +120,7 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = +max(abs(imgplane[*,*,1:*])), $
                                   data_name = data_name, $
                                   image_string = plane_string, $
+                                  /clip_y_axes, $
                                   movie = keyword_set(movies)
 
               ;;==Calculate E-field components
@@ -146,6 +148,7 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = +max(abs(Ex[*,*,1:*])), $
                                   data_name = 'efield_x', $
                                   image_string = plane_string, $
+                                  /clip_y_axes, $
                                   movie = keyword_set(movies)
               eppic_xyt_graphics, Ey,xdata,ydata, $
                                   info, $
@@ -156,6 +159,7 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = +max(abs(Ey[*,*,1:*])), $
                                   data_name = 'efield_y', $
                                   image_string = plane_string, $
+                                  /clip_y_axes, $
                                   movie = keyword_set(movies)
               eppic_xyt_graphics, Er,xdata,ydata, $
                                   info, $
@@ -166,6 +170,7 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = max(Er[*,*,1:*]), $
                                   data_name = 'efield_r', $
                                   image_string = plane_string, $
+                                  /clip_y_axes, $
                                   movie = keyword_set(movies)
               ct = get_custom_ct(2)
               eppic_xyt_graphics, Et,xdata,ydata, $
@@ -177,6 +182,7 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = +!pi, $
                                   data_name = 'efield_t', $
                                   image_string = plane_string, $
+                                  /clip_y_axes, $
                                   movie = keyword_set(movies)
 
               ;;-->ADD plots (e.g., mean Ex)
