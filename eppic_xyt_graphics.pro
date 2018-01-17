@@ -6,13 +6,12 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
                         info, $
                         xrng=xrng, $
                         yrng=yrng, $
+                        aspect_ratio=aspect_ratio, $
                         rgb_table=rgb_table, $
                         min_value=min_value, $
                         max_value=max_value, $
                         xrange=xrange, $
                         yrange=yrange, $
-                        ;; data_name=data_name, $
-                        ;; image_string=image_string, $
                         basename=basename, $
                         clip_x_axes=clip_x_axes, $
                         clip_y_axes=clip_y_axes, $
@@ -62,8 +61,6 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
         string_time = "t = "+strcompress(string_time,/remove_all)+" ms"
 
         ;;==Create movie
-        ;; filename = info.filepath+path_sep()+ $
-        ;;            data_name+image_string+'.mp4'
         filename = basename+'.mp4'
         data_movie, gdata,xdata,ydata, $
                     filename = filename, $
@@ -85,6 +82,7 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
         img = multi_image(gdata,xdata,ydata, $
                           xrange = xrange, $
                           yrange = yrange, $
+                          aspect_ratio = aspect_ratio, $
                           position = info.position, $
                           title = info.title, $
                           axis_style = info.axis_style, $
