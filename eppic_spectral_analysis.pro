@@ -1,7 +1,7 @@
 ;+
 ; This routine makes images from EPPIC spectral data. 
 ;-
-pro eppic_spectral_analysis, info,movies=movies
+pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
 
   ;;==Loop over requested data quantities
   for id=0,n_elements(info.data_names)-1 do begin
@@ -10,7 +10,7 @@ pro eppic_spectral_analysis, info,movies=movies
      data_name = info.data_names[id]
      
      ;;==Read data
-     if keyword_set(movies) then $
+     if keyword_set(movies) || keyword_set(full_transform) then $
         data = (load_eppic_data(data_name,path=info.path))[data_name] $
      else $
         data = (load_eppic_data(data_name,path=info.path,timestep=info.timestep))[data_name]
@@ -24,7 +24,7 @@ pro eppic_spectral_analysis, info,movies=movies
         data_name = strmid(data_name,0,pos)+strmid(data_name,pos+2)
 
         ;;==Read data
-        if keyword_set(movies) then $
+        if keyword_set(movies) || keyword_set(full_transform) then $
            data = (load_eppic_data(data_name,path=info.path))[data_name] $
         else $
            data = (load_eppic_data(data_name,path=info.path,timestep=info.timestep))[data_name]
@@ -104,46 +104,89 @@ pro eppic_spectral_analysis, info,movies=movies
            ;;==Save string for filenames
            if data_is_2D then plane_string = '' $
            else plane_string = '_'+info.planes[ip]
-
-           ;;==Transform spatial data
-           if data_is_spatial then begin
-              for it=0,nt-1 do begin
-                 imgplane[*,*,it] = real_part(fft(imgplane[*,*,it],/overwrite))
-              endfor              
-              data_name += 'fft'
-           endif
-
-           ;;==Set up data
-           ;;--Extract the real part
-           imgplane = real_part(imgplane)^2
-           ;;--Recenter
-           imgplane = shift(imgplane,nx/2,ny/2,0)
-           ;;--Zero the near-DC components (crude high-pass filter)
-           imgplane[nx/2-5:nx/2+5,ny/2-2:ny/2+2,*] = 0.0
-           ;;--Smooth
-           imgplane = smooth(imgplane,[5,5,1],/edge_wrap)
-           ;;--Normalize
-           imgplane = imgplane/max(imgplane)
-           ;;--Convert to dB
-           imgplane = 10*alog10(imgplane)
-
-           ;;==Create images of Fourier-transformed densities
-           eppic_xyt_graphics, imgplane,xdata,ydata, $
-                               info, $
-                               xrng = xrng, $
-                               yrng = yrng, $
-                               xrange = [-2*!pi,2*!pi], $
-                               yrange = [0,2*!pi], $
-                               rgb_table = 39, $
-                               min_value = max(imgplane,/nan)-30, $
-                               max_value = max(imgplane,/nan), $
-                               data_name = data_name, $
-                               image_string = plane_string, $
-                               dimensions = [nx/2,ny], $
-                               /clip_y_axes, $
-                               colorbar_title = "Power [dB]", $
-                               movie = keyword_set(movies)
            
+           if keyword_set(full_transform) then begin
+
+              ;;==Transform spatial data at each time step
+              if data_is_spatial then begin
+                 for it=0,nt-1 do begin
+                    imgplane[*,*,it] = fft(imgplane[*,*,it],/overwrite)
+                 endfor              
+                 data_name += 'fft'
+              endif
+
+              ;;==Transform the time dimension
+              nw = next_power2(nt)
+              temp = make_array(nx,ny,nw,type=6,value=0.0)
+              temp[*,*,0:nt-1] = imgplane
+              imgplane = fft(temp,dim=3,/overwrite)
+              ;; nw = nt
+              ;; imgplane = fft(imgplane,dim=3,/overwrite)
+
+              ;;==Set up data
+              ;;--Extract the real part
+              imgplane = real_part(imgplane)^2
+              ;;--Recenter
+              imgplane = shift(imgplane,nx/2,ny/2,nw/2)
+              ;;--Zero the near-DC components (crude high-pass filter)
+              imgplane[nx/2-5:nx/2+5,ny/2-2:ny/2+2,nw/2] = 0.0
+              ;;--Smooth
+              imgplane = smooth(imgplane,[5,5,1],/edge_wrap)
+              ;;--Normalize
+              imgplane = imgplane/max(imgplane)
+              ;;--Convert to dB
+              imgplane = 10*alog10(imgplane)
+
+              ;;==Interpolate
+              rtp = xyz_rtp(imgplane[*,*,0],dx=info.xdif,dy=info.ydif)
+              ktw = fltarr(n_elements(rtp.r_vals),n_elements(rtp.t_vals),nw)
+              for iw=0,nw-1 do begin
+                 rtp = xyz_rtp(imgplane[*,*,iw],dx=info.xdif,dy=info.ydif)
+                 ktw[*,*,iw] = rtp.data
+              endfor
+STOP
+           endif $
+           else begin
+
+              ;;==Transform spatial data at each time step
+              if data_is_spatial then begin
+                 for it=0,nt-1 do begin
+                    imgplane[*,*,it] = fft(imgplane[*,*,it],/overwrite)
+                 endfor              
+                 data_name += 'fft'
+              endif
+
+              ;;==Set up data
+              ;;--Extract the real part
+              imgplane = real_part(imgplane)^2
+              ;;--Recenter
+              imgplane = shift(imgplane,nx/2,ny/2,0)
+              ;;--Zero the near-DC components (crude high-pass filter)
+              imgplane[nx/2-5:nx/2+5,ny/2-2:ny/2+2,*] = 0.0
+              ;;--Smooth
+              imgplane = smooth(imgplane,[5,5,1],/edge_wrap)
+              ;;--Normalize
+              imgplane = imgplane/max(imgplane)
+              ;;--Convert to dB
+              imgplane = 10*alog10(imgplane)
+
+              ;;==Create images of Fourier-transformed densities
+              eppic_xyt_graphics, imgplane,xdata,ydata, $
+                                  info, $
+                                  xrng = xrng, $
+                                  yrng = yrng, $
+                                  xrange = [-2*!pi,2*!pi], $
+                                  yrange = [0,2*!pi], $
+                                  rgb_table = 39, $
+                                  min_value = max(imgplane,/nan)-30, $
+                                  max_value = max(imgplane,/nan), $
+                                  data_name = data_name, $
+                                  image_string = plane_string, $
+                                  dimensions = [nx/2,ny], $
+                                  /clip_y_axes, $
+                                  colorbar_title = "Power [dB]", $
+                                  movie = keyword_set(movies)
+           endelse
 
         endfor   ;;--planes
      endif $     ;;--n_dims

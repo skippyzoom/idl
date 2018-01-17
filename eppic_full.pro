@@ -100,11 +100,12 @@ pro eppic_full, path=path, $
   info['filepath'] = filepath
   info['planes'] = planes
   info['timestep'] = timestep
+  info['nt_max'] = nt_max
   info['title'] = string_time
   info['data_names'] = data_names
 
   ;;==Create images from spatial data
-  eppic_spatial_analysis, info
+  ;; eppic_spatial_analysis, info
 
   ;;==Create movies from spatial data
   ;; eppic_spatial_analysis, info,/movies
@@ -155,11 +156,12 @@ pro eppic_full, path=path, $
   info['filepath'] = filepath
   info['planes'] = planes
   info['timestep'] = timestep
+  info['nt_max'] = nt_max
   info['title'] = string_time
   info['data_names'] = data_names
 
   ;;==Create images from spectral data
-  eppic_spectral_analysis, info
+  eppic_spectral_analysis, info,/full_transform
 
   ;;==Create images from spectral data
   ;; eppic_spectral_analysis, info,/movies
