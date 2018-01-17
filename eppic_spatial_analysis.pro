@@ -104,8 +104,6 @@ pro eppic_spatial_analysis, info,movies=movies
                                   rgb_table = 5, $
                                   min_value = -max(abs(imgplane)), $
                                   max_value = +max(abs(imgplane)), $
-                                  ;; data_name = data_name, $
-                                  ;; image_string = plane_string, $
                                   basename = basename, $
                                   /clip_y_axes, $
                                   movie = keyword_set(movies)
@@ -125,8 +123,6 @@ pro eppic_spatial_analysis, info,movies=movies
                                   rgb_table = 70, $
                                   min_value = -max(abs(imgplane[*,*,1:*])), $
                                   max_value = +max(abs(imgplane[*,*,1:*])), $
-                                  ;; data_name = data_name, $
-                                  ;; image_string = plane_string, $
                                   basename = basename, $
                                   /clip_y_axes, $
                                   movie = keyword_set(movies)
@@ -156,8 +152,6 @@ pro eppic_spatial_analysis, info,movies=movies
                                   rgb_table = 70, $
                                   min_value = -max(abs(Ex[*,*,1:*])), $
                                   max_value = +max(abs(Ex[*,*,1:*])), $
-                                  ;; data_name = 'efield_x', $
-                                  ;; image_string = plane_string, $
                                   basename = basename, $
                                   /clip_y_axes, $
                                   movie = keyword_set(movies)
@@ -170,8 +164,6 @@ pro eppic_spatial_analysis, info,movies=movies
                                   rgb_table = 70, $
                                   min_value = -max(abs(Ey[*,*,1:*])), $
                                   max_value = +max(abs(Ey[*,*,1:*])), $
-                                  ;; data_name = 'efield_y', $
-                                  ;; image_string = plane_string, $
                                   basename = basename, $
                                   /clip_y_axes, $
                                   movie = keyword_set(movies)
@@ -184,8 +176,6 @@ pro eppic_spatial_analysis, info,movies=movies
                                   rgb_table = 3, $
                                   min_value = 0, $
                                   max_value = max(Er[*,*,1:*]), $
-                                  ;; data_name = 'efield_r', $
-                                  ;; image_string = plane_string, $
                                   basename = basename, $
                                   /clip_y_axes, $
                                   movie = keyword_set(movies)
@@ -199,18 +189,16 @@ pro eppic_spatial_analysis, info,movies=movies
                                   rgb_table = [[ct.r],[ct.g],[ct.b]], $
                                   min_value = -!pi, $
                                   max_value = +!pi, $
-                                  ;; data_name = 'efield_t', $
-                                  ;; image_string = plane_string, $
                                   basename = basename, $
                                   /clip_y_axes, $
                                   movie = keyword_set(movies)
 
               ;;==Make plots in the plane perpendicular to B
               if strcmp(info.planes[ip],perp_to_B) then begin
-                 filename = info.filepath+path_sep()+'efield-means'+plane_string+
+                 basename = info.filepath+path_sep()+'efield-means'+plane_string
                  plot_efield_means, xdata,ydata, $
                                     Ex[*,*,[0,nt/2,nt-1]],Ey[*,*,[0,nt/2,nt-1]], $
-                                    filename = basename
+                                    basename = basename
               endif ;;--perp_to_B
            endif    ;;--phi           
         endfor      ;;--planes

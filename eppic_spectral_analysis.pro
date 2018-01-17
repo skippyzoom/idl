@@ -106,16 +106,22 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
            ;;==Save string for filenames
            if data_is_2D then plane_string = '' $
            else plane_string = '_'+info.planes[ip]
+
+           ;;==Transform spatial data at each time step
+           if data_is_spatial then begin
+              for it=0,nt-1 do begin
+                 imgplane[*,*,it] = fft(imgplane[*,*,it],/overwrite)
+              endfor              
+              data_name += 'fft'
+           endif
            
            if keyword_set(full_transform) then begin
 
-              ;;==Transform spatial data at each time step
-              if data_is_spatial then begin
-                 for it=0,nt-1 do begin
-                    imgplane[*,*,it] = fft(imgplane[*,*,it],/overwrite)
-                 endfor              
-                 data_name += 'fft'
-              endif
+              ;;==Get new dimensions
+              img_size = size(imgplane)
+              nz = img_size[3]
+              ny = img_size[2]
+              nx = img_size[1]
 
               ;;==Transform the time dimension
               nw = next_power2(nt)
@@ -145,16 +151,15 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
                  ktw[*,*,iw] = rtp.data
               endfor
 
+              ;;==Create images of interpolated data
+              basename = info.filepath+path_sep()+ $
+                         data_name+'-ktw'+plane_string
+              eppic_ktw_graphics, ktw,rtp,info, $
+                                  lambda = 3.0, $
+                                  basename = basename
+
            endif $
            else begin
-
-              ;;==Transform spatial data at each time step
-              if data_is_spatial then begin
-                 for it=0,nt-1 do begin
-                    imgplane[*,*,it] = fft(imgplane[*,*,it],/overwrite)
-                 endfor              
-                 data_name += 'fft'
-              endif
 
               ;;==Set up data
               ;;--Extract the real part
@@ -170,7 +175,7 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
               ;;--Convert to dB
               imgplane = 10*alog10(imgplane)
 
-              ;;==Create images of Fourier-transformed densities
+              ;;==Create images of Fourier-transformed data
               basename = info.filepath+path_sep()+ $
                          data_name+plane_string
               eppic_xyt_graphics, imgplane,xdata,ydata, $
@@ -182,8 +187,6 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
                                   rgb_table = 39, $
                                   min_value = max(imgplane,/nan)-30, $
                                   max_value = max(imgplane,/nan), $
-                                  ;; data_name = data_name, $
-                                  ;; image_string = plane_string, $
                                   basename = basename, $
                                   dimensions = [nx/2,ny], $
                                   /clip_y_axes, $

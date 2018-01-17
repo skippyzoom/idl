@@ -4,8 +4,7 @@
 ;-
 pro eppic_ktw_graphics, ktw,rtp,info, $
                         lambda=lambda, $
-                        data_name=data_name, $
-                        image_string=image_string
+                        basename=basename
 
   nl = n_elements(lambda)
   for il=0,nl-1 do begin
@@ -40,8 +39,7 @@ pro eppic_ktw_graphics, ktw,rtp,info, $
                 font_size = 5.0)
 
      ;;==Save image
-     image_save, img[0],filename=info.filepath+path_sep()+ $
-                 data_name+image_string+'.pdf'
+     image_save, img[0],filename=basename+'.pdf'
 
   endfor
 end
