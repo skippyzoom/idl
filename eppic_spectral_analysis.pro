@@ -13,7 +13,8 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
      if keyword_set(movies) || keyword_set(full_transform) then $
         data = (load_eppic_data(data_name,path=info.path))[data_name] $
      else $
-        data = (load_eppic_data(data_name,path=info.path,timestep=info.timestep))[data_name]
+        data = (load_eppic_data(data_name,path=info.path, $
+                                timestep=info.timestep))[data_name]
 
      ;;==Check successful read
      data_is_spatial = 0B
@@ -27,7 +28,8 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
         if keyword_set(movies) || keyword_set(full_transform) then $
            data = (load_eppic_data(data_name,path=info.path))[data_name] $
         else $
-           data = (load_eppic_data(data_name,path=info.path,timestep=info.timestep))[data_name]
+           data = (load_eppic_data(data_name,path=info.path, $
+                                   timestep=info.timestep))[data_name]
 
         ;;==Check successful read
         data_is_spatial = (size(data,/n_dim) ne 0) ? 1B : 0B
@@ -120,8 +122,6 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
               temp = make_array(nx,ny,nw,type=6,value=0.0)
               temp[*,*,0:nt-1] = imgplane
               imgplane = fft(temp,dim=3,/overwrite)
-              ;; nw = nt
-              ;; imgplane = fft(imgplane,dim=3,/overwrite)
 
               ;;==Set up data
               ;;--Extract the real part
@@ -144,7 +144,7 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
                  rtp = xyz_rtp(imgplane[*,*,iw],dx=info.xdif,dy=info.ydif)
                  ktw[*,*,iw] = rtp.data
               endfor
-STOP
+
            endif $
            else begin
 
@@ -171,6 +171,8 @@ STOP
               imgplane = 10*alog10(imgplane)
 
               ;;==Create images of Fourier-transformed densities
+              basename = info.filepath+path_sep()+ $
+                         data_name+plane_string
               eppic_xyt_graphics, imgplane,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
@@ -180,8 +182,9 @@ STOP
                                   rgb_table = 39, $
                                   min_value = max(imgplane,/nan)-30, $
                                   max_value = max(imgplane,/nan), $
-                                  data_name = data_name, $
-                                  image_string = plane_string, $
+                                  ;; data_name = data_name, $
+                                  ;; image_string = plane_string, $
+                                  basename = basename, $
                                   dimensions = [nx/2,ny], $
                                   /clip_y_axes, $
                                   colorbar_title = "Power [dB]", $

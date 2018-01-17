@@ -1,4 +1,4 @@
-pro plot_efield_means, xdata,ydata,Ex,Ey,filename=filename
+pro plot_efield_means, xdata,ydata,Ex,Ey,basename=basename
 
   ;;==Calculate positions
   layout = [2,2]
@@ -71,6 +71,6 @@ pro plot_efield_means, xdata,ydata,Ex,Ey,filename=filename
   op1 = plot(xdata,gdata[*,2],'r-',/overplot)
 
   ;;==Save plot
-  image_save, plt,filename=filename,/landscape
+  image_save, plt,filename=basename+'.pdf',/landscape
 
 end

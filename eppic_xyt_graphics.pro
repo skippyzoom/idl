@@ -11,8 +11,9 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
                         max_value=max_value, $
                         xrange=xrange, $
                         yrange=yrange, $
-                        data_name=data_name, $
-                        image_string=image_string, $
+                        ;; data_name=data_name, $
+                        ;; image_string=image_string, $
+                        basename=basename, $
                         clip_x_axes=clip_x_axes, $
                         clip_y_axes=clip_y_axes, $
                         dimensions=dimensions, $
@@ -61,8 +62,9 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
         string_time = "t = "+strcompress(string_time,/remove_all)+" ms"
 
         ;;==Create movie
-        filename = info.filepath+path_sep()+ $
-                   data_name+image_string+'.mp4'
+        ;; filename = info.filepath+path_sep()+ $
+        ;;            data_name+image_string+'.mp4'
+        filename = basename+'.mp4'
         data_movie, gdata,xdata,ydata, $
                     filename = filename, $
                     title = string_time, $
@@ -121,8 +123,9 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
                    font_size = 5.0)
 
         ;;==Save image
-        image_save, img[0],filename=info.filepath+path_sep()+ $
-                    data_name+image_string+'.pdf'
+        ;; image_save, img[0],filename=info.filepath+path_sep()+ $
+        ;;             data_name+image_string+'.pdf'
+        image_save, img[0],filename=basename+'.pdf'
 
      endelse
 

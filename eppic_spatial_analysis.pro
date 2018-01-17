@@ -13,7 +13,8 @@ pro eppic_spatial_analysis, info,movies=movies
      if keyword_set(movies) then $
         data = (load_eppic_data(data_name,path=info.path))[data_name] $
      else $
-        data = (load_eppic_data(data_name,path=info.path,timestep=info.timestep))[data_name]
+        data = (load_eppic_data(data_name,path=info.path, $
+                                timestep=info.timestep))[data_name]
 
      ;;==Get data dimensions
      data_size = size(data)
@@ -94,6 +95,8 @@ pro eppic_spatial_analysis, info,movies=movies
 
            ;;==Create graphics of densities
            if strcmp(data_name,'den',3) then begin
+              basename = info.filepath+path_sep()+ $
+                         data_name+plane_string
               eppic_xyt_graphics, imgplane,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
@@ -101,8 +104,9 @@ pro eppic_spatial_analysis, info,movies=movies
                                   rgb_table = 5, $
                                   min_value = -max(abs(imgplane)), $
                                   max_value = +max(abs(imgplane)), $
-                                  data_name = data_name, $
-                                  image_string = plane_string, $
+                                  ;; data_name = data_name, $
+                                  ;; image_string = plane_string, $
+                                  basename = basename, $
                                   /clip_y_axes, $
                                   movie = keyword_set(movies)
 
@@ -112,6 +116,8 @@ pro eppic_spatial_analysis, info,movies=movies
 
               ;;==Create graphics of electrostatic potential
               ct = get_custom_ct(1)
+              basename = info.filepath+path_sep()+ $
+                         data_name+plane_string
               eppic_xyt_graphics, imgplane,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
@@ -119,8 +125,9 @@ pro eppic_spatial_analysis, info,movies=movies
                                   rgb_table = 70, $
                                   min_value = -max(abs(imgplane[*,*,1:*])), $
                                   max_value = +max(abs(imgplane[*,*,1:*])), $
-                                  data_name = data_name, $
-                                  image_string = plane_string, $
+                                  ;; data_name = data_name, $
+                                  ;; image_string = plane_string, $
+                                  basename = basename, $
                                   /clip_y_axes, $
                                   movie = keyword_set(movies)
 
@@ -140,6 +147,8 @@ pro eppic_spatial_analysis, info,movies=movies
               endfor
 
               ;;==Create graphics of electric field
+              basename = info.filepath+path_sep()+ $
+                         'efield_x'+plane_string
               eppic_xyt_graphics, Ex,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
@@ -147,10 +156,13 @@ pro eppic_spatial_analysis, info,movies=movies
                                   rgb_table = 70, $
                                   min_value = -max(abs(Ex[*,*,1:*])), $
                                   max_value = +max(abs(Ex[*,*,1:*])), $
-                                  data_name = 'efield_x', $
-                                  image_string = plane_string, $
+                                  ;; data_name = 'efield_x', $
+                                  ;; image_string = plane_string, $
+                                  basename = basename, $
                                   /clip_y_axes, $
                                   movie = keyword_set(movies)
+              basename = info.filepath+path_sep()+ $
+                         'efield_y'+plane_string
               eppic_xyt_graphics, Ey,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
@@ -158,10 +170,13 @@ pro eppic_spatial_analysis, info,movies=movies
                                   rgb_table = 70, $
                                   min_value = -max(abs(Ey[*,*,1:*])), $
                                   max_value = +max(abs(Ey[*,*,1:*])), $
-                                  data_name = 'efield_y', $
-                                  image_string = plane_string, $
+                                  ;; data_name = 'efield_y', $
+                                  ;; image_string = plane_string, $
+                                  basename = basename, $
                                   /clip_y_axes, $
                                   movie = keyword_set(movies)
+              basename = info.filepath+path_sep()+ $
+                         'efield_r'+plane_string
               eppic_xyt_graphics, Er,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
@@ -169,10 +184,13 @@ pro eppic_spatial_analysis, info,movies=movies
                                   rgb_table = 3, $
                                   min_value = 0, $
                                   max_value = max(Er[*,*,1:*]), $
-                                  data_name = 'efield_r', $
-                                  image_string = plane_string, $
+                                  ;; data_name = 'efield_r', $
+                                  ;; image_string = plane_string, $
+                                  basename = basename, $
                                   /clip_y_axes, $
                                   movie = keyword_set(movies)
+              basename = info.filepath+path_sep()+ $
+                         'efield_t'+plane_string
               ct = get_custom_ct(2)
               eppic_xyt_graphics, Et,xdata,ydata, $
                                   info, $
@@ -181,16 +199,18 @@ pro eppic_spatial_analysis, info,movies=movies
                                   rgb_table = [[ct.r],[ct.g],[ct.b]], $
                                   min_value = -!pi, $
                                   max_value = +!pi, $
-                                  data_name = 'efield_t', $
-                                  image_string = plane_string, $
+                                  ;; data_name = 'efield_t', $
+                                  ;; image_string = plane_string, $
+                                  basename = basename, $
                                   /clip_y_axes, $
                                   movie = keyword_set(movies)
 
               ;;==Make plots in the plane perpendicular to B
               if strcmp(info.planes[ip],perp_to_B) then begin
-                 filename = info.filepath+path_sep()+'efield-means'+plane_string+'.pdf'
-                 plot_efield_means, xdata,ydata,Ex[*,*,[0,nt/2,nt-1]],Ey[*,*,[0,nt/2,nt-1]], $
-                                    filename = filename
+                 filename = info.filepath+path_sep()+'efield-means'+plane_string+
+                 plot_efield_means, xdata,ydata, $
+                                    Ex[*,*,[0,nt/2,nt-1]],Ey[*,*,[0,nt/2,nt-1]], $
+                                    filename = basename
               endif ;;--perp_to_B
            endif    ;;--phi           
         endfor      ;;--planes
