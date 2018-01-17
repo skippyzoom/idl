@@ -188,9 +188,9 @@ pro eppic_spatial_analysis, info,movies=movies
 
               ;;==Make plots in the plane perpendicular to B
               if strcmp(info.planes[ip],perp_to_B) then begin
+                 filename = info.filepath+path_sep()+'efield-means'+plane_string+'.pdf'
                  plot_efield_means, xdata,ydata,Ex[*,*,[0,nt/2,nt-1]],Ey[*,*,[0,nt/2,nt-1]], $
-                                    filename = info.filepath+path_sep()+'efield_H-means.pdf'
-
+                                    filename = filename
               endif ;;--perp_to_B
            endif    ;;--phi           
         endfor      ;;--planes
