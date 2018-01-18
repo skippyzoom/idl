@@ -17,6 +17,8 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
                         clip_y_axes=clip_y_axes, $
                         dimensions=dimensions, $
                         colorbar_title=colorbar_title, $
+                        expand=expand, $
+                        rescale=rescale, $
                         movie=movie
 
   ;;==Get data size
@@ -33,12 +35,16 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
      if n_elements(rgb_table) eq 0 then rgb_table = 0
      if n_elements(min_value) eq 0 then min_value = !NULL
      if n_elements(max_value) eq 0 then max_value = !NULL
-     if n_elements(xrng) eq 0 then xrng = indgen(nx)
-     if n_elements(yrng) eq 0 then yrng = indgen(ny)
+     if n_elements(xrng) eq 0 then xrng = [0,nx-1]
+     if n_elements(yrng) eq 0 then yrng = [0,ny-1]
      if n_elements(xrange) eq 0 then xrange = !NULL
      if n_elements(yrange) eq 0 then yrange = !NULL
      if n_elements(data_name) eq 0 then data_name = 'data'
      if n_elements(image_string) eq 0 then image_string = ''
+     if n_elements(expand) eq 0 then expand = 1.0
+     if n_elements(rescale) eq 0 then rescale = 1.0
+
+     ;;==Backup input
      pdata_in = pdata
      xdata_in = xdata
      ydata_in = ydata
@@ -68,12 +74,13 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
                     rgb_table = rgb_table, $
                     min_value = min_value, $
                     max_value = max_value, $
+                    aspect_ratio = aspect_ratio, $
                     xrange = xrange, $
                     yrange = yrange, $
                     dimensions = dimensions, $
                     colorbar_title = colorbar_title, $
-                    expand = 3, $
-                    rescale = 0.8
+                    expand = expand, $
+                    rescale = rescale
 
      endif $
      else begin
