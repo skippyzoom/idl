@@ -34,6 +34,7 @@ pro data_movie, movdata,xdata,ydata, $
                 max_value=max_value, $
                 xtitle=xtitle, $
                 ytitle=ytitle, $
+                aspect_ratio=aspect_ratio, $
                 xrange=xrange, $
                 yrange=yrange, $
                 dimensions=dimensions, $
@@ -76,6 +77,8 @@ pro data_movie, movdata,xdata,ydata, $
      if n_elements(ytitle) eq 0 then ytitle = ''
      if n_elements(dimensions) eq 0 then dimensions = [xsize,ysize]
      if n_elements(expand) eq 0 then expand = 1.0
+     if n_elements(rescale) eq 0 then rescale = 1.0
+     if n_elements(aspect_ratio) eq 0 then aspect_ratio = 1.0
 
      ;;==Set up graphics parameters
      if keyword_set(xrange) then begin
@@ -107,8 +110,6 @@ pro data_movie, movdata,xdata,ydata, $
         ytickname = strcompress(fix(ytickvalues),/remove_all)
         yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
      endelse
-
-     aspect_ratio = 1.0
 
      ;;==Open video stream
      print, "DATA_MOVIE: Creating ",filename
