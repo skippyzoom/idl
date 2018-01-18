@@ -127,7 +127,8 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
               nw = next_power2(nt)
               temp = make_array(nx,ny,nw,type=6,value=0.0)
               temp[*,*,0:nt-1] = imgplane
-              imgplane = fft(temp,dim=3,/overwrite)
+              imgplane = fft(temp,dim=3)
+              temp = !NULL
 
               ;;==Set up data
               ;;--Extract the real part
@@ -144,11 +145,15 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
               imgplane = 10*alog10(imgplane)
 
               ;;==Interpolate
-              n_theta = 360
-              rtp = xyz_rtp(imgplane[*,*,0],dx=info.xdif,dy=info.ydif,n_theta=n_theta)
-              ktw = fltarr(n_elements(rtp.r_vals),n_elements(rtp.t_vals),nw)
+              theta_range = [0,360]
+              rtp = xyz_rtp(imgplane[*,*,0],dx=info.xdif,dy=info.ydif, $
+                            theta_range = theta_range)
+              nk = n_elements(rtp.r_vals)
+              n_theta = n_elements(rtp.t_vals)
+              ktw = fltarr(nk,n_theta,nw)
               for iw=0,nw-1 do begin
-                 rtp = xyz_rtp(imgplane[*,*,iw],dx=info.xdif,dy=info.ydif,n_theta=n_theta)
+                 rtp = xyz_rtp(imgplane[*,*,iw],dx=info.xdif,dy=info.ydif, $
+                               theta_range = theta_range)
                  ktw[*,*,iw] = rtp.data
               endfor
 
@@ -156,7 +161,7 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
               basename = info.filepath+path_sep()+ $
                          data_name+'-ktw'+plane_string
               eppic_ktw_graphics, ktw,rtp,info, $
-                                  lambda = 3.0, $
+                                  lambda = [3.0,4.0,10.0], $
                                   basename = basename
 
            endif $
@@ -192,34 +197,42 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
                                   dimensions = [nx/2,ny], $
                                   /clip_y_axes, $
                                   colorbar_title = "Power [dB]", $
+                                  expand = 3, $
+                                  rescale = 0.8, $
                                   movie = keyword_set(movies)
 
               ;;==Interpolate
-              n_theta = 360
-              rtp = xyz_rtp(imgplane[*,*,0],dx=info.xdif,dy=info.ydif,n_theta=n_theta)
-              ktw = fltarr(n_elements(rtp.r_vals),n_elements(rtp.t_vals),nt)
+              theta_range = [0,180]
+              rtp = xyz_rtp(imgplane[*,*,0],dx=info.xdif,dy=info.ydif, $
+                            theta_range = theta_range)
+              nk = n_elements(rtp.r_vals)
+              n_theta = n_elements(rtp.t_vals)
+              ktt = fltarr(nk,n_theta,nt)
               for it=0,nt-1 do begin
-                 rtp = xyz_rtp(imgplane[*,*,it],dx=info.xdif,dy=info.ydif,n_theta=n_theta)
-                 ktw[*,*,it] = rtp.data
+                 rtp = xyz_rtp(imgplane[*,*,it],dx=info.xdif,dy=info.ydif, $
+                               theta_range = theta_range)
+                 ktt[*,*,it] = rtp.data
               endfor
 
               ;;==Create images of interpolated data
               basename = info.filepath+path_sep()+ $
                          data_name+'-ktt'+plane_string
-              aspect_ratio = float(n_elements(rtp.r_vals))/n_theta
-              eppic_xyt_graphics, ktw,rtp.r_vals,rtp.t_vals, $
+              ;; aspect_ratio = float(n_elements(rtp.r_vals))/n_elements(rtp.t_vals)
+              aspect_ratio = (rtp.r_vals[nk-1]-rtp.r_vals[0])/(rtp.t_vals[n_theta-1]-rtp.t_vals[0])
+              eppic_xyt_graphics, ktt,rtp.r_vals,rtp.t_vals, $
                                   info, $
                                   aspect_ratio = aspect_ratio, $
                                   rgb_table = 39, $
                                   min_value = max(imgplane,/nan)-30, $
                                   max_value = max(imgplane,/nan), $
                                   basename = basename, $
-                                  ;; dimensions = [nx/2,ny], $
                                   /clip_y_axes, $
                                   colorbar_title = "Power [dB]", $
+                                  dimensions = [1000,1000], $
+                                  expand = 1, $
+                                  rescale = 1.0, $
                                   movie = keyword_set(movies)
 
-STOP
            endelse
 
         endfor   ;;--planes

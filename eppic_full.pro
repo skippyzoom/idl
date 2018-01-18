@@ -161,7 +161,7 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
 
   ;;==Create images from spectral data
-  eppic_spectral_analysis, info,full_transform=0B
+  ;; eppic_spectral_analysis, info,full_transform=0B,/movies
 
   ;;==Create images from spectral data
   eppic_spectral_analysis, info,full_transform=1B
