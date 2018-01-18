@@ -39,7 +39,10 @@ pro eppic_ktw_graphics, ktw,rtp,info, $
                 font_size = 5.0)
 
      ;;==Save image
-     image_save, img[0],filename=basename+'.pdf'
+     string_lambda = string(lambda[il],format='(f5.2)')
+     string_lambda = strcompress(string_lambda,/remove_all)
+     image_save, img[0],filename=basename+ $
+                 '_lambda'+string_lambda+'.pdf'
 
   endfor
 end
