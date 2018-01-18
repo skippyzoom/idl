@@ -106,6 +106,9 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = +max(abs(imgplane)), $
                                   basename = basename, $
                                   /clip_y_axes, $
+                                  colorbar_title = "$\delta n/n_0$",$
+                                  expand = 3, $
+                                  rescale = 0.8, $
                                   movie = keyword_set(movies)
 
            endif
@@ -125,6 +128,9 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = +max(abs(imgplane[*,*,1:*])), $
                                   basename = basename, $
                                   /clip_y_axes, $
+                                  colorbar_title = "$\phi$ [mV]",$
+                                  expand = 3, $
+                                  rescale = 0.8, $
                                   movie = keyword_set(movies)
 
               ;;==Calculate E-field components
@@ -154,6 +160,9 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = +max(abs(Ex[*,*,1:*])), $
                                   basename = basename, $
                                   /clip_y_axes, $
+                                  colorbar_title = "$E_x$ [mV/m]",$
+                                  expand = 3, $
+                                  rescale = 0.8, $
                                   movie = keyword_set(movies)
               basename = info.filepath+path_sep()+ $
                          'efield_y'+plane_string
@@ -166,6 +175,9 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = +max(abs(Ey[*,*,1:*])), $
                                   basename = basename, $
                                   /clip_y_axes, $
+                                  colorbar_title = "$E_y$ [mV/m]",$
+                                  expand = 3, $
+                                  rescale = 0.8, $
                                   movie = keyword_set(movies)
               basename = info.filepath+path_sep()+ $
                          'efield_r'+plane_string
@@ -178,6 +190,9 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = max(Er[*,*,1:*]), $
                                   basename = basename, $
                                   /clip_y_axes, $
+                                  colorbar_title = "$|E|$ [mV/m]",$
+                                  expand = 3, $
+                                  rescale = 0.8, $
                                   movie = keyword_set(movies)
               basename = info.filepath+path_sep()+ $
                          'efield_t'+plane_string
@@ -191,6 +206,9 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = +!pi, $
                                   basename = basename, $
                                   /clip_y_axes, $
+                                  colorbar_title = "$\theta(E)$ [rad]",$
+                                  expand = 3, $
+                                  rescale = 0.8, $
                                   movie = keyword_set(movies)
 
               ;;==Make plots in the plane perpendicular to B
