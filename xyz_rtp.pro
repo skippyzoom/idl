@@ -5,26 +5,36 @@
 ; -- This function is based on kmag_interpolate.pro but 
 ;    nx, ny, and nz here correspond to nx/2... in that
 ;    function.
-;
-; TO DO
-; -- Allow arbitrary angle ranges.
 ;-
 function xyz_rtp, xyz, $
                   dx=dx,dy=dy,dz=dz, $
-                  n_theta=n_theta,n_phi=n_phi, $
+                  ;; n_theta=n_theta,n_phi=n_phi, $
+                  theta_range=theta_range, $
+                  phi_range=phi_range, $
                   shape=shape, $
                   missing=missing
 
-  if n_elements(n_theta) eq 0 then n_theta = 360
-  if n_elements(n_phi) eq 0 then n_phi = 1
+  ;;==Defaults and guards
+  ;; if n_elements(n_theta) eq 0 then n_theta = 360
+  ;; n_theta = 360
+  ;; print, "[XYZ_RTP] Currently only capable of interpolating over full 360 degrees."
+  if n_elements(theta_range) eq 0 then theta_range = [0,360]
+  n_theta = theta_range[1]-theta_range[0]
+  ;; if n_elements(n_phi) eq 0 then n_phi = 1
+  if n_elements(phi_range) eq 0 then phi_range = [0,180]
+  n_phi = phi_range[1]-phi_range[0]
   if n_elements(shape) eq 0 then shape = 'cone'
   if n_elements(missing) eq 0 then missing = 0.0
-
+  
+  ;;==Initialize the output dictionary
   rtp = dictionary()
 
+  ;;==Get dimensions of input
   xyz_size = size(xyz)
   n_dims = xyz_size[0]
   rtp['n_dims'] = n_dims
+
+  ;;==Set up interpolation parameters
   case n_dims of
      2: begin
         nx = xyz_size[1]/2
@@ -52,13 +62,16 @@ function xyz_rtp, xyz, $
   endcase
   rtp['r_vals'] = r_min*(1.0+dindgen(nr))
 
+  ;;==Perform the interpolation
   case n_dims of 
      2: begin
-        rtp['t_vals'] = indgen(n_theta)
+        rtp['t_vals'] = theta_range[0]+indgen(n_theta)
         data = fltarr(nr,n_theta)
         for ir=0,nr-1 do begin
            t_size = 8*fix(rtp.r_vals[ir]/min([x_min,y_min]))
-           t_interp = 2*!pi*dindgen(t_size)/t_size
+           ;; t_interp = 2*!pi*dindgen(t_size)/t_size
+           t_interp = theta_range[0]+(theta_range[1]-theta_range[0])*dindgen(t_size)/t_size
+           t_interp *= !dtor
            x_interp = cos(t_interp)*rtp.r_vals[ir]/x_min + nx
            y_interp = sin(t_interp)*rtp.r_vals[ir]/y_min + ny
            data_tmp = interpolate(xyz, $
