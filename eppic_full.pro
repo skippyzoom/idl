@@ -95,6 +95,7 @@ pro eppic_full, path=path, $
   info['position'] = position
   info['layout'] = layout
   info['font_name'] = font_name
+  info['font_size'] = font_size
   info['axis_style'] = 2
   info['path'] = path
   info['filepath'] = filepath
@@ -115,8 +116,7 @@ pro eppic_full, path=path, $
                                 ;-----------------------------;
 
   ;;==Choose EPPIC spectral output quantities to analyze
-  ;; data_names = list('denft0','denft1')
-  data_names = list('denft1')
+  data_names = list('denft0','denft1')
 
   ;;==Declare panel positions for spectral data
   position = multi_position(layout[*], $
@@ -151,6 +151,7 @@ pro eppic_full, path=path, $
   info['position'] = position
   info['layout'] = layout
   info['font_name'] = font_name
+  info['font_size'] = font_size
   info['axis_style'] = 2
   info['path'] = path
   info['filepath'] = filepath
@@ -161,10 +162,10 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
 
   ;;==Create images from spectral data
-  ;; eppic_spectral_analysis, info,full_transform=0B,/movies
+  eppic_spectral_analysis, info,full_transform=0B,/movies
 
   ;;==Create images from spectral data
-  eppic_spectral_analysis, info,full_transform=1B
+  ;; eppic_spectral_analysis, info,full_transform=1B
 
   ;;==Create images from spectral data
   ;; eppic_spectral_analysis, info,/movies

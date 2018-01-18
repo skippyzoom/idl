@@ -35,7 +35,7 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
         data_is_spatial = (size(data,/n_dim) ne 0) ? 1B : 0B
 
      endif
-     
+
      ;;==Get data size and dimensions
      data_size = size(data)
      n_dims = data_size[0]
@@ -62,6 +62,9 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
            perp_to_B = 'xy'
         endif
 
+        ;; ;;==Restrict time range --> DEV
+        ;; data = data[*,*,*,nt/2:nt-1]
+
         ;;==Transpose data
         xyzt = info.xyz
         tmp = indgen(n_dims)
@@ -71,6 +74,7 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
 
         ;;==Get new dimensions
         data_size = size(data)
+        nt = data_size[n_dims]
         nz = data_size[3]
         ny = data_size[2]
         nx = data_size[1]
@@ -136,7 +140,9 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
               ;;--Recenter
               imgplane = shift(imgplane,nx/2,ny/2,nw/2)
               ;;--Zero the near-DC components (crude high-pass filter)
-              imgplane[nx/2-5:nx/2+5,ny/2-2:ny/2+2,nw/2] = 0.0
+              dc_width = 8
+              imgplane[nx/2-dc_width:nx/2+dc_width, $
+                       ny/2-dc_width:ny/2+dc_width,*] = 0.0
               ;;--Smooth
               imgplane = smooth(imgplane,[5,5,1],/edge_wrap)
               ;;--Normalize
@@ -157,11 +163,27 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
                  ktw[*,*,iw] = rtp.data
               endfor
 
+              ;;==Build vector of frequencies
+              w_max = 2*!pi/(info.params.dt*info.params.nout)
+              w_vals = w_max*(dindgen(nw)/nw-0.5)
+              rtp['w_vals'] = w_vals
+
               ;;==Create images of interpolated data
+              th_range = [0,180]
+              v_ExB = abs(info.params.Ex0_external/info.params.Bz)
+              vp_range = [-3*v_ExB,+3*v_ExB]
+              aspect_ratio = (th_range[1]-th_range[0])/ $
+                             (vp_range[1]-vp_range[0])
+              ;; aspect_ratio *= 1.2
               basename = info.filepath+path_sep()+ $
                          data_name+'-ktw'+plane_string
               eppic_ktw_graphics, ktw,rtp,info, $
                                   lambda = [3.0,4.0,10.0], $
+                                  yrange = vp_range, $
+                                  xrange = th_range, $
+                                  aspect_ratio = aspect_ratio, $
+                                  min_value = -30, $
+                                  max_value = 0, $
                                   basename = basename
 
            endif $
@@ -173,7 +195,9 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
               ;;--Recenter
               imgplane = shift(imgplane,nx/2,ny/2,0)
               ;;--Zero the near-DC components (crude high-pass filter)
-              imgplane[nx/2-5:nx/2+5,ny/2-2:ny/2+2,*] = 0.0
+              dc_width = 8
+              imgplane[nx/2-dc_width:nx/2+dc_width, $
+                       ny/2-dc_width:ny/2+dc_width,*] = 0.0
               ;;--Smooth
               imgplane = smooth(imgplane,[5,5,1],/edge_wrap)
               ;;--Normalize
@@ -184,6 +208,8 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
               ;;==Create images of Fourier-transformed data
               basename = info.filepath+path_sep()+ $
                          data_name+plane_string
+              min_value = max(imgplane,/nan)-30
+              max_value = max(imgplane,/nan)
               eppic_xyt_graphics, imgplane,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
@@ -191,8 +217,8 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
                                   xrange = [-2*!pi,2*!pi], $
                                   yrange = [0,2*!pi], $
                                   rgb_table = 39, $
-                                  min_value = max(imgplane,/nan)-30, $
-                                  max_value = max(imgplane,/nan), $
+                                  min_value = min_value, $
+                                  max_value = max_value, $
                                   basename = basename, $
                                   dimensions = [nx/2,ny], $
                                   /clip_y_axes, $
@@ -217,20 +243,22 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
               ;;==Create images of interpolated data
               basename = info.filepath+path_sep()+ $
                          data_name+'-ktt'+plane_string
-              ;; aspect_ratio = float(n_elements(rtp.r_vals))/n_elements(rtp.t_vals)
-              aspect_ratio = (rtp.r_vals[nk-1]-rtp.r_vals[0])/(rtp.t_vals[n_theta-1]-rtp.t_vals[0])
+              aspect_ratio = (rtp.r_vals[nk-1]-rtp.r_vals[0])/ $
+                             (rtp.t_vals[n_theta-1]-rtp.t_vals[0])
+              min_value = max(imgplane,/nan)-30
+              max_value = max(imgplane,/nan)
               eppic_xyt_graphics, ktt,rtp.r_vals,rtp.t_vals, $
                                   info, $
                                   aspect_ratio = aspect_ratio, $
                                   rgb_table = 39, $
-                                  min_value = max(imgplane,/nan)-30, $
-                                  max_value = max(imgplane,/nan), $
+                                  min_value = min_value, $
+                                  max_value = max_value, $
                                   basename = basename, $
                                   /clip_y_axes, $
                                   colorbar_title = "Power [dB]", $
-                                  dimensions = [1000,1000], $
+                                  ;; dimensions = [1000,1000], $
                                   expand = 1, $
-                                  rescale = 1.0, $
+                                  rescale = 0.8, $
                                   movie = keyword_set(movies)
 
            endelse
