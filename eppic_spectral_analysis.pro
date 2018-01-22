@@ -123,7 +123,6 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
 
               ;;==Get new dimensions
               img_size = size(imgplane)
-              nz = img_size[3]
               ny = img_size[2]
               nx = img_size[1]
 
@@ -188,6 +187,11 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
 
            endif $
            else begin
+
+              ;;==Get new dimensions
+              img_size = size(imgplane)
+              ny = img_size[2]
+              nx = img_size[1]
 
               ;;==Set up data
               ;;--Extract the real part
@@ -266,6 +270,9 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
         endfor   ;;--planes
      endif $     ;;--n_dims
      else print, "[EPPIC_SPECTRAL_ANALYSIS] Could not create an image."
+
+     ;;==Free memory
+     data = !NULL
 
   endfor ;;--data_names
 

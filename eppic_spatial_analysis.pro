@@ -39,7 +39,7 @@ pro eppic_spatial_analysis, info,movies=movies
            data = reform(data,[nx,ny,1,nt])
            n_dims = size(data,/n_dim)
            info.planes = 'xy'
-           perp_to_B = 'xy'
+           info['perp_to_B'] = 'xy'
         endif
 
         ;;==Transpose data
@@ -233,7 +233,7 @@ pro eppic_spatial_analysis, info,movies=movies
                                   movie = keyword_set(movies)
 
               ;;==Make plots in the plane perpendicular to B
-              if strcmp(info.planes[ip],perp_to_B) then begin
+              if strcmp(info.planes[ip],info.perp_to_B) then begin
                  image_string = plane_string
                  basename = info.filepath+path_sep()+'efield-means'+image_string
                  plot_efield_means, xdata,ydata, $

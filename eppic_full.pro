@@ -59,10 +59,10 @@ pro eppic_full, path=path, $
   planes = ['xy','xz','yz']
 
   ;;==Declare the plane perpendicular to B
-  perp_to_B = 'xy'
+  perp_to_B = 'yz'
 
   ;;==Declare transpose for images
-  xyz = [1,0,2]
+  xyz = [0,1,2]
 
   ;;==Choose EPPIC spatial output quantities to analyze
   data_names = list('phi','den0','den1')
@@ -74,7 +74,7 @@ pro eppic_full, path=path, $
 
   ;;==Declare data ranges for spatial data image panels
   rngs = [[0,grid.nx-1], $
-          [grid.ny/2,grid.ny-1], $
+          [0,grid.ny-1], $
           [0,grid.nz-1]]
   ctrs = [grid.nx/2,grid.ny/2,grid.nz/2]
   vecs = {x:grid.x, y:grid.y, z:grid.z}
@@ -91,6 +91,7 @@ pro eppic_full, path=path, $
   info['yvec'] = vecs.(xyz[1])
   info['zvec'] = vecs.(xyz[2])
   info['xyz'] = xyz
+  info['perp_to_B'] = perp_to_B
   info['params'] = params
   info['position'] = position
   info['layout'] = layout
@@ -146,6 +147,7 @@ pro eppic_full, path=path, $
   info['ydif'] = difs[xyz[1]]
   info['zdif'] = difs[xyz[2]]
   info['xyz'] = xyz
+  info['perp_to_B'] = perp_to_B
   info['params'] = params
   info['grid'] = grid
   info['position'] = position
@@ -162,10 +164,10 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
 
   ;;==Create images from spectral data
-  eppic_spectral_analysis, info,full_transform=0B,/movies
+  eppic_spectral_analysis, info,full_transform=0B,movies=0B
 
   ;;==Create images from spectral data
-  ;; eppic_spectral_analysis, info,full_transform=1B
+  eppic_spectral_analysis, info,full_transform=1B,movies=0B
 
   ;;==Create images from spectral data
   ;; eppic_spectral_analysis, info,/movies
