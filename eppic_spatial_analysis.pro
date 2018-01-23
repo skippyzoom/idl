@@ -99,8 +99,10 @@ pro eppic_spatial_analysis, info,movies=movies
               scale = 100
               basename = info.filepath+path_sep()+ $
                          data_name+image_string
-              min_value = -max(abs(scale*imgplane))
-              max_value = +max(abs(scale*imgplane))
+              ;; min_value = -max(abs(scale*imgplane))
+              ;; max_value = +max(abs(scale*imgplane))
+              min_value = -9
+              max_value = +9
               eppic_xyt_graphics, scale*imgplane,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
@@ -125,8 +127,10 @@ pro eppic_spatial_analysis, info,movies=movies
               ct = get_custom_ct(1)
               basename = info.filepath+path_sep()+ $
                          data_name+image_string
-              min_value = -max(abs(scale*imgplane[*,*,1:*]))
-              max_value = +max(abs(scale*imgplane[*,*,1:*]))
+              ;; min_value = -max(abs(scale*imgplane[*,*,1:*]))
+              ;; max_value = +max(abs(scale*imgplane[*,*,1:*]))
+              min_value = -600
+              max_value = +600
               eppic_xyt_graphics, scale*imgplane,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
@@ -171,8 +175,10 @@ pro eppic_spatial_analysis, info,movies=movies
               scale = 1e3
               basename = info.filepath+path_sep()+ $
                          'efield_x'+image_string
-              min_value = -max(abs(scale*Ex[*,*,1:*]))
-              max_value = +max(abs(scale*Ex[*,*,1:*]))
+              ;; min_value = -max(abs(scale*Ex[*,*,1:*]))
+              ;; max_value = +max(abs(scale*Ex[*,*,1:*]))
+              min_value = -36
+              max_value = +36
               eppic_xyt_graphics, scale*Ex,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
@@ -188,8 +194,10 @@ pro eppic_spatial_analysis, info,movies=movies
                                   movie = keyword_set(movies)
               basename = info.filepath+path_sep()+ $
                          'efield_y'+image_string
-              min_value = -max(abs(scale*Ey[*,*,1:*]))
-              max_value = +max(abs(scale*Ey[*,*,1:*]))
+              ;; min_value = -max(abs(scale*Ey[*,*,1:*]))
+              ;; max_value = +max(abs(scale*Ey[*,*,1:*]))
+              min_value = -24
+              max_value = +24
               eppic_xyt_graphics, scale*Ey,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
@@ -206,7 +214,8 @@ pro eppic_spatial_analysis, info,movies=movies
               basename = info.filepath+path_sep()+ $
                          'efield_r'+image_string
               min_value = 0
-              max_value = max(scale*Er[*,*,1:*])
+              ;; max_value = max(scale*Er[*,*,1:*])
+              max_value = 36
               eppic_xyt_graphics, scale*Er,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
