@@ -203,7 +203,9 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
               imgplane[nx/2-dc_width:nx/2+dc_width, $
                        ny/2-dc_width:ny/2+dc_width,*] = 0.0
               ;;--Smooth
-              imgplane = smooth(imgplane,[5,5,1],/edge_wrap)
+              s_width = 3
+              if s_width gt 1 then $
+                 imgplane = smooth(imgplane,[s_width,s_width,1],/edge_wrap)
               ;;--Normalize
               imgplane = imgplane/max(imgplane)
               ;;--Convert to dB

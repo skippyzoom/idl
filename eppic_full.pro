@@ -46,9 +46,12 @@ pro eppic_full, path=path, $
                                 ;----------------------------;
 
   ;;==Choose time steps for images
-  nt = 9
-  timestep = params.nout*(nt_max/(nt-1))*lindgen(nt)
-  layout = [3,3]
+  ;; nt = 9
+  ;; timestep = params.nout*(nt_max/(nt-1))*lindgen(nt)
+  ;; layout = [3,3]
+  timestep = params.nout*[1,nt_max-1]
+  nt = n_elements(timestep)
+  layout = [1,2]
   string_time = string(1e3*params.dt*timestep,format='(f8.2)')
   string_time = "t = "+strcompress(string_time,/remove_all)+" ms"
 
@@ -59,10 +62,10 @@ pro eppic_full, path=path, $
   planes = ['xy','xz','yz']
 
   ;;==Declare the plane perpendicular to B
-  perp_to_B = 'yz'
+  perp_to_B = 'xy'
 
   ;;==Declare transpose for images
-  xyz = [0,1,2]
+  xyz = [1,0,2]
 
   ;;==Choose EPPIC spatial output quantities to analyze
   data_names = list('phi','den0','den1')
@@ -74,7 +77,7 @@ pro eppic_full, path=path, $
 
   ;;==Declare data ranges for spatial data image panels
   rngs = [[0,grid.nx-1], $
-          [0,grid.ny-1], $
+          [grid.ny/2,grid.ny-1], $
           [0,grid.nz-1]]
   ctrs = [grid.nx/2,grid.ny/2,grid.nz/2]
   vecs = {x:grid.x, y:grid.y, z:grid.z}
@@ -107,7 +110,7 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
 
   ;;==Create images from spatial data
-  ;; eppic_spatial_analysis, info
+  eppic_spatial_analysis, info
 
   ;;==Create movies from spatial data
   ;; eppic_spatial_analysis, info,/movies
@@ -122,7 +125,7 @@ pro eppic_full, path=path, $
   ;;==Declare panel positions for spectral data
   position = multi_position(layout[*], $
                             edges = [0.12,0.10,0.80,0.80], $
-                            buffer = [0.01,0.0])
+                            buffer = [0.0,0.2])
 
   ;;==Declare data ranges for spectral data
   rngs = [[0,grid.nx*params.nout_avg-1], $
@@ -164,10 +167,10 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
 
   ;;==Create images from spectral data
-  eppic_spectral_analysis, info,full_transform=0B,movies=0B
+  ;; eppic_spectral_analysis, info,full_transform=0B,movies=0B
 
   ;;==Create images from spectral data
-  eppic_spectral_analysis, info,full_transform=1B,movies=0B
+  ;; eppic_spectral_analysis, info,full_transform=1B,movies=0B
 
   ;;==Create images from spectral data
   ;; eppic_spectral_analysis, info,/movies

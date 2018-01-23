@@ -96,18 +96,21 @@ pro eppic_spatial_analysis, info,movies=movies
            ;;==Create graphics of densities
            image_string = plane_string
            if strcmp(data_name,'den',3) then begin
+              scale = 100
               basename = info.filepath+path_sep()+ $
                          data_name+image_string
-              eppic_xyt_graphics, imgplane,xdata,ydata, $
+              min_value = -max(abs(scale*imgplane))
+              max_value = +max(abs(scale*imgplane))
+              eppic_xyt_graphics, scale*imgplane,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
                                   yrng = yrng, $
                                   rgb_table = 5, $
-                                  min_value = -max(abs(imgplane)), $
-                                  max_value = +max(abs(imgplane)), $
+                                  min_value = min_value, $
+                                  max_value = max_value, $
                                   basename = basename, $
                                   /clip_y_axes, $
-                                  colorbar_title = "$\delta n/n_0$",$
+                                  colorbar_title = "$\delta n/n_0$ [%]",$
                                   expand = 3, $
                                   rescale = 0.8, $
                                   movie = keyword_set(movies)
@@ -117,18 +120,20 @@ pro eppic_spatial_analysis, info,movies=movies
            if strcmp(data_name,'phi') then begin
 
               ;;==Create graphics of electrostatic potential
+              scale = 1e3
               image_string = plane_string
               ct = get_custom_ct(1)
               basename = info.filepath+path_sep()+ $
                          data_name+image_string
-              scale = 1e3
+              min_value = -max(abs(scale*imgplane[*,*,1:*]))
+              max_value = +max(abs(scale*imgplane[*,*,1:*]))
               eppic_xyt_graphics, scale*imgplane,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
                                   yrng = yrng, $
                                   rgb_table = 70, $
-                                  min_value = -max(abs(imgplane[*,*,1:*])), $
-                                  max_value = +max(abs(imgplane[*,*,1:*])), $
+                                  min_value = min_value, $
+                                  max_value = max_value, $
                                   basename = basename, $
                                   /clip_y_axes, $
                                   colorbar_title = "$\phi$ [mV]",$
@@ -152,13 +157,15 @@ pro eppic_spatial_analysis, info,movies=movies
               endfor
 
               ;;==Smooth E-field components
-              s_width = 10
-              Ex = smooth(Ex,[s_width,s_width,1],/edge_wrap)
-              Ey = smooth(Ey,[s_width,s_width,1],/edge_wrap)
-              Er = smooth(Er,[s_width,s_width,1],/edge_wrap)
-              Et = smooth(Et,[s_width,s_width,1],/edge_wrap)
-              image_string = plane_string+'-sw'+ $
-                             strcompress(s_width,/remove_all)
+              s_width = 1
+              if s_width gt 1 then begin
+                 Ex = smooth(Ex,[s_width,s_width,1],/edge_wrap)
+                 Ey = smooth(Ey,[s_width,s_width,1],/edge_wrap)
+                 Er = smooth(Er,[s_width,s_width,1],/edge_wrap)
+                 Et = smooth(Et,[s_width,s_width,1],/edge_wrap)
+                 image_string = plane_string+'-sw'+ $
+                                strcompress(s_width,/remove_all)
+              endif
 
               ;;==Create graphics of electric field
               scale = 1e3
