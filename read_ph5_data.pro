@@ -94,6 +94,7 @@ function read_ph5_data, data_name, $
            3: data = make_array(nx/nout_avg,ny/nout_avg,nz/nout_avg,nt,type=type)
         endcase
         tmp = !NULL
+        if nt eq 1 then data = reform(data,[size(data,/dim),1])
      endif
   endelse
 
