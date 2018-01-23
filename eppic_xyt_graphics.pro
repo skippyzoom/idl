@@ -117,6 +117,7 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
                              tickdir = 1, $
                              ticklen = 0.2, $
                              major = 7, $
+                             title = colorbar_title, $
                              font_name = info.font_name, $
                              font_size = 8.0)
 
@@ -128,8 +129,6 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
                    font_size = 5.0)
 
         ;;==Save image
-        ;; image_save, img[0],filename=info.filepath+path_sep()+ $
-        ;;             data_name+image_string+'.pdf'
         image_save, img[0],filename=basename+'.pdf'
 
      endelse
