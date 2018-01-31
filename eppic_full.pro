@@ -49,9 +49,10 @@ pro eppic_full, path=path, $
   ;; nt = 9
   ;; timestep = params.nout*(nt_max/(nt-1))*lindgen(nt)
   ;; layout = [3,3]
+  ;; timestep = params.nout*[1,nt_max/4,nt_max/2,3*nt_max/4,nt_max-1]
   timestep = params.nout*[1,nt_max-1]
   nt = n_elements(timestep)
-  layout = [1,2]
+  layout = [1,nt]
   string_time = string(1e3*params.dt*timestep,format='(f8.2)')
   string_time = "t = "+strcompress(string_time,/remove_all)+" ms"
 
@@ -64,8 +65,18 @@ pro eppic_full, path=path, $
   ;;==Declare the plane perpendicular to B
   perp_to_B = 'xy'
 
-  ;;==Declare transpose for images
-  xyz = [1,0,2]
+  ;==Build unrotated, untransposed E0 vector
+  E0 = dictionary('x',params.Ex0_external, $
+                  'y',params.Ey0_external, $
+                  'z',params.Ez0_external)
+
+  ;;==Declare transpose array for images
+  xyz = [0,1,2]
+
+  ;;==Declare rotation direction for images
+  rot = dictionary('xy',270, $
+                   'xz',  0, $
+                   'yz',  0)
 
   ;;==Choose EPPIC spatial output quantities to analyze
   data_names = list('phi','den0','den1')
@@ -94,7 +105,9 @@ pro eppic_full, path=path, $
   info['yvec'] = vecs.(xyz[1])
   info['zvec'] = vecs.(xyz[2])
   info['xyz'] = xyz
+  info['rot'] = rot
   info['perp_to_B'] = perp_to_B
+  info['E0'] = E0
   info['params'] = params
   info['position'] = position
   info['layout'] = layout
@@ -113,7 +126,7 @@ pro eppic_full, path=path, $
   eppic_spatial_analysis, info
 
   ;;==Create movies from spatial data
-  ;; eppic_spatial_analysis, info,/movies
+  eppic_spatial_analysis, info,/movies
 
                                 ;-----------------------------;
                                 ; 2-D images of spectral data ;
@@ -150,6 +163,7 @@ pro eppic_full, path=path, $
   info['ydif'] = difs[xyz[1]]
   info['zdif'] = difs[xyz[2]]
   info['xyz'] = xyz
+  info['rot'] = rot
   info['perp_to_B'] = perp_to_B
   info['params'] = params
   info['grid'] = grid

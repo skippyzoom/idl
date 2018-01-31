@@ -62,8 +62,10 @@ pro eppic_spatial_analysis, info,movies=movies
                  yrng = info.yrng
                  dx = info.params.dx
                  dy = info.params.dy
-                 Ex0 = info.params.Ex0_external
-                 Ey0 = info.params.Ey0_external
+                 r_ang = info.rot.xy*!dtor
+                 r_mat = [[cos(r_ang),-sin(r_ang)], $
+                          [sin(r_ang),cos(r_ang)]]
+                 E0 = r_mat ## [info.params.Ex0_external,info.params.Ey0_external]
               end
               strcmp(info.planes[ip],'xz') || strcmp(info.planes[ip],'zx'): begin
                  imgplane = reform(data[*,info.yctr,*,*])
@@ -73,8 +75,10 @@ pro eppic_spatial_analysis, info,movies=movies
                  yrng = info.zrng
                  dx = info.params.dx
                  dy = info.params.dz
-                 Ex0 = info.params.Ex0_external
-                 Ey0 = info.params.Ez0_external
+                 r_ang = info.rot.xz*!dtor
+                 r_mat = [[cos(r_ang),-sin(r_ang)], $
+                          [sin(r_ang),cos(r_ang)]]
+                 E0 = r_mat ## [params.info.Ex0_external,params.info.Ez0_external]
               end
               strcmp(info.planes[ip],'yz') || strcmp(info.planes[ip],'zy'): begin
                  imgplane = reform(data[info.xctr,*,*,*])
@@ -84,14 +88,42 @@ pro eppic_spatial_analysis, info,movies=movies
                  yrng = info.zrng
                  dx = info.params.dy
                  dy = info.params.dz
-                 Ex0 = info.params.Ey0_external
-                 Ey0 = info.params.Ez0_external
+                 r_ang = info.rot.yz*!dtor
+                 r_mat = [[cos(r_ang),-sin(r_ang)], $
+                          [sin(r_ang),cos(r_ang)]]
+                 E0 = r_mat ## [params.info.Ey0_external,params.info.Ez0_external]
               end
            endcase
-
+STOP
            ;;==Save string for filenames
            if data_is_2D then plane_string = '' $
            else plane_string = '_'+info.planes[ip]
+
+           ;;==Rotate data -->DEV
+           if info.haskey('rot') then begin
+              if ~data_is_2D then begin
+                 print, "[EPPIC_SPATIAL_ANALYSIS] WARNING!!!"
+                 print, "       Rotation not tested for 3 D"
+              endif $
+              else begin
+                 rot = info.rot[info.planes[ip]]
+                 if rot ne 0 then begin
+                    tmp = imgplane
+                    imgplane = fltarr(ny,nx,nt)
+                    for it=0,nt-1 do begin
+                       imgplane[*,*,it] = rotate(tmp[*,*,it],rot)
+                    endfor
+                    tmp = !NULL
+                    tmp = xdata
+                    xdata = ydata
+                    ydata = tmp
+                    tmp = xrng
+                    xrng = yrng
+                    yrng = tmp
+                    tmp = !NULL                 
+                 endif
+              endelse
+           endif
 
            ;;==Create graphics of densities
            image_string = plane_string
@@ -116,6 +148,12 @@ pro eppic_spatial_analysis, info,movies=movies
                                   expand = 3, $
                                   rescale = 0.8, $
                                   movie = keyword_set(movies)
+
+              ;; basename = info.filepath+path_sep()+ $
+              ;;            'TEST_'+data_name+'_means'+image_string
+              ;; plot_efield_means, xdata,ydata, $
+              ;;                    scale*imgplane,scale*imgplane, $
+              ;;                    basename = basename
 
            endif
 
@@ -154,11 +192,15 @@ pro eppic_spatial_analysis, info,movies=movies
                  gradf = gradient(imgplane[*,*,it], $
                                   dx = dx*info.params.nout_avg, $
                                   dy = dy*info.params.nout_avg)
-                 Ex[*,*,it] = -1.0*gradf.x + Ex0
-                 Ey[*,*,it] = -1.0*gradf.y + Ey0
+                 ;; Ex[*,*,it] = -1.0*gradf.x + Ex0
+                 ;; Ey[*,*,it] = -1.0*gradf.y + Ey0
+                 Ex[*,*,it] = -1.0*gradf.x + E0[0]
+                 Ey[*,*,it] = -1.0*gradf.y + E0[1]
+                 ;; Ex[*,*,it] = -1.0*gradf.x
+                 ;; Ey[*,*,it] = -1.0*gradf.y
                  Er[*,*,it] = sqrt(Ex[*,*,it]^2 + Ey[*,*,it]^2)
                  Et[*,*,it] = atan(Ey[*,*,it],Ex[*,*,it])
-              endfor
+              endfor              
 
               ;;==Smooth E-field components
               s_width = 1
@@ -174,11 +216,11 @@ pro eppic_spatial_analysis, info,movies=movies
               ;;==Create graphics of electric field
               scale = 1e3
               basename = info.filepath+path_sep()+ $
-                         'efield_x'+image_string
+                         'efield_x-P'+image_string
               ;; min_value = -max(abs(scale*Ex[*,*,1:*]))
               ;; max_value = +max(abs(scale*Ex[*,*,1:*]))
-              min_value = -36
-              max_value = +36
+              min_value = -24
+              max_value = +24
               eppic_xyt_graphics, scale*Ex,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
@@ -188,12 +230,13 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = max_value, $
                                   basename = basename, $
                                   /clip_y_axes, $
-                                  colorbar_title = "$E_x$ [mV/m]",$
+                                  ;; colorbar_title = "$E_x$ [mV/m]",$
+                                  colorbar_title = "$\delta E_x$ [mV/m]",$
                                   expand = 3, $
                                   rescale = 0.8, $
                                   movie = keyword_set(movies)
               basename = info.filepath+path_sep()+ $
-                         'efield_y'+image_string
+                         'efield_y-P'+image_string
               ;; min_value = -max(abs(scale*Ey[*,*,1:*]))
               ;; max_value = +max(abs(scale*Ey[*,*,1:*]))
               min_value = -24
@@ -207,15 +250,16 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = max_value, $
                                   basename = basename, $
                                   /clip_y_axes, $
-                                  colorbar_title = "$E_y$ [mV/m]",$
+                                  ;; colorbar_title = "$E_y$ [mV/m]",$
+                                  colorbar_title = "$\delta E_y$ [mV/m]",$
                                   expand = 3, $
                                   rescale = 0.8, $
                                   movie = keyword_set(movies)
               basename = info.filepath+path_sep()+ $
-                         'efield_r'+image_string
+                         'efield_r-P'+image_string
               min_value = 0
               ;; max_value = max(scale*Er[*,*,1:*])
-              max_value = 36
+              max_value = 24
               eppic_xyt_graphics, scale*Er,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
@@ -225,12 +269,13 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = max_value, $
                                   basename = basename, $
                                   /clip_y_axes, $
-                                  colorbar_title = "$|E|$ [mV/m]",$
+                                  ;; colorbar_title = "$|E|$ [mV/m]",$
+                                  colorbar_title = "$|\delta E|$ [mV/m]",$
                                   expand = 3, $
                                   rescale = 0.8, $
                                   movie = keyword_set(movies)
               basename = info.filepath+path_sep()+ $
-                         'efield_t'+image_string
+                         'efield_t-P'+image_string
               ct = get_custom_ct(2)
               min_value = -!pi
               max_value = +!pi
@@ -243,22 +288,27 @@ pro eppic_spatial_analysis, info,movies=movies
                                   max_value = max_value, $
                                   basename = basename, $
                                   /clip_y_axes, $
-                                  colorbar_title = "$\tan^{-1}(E)$ [rad]",$
+                                  ;; colorbar_title = "$\tan^{-1}(E)$ [rad]",$
+                                  colorbar_title = "$tan^{-1}(\delta E)$ [rad]",$
                                   expand = 3, $
                                   rescale = 0.8, $
                                   movie = keyword_set(movies)
 
               ;;==Make plots in the plane perpendicular to B
-              if strcmp(info.planes[ip],info.perp_to_B) then begin
-                 image_string = plane_string
-                 basename = info.filepath+path_sep()+'efield-means'+image_string
-                 plot_efield_means, xdata,ydata, $
-                                    Ex[*,*,[0,nt/2,nt-1]],Ey[*,*,[0,nt/2,nt-1]], $
-                                    basename = basename
-              endif ;;--perp_to_B
-           endif    ;;--phi           
-        endfor      ;;--planes
-     endif $        ;;--n_dims
+              if ~keyword_set(movies) then begin
+                 if strcmp(info.planes[ip],info.perp_to_B) then begin
+                    image_string = plane_string
+                    basename = info.filepath+path_sep()+'efield_means-P'+image_string
+                    plot_efield_means, xdata,ydata, $
+                                       ;; ;; Ex[*,*,[0,nt/2,nt-1]],Ey[*,*,[0,nt/2,nt-1]], $
+                                       ;; scale*Ex[*,*,[0,nt-1]],scale*Ey[*,*,[0,nt-1]], $
+                                       scale*Ex,scale*Ey, $
+                                       basename = basename
+                 endif ;;--movies
+              endif    ;;--perp_to_B
+           endif       ;;--phi           
+        endfor         ;;--planes
+     endif $           ;;--n_dims
      else print, "[EPPIC_SPATIAL_ANALYSIS] Could not create an image."
 
   endfor ;;--data_names
