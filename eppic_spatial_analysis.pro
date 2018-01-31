@@ -94,7 +94,7 @@ pro eppic_spatial_analysis, info,movies=movies
                  E0 = r_mat ## [params.info.Ey0_external,params.info.Ez0_external]
               end
            endcase
-STOP
+
            ;;==Save string for filenames
            if data_is_2D then plane_string = '' $
            else plane_string = '_'+info.planes[ip]
@@ -149,12 +149,6 @@ STOP
                                   rescale = 0.8, $
                                   movie = keyword_set(movies)
 
-              ;; basename = info.filepath+path_sep()+ $
-              ;;            'TEST_'+data_name+'_means'+image_string
-              ;; plot_efield_means, xdata,ydata, $
-              ;;                    scale*imgplane,scale*imgplane, $
-              ;;                    basename = basename
-
            endif
 
            if strcmp(data_name,'phi') then begin
@@ -192,8 +186,6 @@ STOP
                  gradf = gradient(imgplane[*,*,it], $
                                   dx = dx*info.params.nout_avg, $
                                   dy = dy*info.params.nout_avg)
-                 ;; Ex[*,*,it] = -1.0*gradf.x + Ex0
-                 ;; Ey[*,*,it] = -1.0*gradf.y + Ey0
                  Ex[*,*,it] = -1.0*gradf.x + E0[0]
                  Ey[*,*,it] = -1.0*gradf.y + E0[1]
                  ;; Ex[*,*,it] = -1.0*gradf.x
@@ -299,11 +291,12 @@ STOP
                  if strcmp(info.planes[ip],info.perp_to_B) then begin
                     image_string = plane_string
                     basename = info.filepath+path_sep()+'efield_means-P'+image_string
-                    plot_efield_means, xdata,ydata, $
-                                       ;; ;; Ex[*,*,[0,nt/2,nt-1]],Ey[*,*,[0,nt/2,nt-1]], $
-                                       ;; scale*Ex[*,*,[0,nt-1]],scale*Ey[*,*,[0,nt-1]], $
-                                       scale*Ex,scale*Ey, $
-                                       basename = basename
+                    ;; plot_efield_means, xdata,ydata, $
+                    ;;                    ;; ;; Ex[*,*,[0,nt/2,nt-1]],Ey[*,*,[0,nt/2,nt-1]], $
+                    ;;                    ;; scale*Ex[*,*,[0,nt-1]],scale*Ey[*,*,[0,nt-1]], $
+                    ;;                    scale*Ex,scale*Ey, $
+                    ;;                    basename = basename
+                    mean_field_plots, xdata,ydata,scale*Ex,scale*Ey,basename=basename
                  endif ;;--movies
               endif    ;;--perp_to_B
            endif       ;;--phi           
