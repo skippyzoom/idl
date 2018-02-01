@@ -7,7 +7,9 @@
 ;   4) The y-direction mean of Fy.
 ; This routine is based on plot_efield_means.pro
 ;-
-pro mean_field_plots, xdata,ydata,Fx,Fy,basename=basename
+pro mean_field_plots, xdata,ydata,Fx,Fy, $
+                      rms_=rms_, $
+                      basename=basename
 
   ;;==Extract dimensions
   f_size = size(Fx)
@@ -18,7 +20,11 @@ pro mean_field_plots, xdata,ydata,Fx,Fy,basename=basename
 
   ;;==Store input data in dictionaries
   vecs = dictionary('x',xdata,'y',ydata)
+  xdata = !NULL
+  ydata = !NULL
   field = dictionary('x',Fx,'y',Fy)
+  Fx = !NULL
+  Fy = !NULL
 
   ;;==Check dimensions
   if n_dims eq 3 then begin
@@ -29,15 +35,22 @@ pro mean_field_plots, xdata,ydata,Fx,Fy,basename=basename
                                edges = [0.12,0.10,0.80,0.80], $
                                buffer = [0.20,0.10])
 
+     ;;==Set up plot axes
+     ;;  Note that the x-direction mean will have
+     ;;  dimensions (ny,nt) and vice versa.
+     axes = ['y','x']
+
      ;;==Loop over all panels
-     axes = ['x','y']
      for id=0,3 do begin
 
         ;;==Extract axis vector
-        xdata = vecs[axes[id/2]]
+        xdata = vecs[axes[id mod 2]]
 
         ;;==Calculate mean
-        gdata = mean(field[axes[id/2]],dim=((id mod 2) + 1))
+        if keyword_set(rms_) then $
+           gdata = rms(field[axes[id/2]],dim=((id mod 2) + 1)) $
+        else $
+           gdata = mean(field[axes[id/2]],dim=((id mod 2) + 1))
 
         ;;==Create plot
         plt = objarr(nt)

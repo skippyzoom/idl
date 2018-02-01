@@ -106,7 +106,7 @@ pro eppic_spatial_analysis, info,movies=movies
                  print, "       Rotation not tested for 3 D"
               endif $
               else begin
-                 rot = info.rot[info.planes[ip]]
+                 rot = info.rot[info.planes[ip]]/90
                  if rot ne 0 then begin
                     tmp = imgplane
                     imgplane = fltarr(ny,nx,nt)
@@ -149,6 +149,14 @@ pro eppic_spatial_analysis, info,movies=movies
                                   rescale = 0.8, $
                                   movie = keyword_set(movies)
 
+              if strcmp(info.planes[ip],info.perp_to_B) then begin
+                 image_string = plane_string
+                 basename = info.filepath+path_sep()+'den_rms'+image_string
+                 mean_field_plots, xdata,ydata, $
+                                   scale*imgplane,scale*imgplane, $
+                                   /rms, $
+                                   basename = basename
+              endif ;;--perp_to_B
            endif
 
            if strcmp(data_name,'phi') then begin
@@ -186,10 +194,10 @@ pro eppic_spatial_analysis, info,movies=movies
                  gradf = gradient(imgplane[*,*,it], $
                                   dx = dx*info.params.nout_avg, $
                                   dy = dy*info.params.nout_avg)
-                 Ex[*,*,it] = -1.0*gradf.x + E0[0]
-                 Ey[*,*,it] = -1.0*gradf.y + E0[1]
-                 ;; Ex[*,*,it] = -1.0*gradf.x
-                 ;; Ey[*,*,it] = -1.0*gradf.y
+                 ;; Ex[*,*,it] = -1.0*gradf.x + E0[0]
+                 ;; Ey[*,*,it] = -1.0*gradf.y + E0[1]
+                 Ex[*,*,it] = -1.0*gradf.x
+                 Ey[*,*,it] = -1.0*gradf.y
                  Er[*,*,it] = sqrt(Ex[*,*,it]^2 + Ey[*,*,it]^2)
                  Et[*,*,it] = atan(Ey[*,*,it],Ex[*,*,it])
               endfor              
@@ -291,14 +299,9 @@ pro eppic_spatial_analysis, info,movies=movies
                  if strcmp(info.planes[ip],info.perp_to_B) then begin
                     image_string = plane_string
                     basename = info.filepath+path_sep()+'efield_means-P'+image_string
-                    ;; plot_efield_means, xdata,ydata, $
-                    ;;                    ;; ;; Ex[*,*,[0,nt/2,nt-1]],Ey[*,*,[0,nt/2,nt-1]], $
-                    ;;                    ;; scale*Ex[*,*,[0,nt-1]],scale*Ey[*,*,[0,nt-1]], $
-                    ;;                    scale*Ex,scale*Ey, $
-                    ;;                    basename = basename
                     mean_field_plots, xdata,ydata,scale*Ex,scale*Ey,basename=basename
-                 endif ;;--movies
-              endif    ;;--perp_to_B
+                 endif ;;--perp_to_B
+              endif    ;;--movies
            endif       ;;--phi           
         endfor         ;;--planes
      endif $           ;;--n_dims
