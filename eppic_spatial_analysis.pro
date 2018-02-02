@@ -99,31 +99,12 @@ pro eppic_spatial_analysis, info,movies=movies
            if data_is_2D then plane_string = '' $
            else plane_string = '_'+info.planes[ip]
 
-           ;;==Rotate data -->DEV
-           if info.haskey('rot') then begin
-              if ~data_is_2D then begin
-                 print, "[EPPIC_SPATIAL_ANALYSIS] WARNING!!!"
-                 print, "       Rotation not tested for 3 D"
-              endif $
-              else begin
-                 rot = info.rot[info.planes[ip]]/90
-                 if rot ne 0 then begin
-                    tmp = imgplane
-                    imgplane = fltarr(ny,nx,nt)
-                    for it=0,nt-1 do begin
-                       imgplane[*,*,it] = rotate(tmp[*,*,it],rot)
-                    endfor
-                    tmp = !NULL
-                    tmp = xdata
-                    xdata = ydata
-                    ydata = tmp
-                    tmp = xrng
-                    xrng = yrng
-                    yrng = tmp
-                    tmp = !NULL                 
-                 endif
-              endelse
-           endif
+           ;;==Rotate data
+           if info.haskey('rot') then rotate_plane, imgplane, $
+                                                    xdata=xdata,ydata=ydata, $
+                                                    xrng=xrng,yrng=yrng, $
+                                                    info.rot[info.planes[ip]]/90
+
 
            ;;==Create graphics of densities
            image_string = plane_string
