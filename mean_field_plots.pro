@@ -11,6 +11,9 @@ pro mean_field_plots, xdata,ydata,Fx,Fy, $
                       rms_=rms_, $
                       basename=basename
 
+  ;;==Preserve input
+  xdata_in = xdata
+
   ;;==Extract dimensions
   f_size = size(Fx)
   n_dims = f_size[0]
@@ -20,11 +23,11 @@ pro mean_field_plots, xdata,ydata,Fx,Fy, $
 
   ;;==Store input data in dictionaries
   vecs = dictionary('x',xdata,'y',ydata)
-  xdata = !NULL
-  ydata = !NULL
+  ;; xdata = !NULL
+  ;; ydata = !NULL
   field = dictionary('x',Fx,'y',Fy)
-  Fx = !NULL
-  Fy = !NULL
+  ;; Fx = !NULL
+  ;; Fy = !NULL
 
   ;;==Check dimensions
   if n_dims eq 3 then begin
@@ -68,6 +71,10 @@ pro mean_field_plots, xdata,ydata,Fx,Fy, $
 
      ;;==Save plot
      image_save, plt[0],filename=basename+'.pdf',/landscape
+
+     ;;==Restore input data
+     xdata = xdata_in
+
   endif $
   else print, "[MEAN_FIELD_PLOTS] Could not create an image."
 
