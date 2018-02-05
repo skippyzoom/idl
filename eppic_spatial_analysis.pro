@@ -169,8 +169,8 @@ pro eppic_spatial_analysis, info,movies=movies
               ;;==Calculate E-field components
               Ex = fltarr(size(imgplane,/dim))
               Ey = fltarr(size(imgplane,/dim))
-              Er = fltarr(size(imgplane,/dim))
-              Et = fltarr(size(imgplane,/dim))
+              ;; Er = fltarr(size(imgplane,/dim))
+              ;; Et = fltarr(size(imgplane,/dim))
               for it=0,nt-1 do begin
                  gradf = gradient(imgplane[*,*,it], $
                                   dx = dx*info.params.nout_avg, $
@@ -179,113 +179,136 @@ pro eppic_spatial_analysis, info,movies=movies
                  ;; Ey[*,*,it] = -1.0*gradf.y + E0[1]
                  Ex[*,*,it] = -1.0*gradf.x
                  Ey[*,*,it] = -1.0*gradf.y
-                 Er[*,*,it] = sqrt(Ex[*,*,it]^2 + Ey[*,*,it]^2)
-                 Et[*,*,it] = atan(Ey[*,*,it],Ex[*,*,it])
+                 ;; Er[*,*,it] = sqrt(Ex[*,*,it]^2 + Ey[*,*,it]^2)
+                 ;; Et[*,*,it] = atan(Ey[*,*,it],Ex[*,*,it])
               endfor              
 
-              ;;==Smooth E-field components
-              s_width = 1
-              if s_width gt 1 then begin
-                 Ex = smooth(Ex,[s_width,s_width,1],/edge_wrap)
-                 Ey = smooth(Ey,[s_width,s_width,1],/edge_wrap)
-                 Er = smooth(Er,[s_width,s_width,1],/edge_wrap)
-                 Et = smooth(Et,[s_width,s_width,1],/edge_wrap)
-                 image_string = plane_string+'-sw'+ $
-                                strcompress(s_width,/remove_all)
-              endif
+              ;;==Create images for perturbed and full field
+              field_types = list('pert','full')
+              n_types = field_types.count()
+              for ii=0,n_types-1 do begin
+                 ;; add_E0 = (ii eq 1)
+                 add_E0 = strcmp(field_types[ii],'full')
 
-              ;;==Create graphics of electric field
-              scale = 1e3
-              basename = info.filepath+path_sep()+ $
-                         'efield_x-P'+image_string
-              ;; min_value = -max(abs(scale*Ex[*,*,1:*]))
-              ;; max_value = +max(abs(scale*Ex[*,*,1:*]))
-              min_value = -24
-              max_value = +24
-              eppic_xyt_graphics, scale*Ex,xdata,ydata, $
-                                  info, $
-                                  xrng = xrng, $
-                                  yrng = yrng, $
-                                  rgb_table = 70, $
-                                  min_value = min_value, $
-                                  max_value = max_value, $
-                                  basename = basename, $
-                                  /clip_y_axes, $
-                                  ;; colorbar_title = "$E_x$ [mV/m]",$
-                                  colorbar_title = "$\delta E_x$ [mV/m]",$
-                                  expand = 3, $
-                                  rescale = 0.8, $
-                                  movie = keyword_set(movies)
-              basename = info.filepath+path_sep()+ $
-                         'efield_y-P'+image_string
-              ;; min_value = -max(abs(scale*Ey[*,*,1:*]))
-              ;; max_value = +max(abs(scale*Ey[*,*,1:*]))
-              min_value = -24
-              max_value = +24
-              eppic_xyt_graphics, scale*Ey,xdata,ydata, $
-                                  info, $
-                                  xrng = xrng, $
-                                  yrng = yrng, $
-                                  rgb_table = 70, $
-                                  min_value = min_value, $
-                                  max_value = max_value, $
-                                  basename = basename, $
-                                  /clip_y_axes, $
-                                  ;; colorbar_title = "$E_y$ [mV/m]",$
-                                  colorbar_title = "$\delta E_y$ [mV/m]",$
-                                  expand = 3, $
-                                  rescale = 0.8, $
-                                  movie = keyword_set(movies)
-              basename = info.filepath+path_sep()+ $
-                         'efield_r-P'+image_string
-              min_value = 0
-              ;; max_value = max(scale*Er[*,*,1:*])
-              max_value = 24
-              eppic_xyt_graphics, scale*Er,xdata,ydata, $
-                                  info, $
-                                  xrng = xrng, $
-                                  yrng = yrng, $
-                                  rgb_table = 3, $
-                                  min_value = min_value, $
-                                  max_value = max_value, $
-                                  basename = basename, $
-                                  /clip_y_axes, $
-                                  ;; colorbar_title = "$|E|$ [mV/m]",$
-                                  colorbar_title = "$|\delta E|$ [mV/m]",$
-                                  expand = 3, $
-                                  rescale = 0.8, $
-                                  movie = keyword_set(movies)
-              basename = info.filepath+path_sep()+ $
-                         'efield_t-P'+image_string
-              ct = get_custom_ct(2)
-              min_value = -!pi
-              max_value = +!pi
-              eppic_xyt_graphics, Et,xdata,ydata, $
-                                  info, $
-                                  xrng = xrng, $
-                                  yrng = yrng, $
-                                  rgb_table = [[ct.r],[ct.g],[ct.b]], $
-                                  min_value = min_value, $
-                                  max_value = max_value, $
-                                  basename = basename, $
-                                  /clip_y_axes, $
-                                  ;; colorbar_title = "$\tan^{-1}(E)$ [rad]",$
-                                  colorbar_title = "$tan^{-1}(\delta E)$ [rad]",$
-                                  expand = 3, $
-                                  rescale = 0.8, $
-                                  movie = keyword_set(movies)
+                 ;;==Add background field, if requested
+                 field_string = '-P'
+                 if add_E0 then begin
+                    Ex += E0[0]
+                    Ey += E0[1]
+                    field_string = '-F'
+                 endif
 
-              ;;==Make plots in the plane perpendicular to B
-              if ~keyword_set(movies) then begin
-                 if strcmp(info.planes[ip],info.perp_to_B) then begin
-                    image_string = plane_string
-                    basename = info.filepath+path_sep()+'efield_means-P'+image_string
-                    mean_field_plots, xdata,ydata,scale*Ex,scale*Ey,basename=basename
-                 endif ;;--perp_to_B
-              endif    ;;--movies
-           endif       ;;--phi           
-        endfor         ;;--planes
-     endif $           ;;--n_dims
+                 ;;==Construct magnitude and angle
+                 Er = sqrt(Ex^2 + Ey^2)
+                 Et = atan(Ey,Ex)
+
+                 ;;==Smooth E-field components
+                 s_width = 1
+                 if s_width gt 1 then begin
+                    Ex = smooth(Ex,[s_width,s_width,1],/edge_wrap)
+                    Ey = smooth(Ey,[s_width,s_width,1],/edge_wrap)
+                    Er = smooth(Er,[s_width,s_width,1],/edge_wrap)
+                    Et = smooth(Et,[s_width,s_width,1],/edge_wrap)
+                    image_string = plane_string+'-sw'+ $
+                                   strcompress(s_width,/remove_all)
+                 endif
+
+                 ;;==Create graphics of electric field
+                 scale = 1e3
+                 basename = info.filepath+path_sep()+ $
+                            'efield_x'+field_string+image_string
+                 ;; min_value = -max(abs(scale*Ex[*,*,1:*]))
+                 ;; max_value = +max(abs(scale*Ex[*,*,1:*]))
+                 min_value = -24
+                 max_value = +24
+                 eppic_xyt_graphics, scale*Ex,xdata,ydata, $
+                                     info, $
+                                     xrng = xrng, $
+                                     yrng = yrng, $
+                                     rgb_table = 70, $
+                                     min_value = min_value, $
+                                     max_value = max_value, $
+                                     basename = basename, $
+                                     /clip_y_axes, $
+                                     ;; colorbar_title = "$E_x$ [mV/m]",$
+                                     colorbar_title = "$\delta E_x$ [mV/m]",$
+                                     expand = 3, $
+                                     rescale = 0.8, $
+                                     movie = keyword_set(movies)
+                 basename = info.filepath+path_sep()+ $
+                            'efield_y'+field_string+image_string
+                 ;; min_value = -max(abs(scale*Ey[*,*,1:*]))
+                 ;; max_value = +max(abs(scale*Ey[*,*,1:*]))
+                 min_value = -24
+                 max_value = +24
+                 eppic_xyt_graphics, scale*Ey,xdata,ydata, $
+                                     info, $
+                                     xrng = xrng, $
+                                     yrng = yrng, $
+                                     rgb_table = 70, $
+                                     min_value = min_value, $
+                                     max_value = max_value, $
+                                     basename = basename, $
+                                     /clip_y_axes, $
+                                     ;; colorbar_title = "$E_y$ [mV/m]",$
+                                     colorbar_title = "$\delta E_y$ [mV/m]",$
+                                     expand = 3, $
+                                     rescale = 0.8, $
+                                     movie = keyword_set(movies)
+                 basename = info.filepath+path_sep()+ $
+                            'efield_r'+field_string+image_string
+                 min_value = 0
+                 ;; max_value = max(scale*Er[*,*,1:*])
+                 max_value = 24
+                 eppic_xyt_graphics, scale*Er,xdata,ydata, $
+                                     info, $
+                                     xrng = xrng, $
+                                     yrng = yrng, $
+                                     rgb_table = 3, $
+                                     min_value = min_value, $
+                                     max_value = max_value, $
+                                     basename = basename, $
+                                     /clip_y_axes, $
+                                     ;; colorbar_title = "$|E|$ [mV/m]",$
+                                     colorbar_title = "$|\delta E|$ [mV/m]",$
+                                     expand = 3, $
+                                     rescale = 0.8, $
+                                     movie = keyword_set(movies)
+                 basename = info.filepath+path_sep()+ $
+                            'efield_t'+field_string+image_string
+                 ct = get_custom_ct(2)
+                 min_value = -!pi
+                 max_value = +!pi
+                 eppic_xyt_graphics, Et,xdata,ydata, $
+                                     info, $
+                                     xrng = xrng, $
+                                     yrng = yrng, $
+                                     rgb_table = [[ct.r],[ct.g],[ct.b]], $
+                                     min_value = min_value, $
+                                     max_value = max_value, $
+                                     basename = basename, $
+                                     /clip_y_axes, $
+                                     ;; colorbar_title = "$\tan^{-1}(E)$ [rad]",$
+                                     colorbar_title = "$tan^{-1}(\delta E)$ [rad]",$
+                                     expand = 3, $
+                                     rescale = 0.8, $
+                                     movie = keyword_set(movies)
+
+                 ;;==Make plots in the plane perpendicular to B
+                 if ~keyword_set(movies) then begin
+                    if strcmp(info.planes[ip],info.perp_to_B) then begin
+                       image_string = plane_string
+                       basename = info.filepath+path_sep()+ $
+                                  'efield_means'+field_string+image_string
+                       mean_field_plots, xdata,ydata, $
+                                         scale*Ex,scale*Ey, $
+                                         basename=basename
+                    endif ;;--perp_to_B
+                 endif    ;;--movies
+              endfor      ;;--field_types
+           endif          ;;--phi           
+        endfor            ;;--planes
+     endif $              ;;--n_dims
      else print, "[EPPIC_SPATIAL_ANALYSIS] Could not create an image."
 
   endfor ;;--data_names
