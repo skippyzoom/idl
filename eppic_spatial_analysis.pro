@@ -49,6 +49,11 @@ pro eppic_spatial_analysis, info,movies=movies
         if n_xyzt lt 4 then xyzt = [xyzt,tmp[n_xyzt,*]]
         data = transpose(data,xyzt)
 
+        ;;==Extract appropriate background density
+        if strcmp(data_name,'den',3) then $
+           n0 = info.params['n0d'+strmid(data_name,3)] $
+        else n0 = info.params.n0d1
+
         ;;==Loop over 2-D image planes
         for ip=0,n_elements(info.planes)-1 do begin
 
@@ -134,8 +139,8 @@ pro eppic_spatial_analysis, info,movies=movies
                  image_string = plane_string
                  basename = info.filepath+path_sep()+'den_rms'+image_string
                  mean_field_plots, xdata,ydata, $
-                                   scale*imgplane,scale*imgplane, $
-                                   /rms, $
+                                   scale*imgplane,scale*n0*(1+imgplane), $
+                                   rms = [0,0,1,1], $
                                    basename = basename
               endif ;;--perp_to_B
            endif
