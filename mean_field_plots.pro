@@ -21,16 +21,24 @@ pro mean_field_plots, xdata,ydata,Fx,Fy, $
   ny = f_size[2]
   nt = f_size[n_dims]
 
-  ;;==Store input data in dictionaries
-  vecs = dictionary('x',xdata,'y',ydata)
-  ;; xdata = !NULL
-  ;; ydata = !NULL
-  field = dictionary('x',Fx,'y',Fy)
-  ;; Fx = !NULL
-  ;; Fy = !NULL
-
   ;;==Check dimensions
   if n_dims eq 3 then begin
+
+     ;;==Store input data in dictionaries to simplify access
+     vecs = dictionary('x',xdata,'y',ydata)
+     field = dictionary('x',Fx,'y',Fy)
+
+     ;;==Construct rms flag array
+     case n_elements(rms_) of
+        0: rms_ = make_array(4,type=1,value=0)
+        1: rms_ = make_array(4,type=1,value=rms_)
+        4: rms_ = rms_ gt 0
+        else: begin
+           print, "[MEAN_FIELD_PLOTS] Invalid value for rms keyword."
+           print, "                   Calculating means (default) instead."
+           rms_ = make_array(4,type=1,value=0)
+        end
+     endcase
 
      ;;==Calculate positions
      layout = [2,2]
@@ -39,21 +47,24 @@ pro mean_field_plots, xdata,ydata,Fx,Fy, $
                                buffer = [0.20,0.10])
 
      ;;==Set up plot axes
-     ;;  Note that the x-direction mean will have
-     ;;  dimensions (ny,nt) and vice versa.
-     axes = ['y','x']
+     axes = ['x','y']
+     n_axes = n_elements(axes)
 
      ;;==Loop over all panels
      for id=0,3 do begin
 
-        ;;==Extract axis vector
-        xdata = vecs[axes[id mod 2]]
+        ;;==Declare current axis and dimension
+        id_div = id / 2
+        id_mod = id mod 2
 
-        ;;==Calculate mean
-        if keyword_set(rms_) then $
-           gdata = rms(field[axes[id/2]],dim=((id mod 2) + 1)) $
+        ;;==Extract axis vector
+        xdata = vecs[axes[n_axes-1-id_mod]]
+
+        ;;==Calculate mean or rms
+        if rms_[id] then $
+           gdata = rms(field[axes[id_div]],dim=id_mod+1) $
         else $
-           gdata = mean(field[axes[id/2]],dim=((id mod 2) + 1))
+           gdata = mean(field[axes[id_div]],dim=id_mod+1)
 
         ;;==Create plot
         plt = objarr(nt)
