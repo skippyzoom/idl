@@ -54,8 +54,8 @@ pro mean_field_plots, xdata,ydata,Fx,Fy, $
      for id=0,3 do begin
 
         ;;==Declare current axis and dimension
-        id_div = id / 2
-        id_mod = id mod 2
+        id_div = id / n_axes
+        id_mod = id mod n_axes
 
         ;;==Extract axis vector
         xdata = vecs[axes[n_axes-1-id_mod]]
