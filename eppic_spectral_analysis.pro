@@ -148,6 +148,8 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
               imgplane = imgplane/max(imgplane)
               ;;--Convert to dB
               imgplane = 10*alog10(imgplane)
+              ;;--Set non-finite values to a finite 'missing' value
+              imgplane[where(finite(imgplane) eq 0)] = -1e10
 
               ;;==Interpolate
               theta_range = [0,360]
@@ -185,6 +187,31 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
                                   max_value = 0, $
                                   basename = basename
 
+
+              ;;==Create images of Fourier-transformed data
+              basename = info.filepath+path_sep()+ $
+                         data_name+'_w'+plane_string
+              min_value = max(imgplane,/nan)-30
+              max_value = max(imgplane,/nan)
+              k_range = [0,2*!pi]
+              w_range = 0.5*[-info.params.coll_rate1,+info.params.coll_rate1]
+              aspect_ratio = (k_range[1]-k_range[0])/ $
+                             (w_range[1]-w_range[0])
+              eppic_xyw_graphics, imgplane,xdata,ydata, $
+                                  w_vals, $
+                                  info, $
+                                  xrng = xrng, $
+                                  yrng = yrng, $
+                                  xrange = k_range, $
+                                  yrange = w_range, $
+                                  rgb_table = 39, $
+                                  aspect_ratio = aspect_ratio, $
+                                  min_value = min_value, $
+                                  max_value = max_value, $
+                                  basename = basename, $
+                                  colorbar_title = "Power [dB]", $
+                                  center = [nx/2,ny/2]
+
            endif $
            else begin
 
@@ -210,10 +237,12 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
               imgplane = imgplane/max(imgplane)
               ;;--Convert to dB
               imgplane = 10*alog10(imgplane)
+              ;;--Set non-finite values to a finite 'missing' value
+              imgplane[where(finite(imgplane) eq 0)] = -1e10
 
               ;;==Create images of Fourier-transformed data
               basename = info.filepath+path_sep()+ $
-                         data_name+plane_string
+                         data_name+'_t'+plane_string
               min_value = max(imgplane,/nan)-30
               max_value = max(imgplane,/nan)
               eppic_xyt_graphics, imgplane,xdata,ydata, $

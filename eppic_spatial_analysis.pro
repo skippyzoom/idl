@@ -174,29 +174,22 @@ pro eppic_spatial_analysis, info,movies=movies
               ;;==Calculate E-field components
               Ex = fltarr(size(imgplane,/dim))
               Ey = fltarr(size(imgplane,/dim))
-              ;; Er = fltarr(size(imgplane,/dim))
-              ;; Et = fltarr(size(imgplane,/dim))
               for it=0,nt-1 do begin
                  gradf = gradient(imgplane[*,*,it], $
                                   dx = dx*info.params.nout_avg, $
                                   dy = dy*info.params.nout_avg)
-                 ;; Ex[*,*,it] = -1.0*gradf.x + E0[0]
-                 ;; Ey[*,*,it] = -1.0*gradf.y + E0[1]
                  Ex[*,*,it] = -1.0*gradf.x
                  Ey[*,*,it] = -1.0*gradf.y
-                 ;; Er[*,*,it] = sqrt(Ex[*,*,it]^2 + Ey[*,*,it]^2)
-                 ;; Et[*,*,it] = atan(Ey[*,*,it],Ex[*,*,it])
               endfor              
 
               ;;==Create images for perturbed and full field
               field_types = list('pert','full')
               n_types = field_types.count()
               for ii=0,n_types-1 do begin
-                 ;; add_E0 = (ii eq 1)
-                 add_E0 = strcmp(field_types[ii],'full')
 
                  ;;==Add background field, if requested
                  field_string = '-P'
+                 add_E0 = strcmp(field_types[ii],'full')
                  if add_E0 then begin
                     Ex += E0[0]
                     Ey += E0[1]

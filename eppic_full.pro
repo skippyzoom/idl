@@ -109,6 +109,7 @@ pro eppic_full, path=path, $
   info['perp_to_B'] = perp_to_B
   info['E0'] = E0
   info['params'] = params
+  info['moments'] = moments
   info['position'] = position
   info['layout'] = layout
   info['font_name'] = font_name
@@ -123,7 +124,7 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
 
   ;;==Create images from spatial data
-  eppic_spatial_analysis, info
+  ;; eppic_spatial_analysis, info
 
   ;;==Create movies from spatial data
   ;; eppic_spatial_analysis, info,/movies
@@ -166,6 +167,7 @@ pro eppic_full, path=path, $
   info['rot'] = rot
   info['perp_to_B'] = perp_to_B
   info['params'] = params
+  info['moments'] = moments
   info['grid'] = grid
   info['position'] = position
   info['layout'] = layout
@@ -184,7 +186,7 @@ pro eppic_full, path=path, $
   ;; eppic_spectral_analysis, info,full_transform=0B,movies=0B
 
   ;;==Create images from spectral data
-  ;; eppic_spectral_analysis, info,full_transform=1B,movies=0B
+  eppic_spectral_analysis, info,full_transform=1B,movies=0B
 
   ;;==Create images from spectral data
   ;; eppic_spectral_analysis, info,/movies

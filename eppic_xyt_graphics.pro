@@ -41,6 +41,7 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
      if n_elements(yrange) eq 0 then yrange = !NULL
      if n_elements(data_name) eq 0 then data_name = 'data'
      if n_elements(image_string) eq 0 then image_string = ''
+     if n_elements(basename) eq 0 then basename = data_name+'-xyt-'+image_string
      if n_elements(expand) eq 0 then expand = 1.0
      if n_elements(rescale) eq 0 then rescale = 1.0
 
