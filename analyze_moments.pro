@@ -20,6 +20,12 @@
 ;    so that B0 is aligned with z. It does this to simplify
 ;    some calculations that require vector components (e.g.,
 ;    nu0 and nu1)
+; -- This function appears to calculate nu1 from the unmagnetized,
+;    cold perpendicular drift equation but that's really just a
+;    way to get the Pedersen drift correct even when the simula-
+;    tion domain is rotated from the physical domain (e.g., 
+;    the user set up the run with simulation axes x & y
+;    corresponding to physical axes y & -x)
 ;-
 
 function analyze_moments, path=path
@@ -71,11 +77,11 @@ function analyze_moments, path=path
      ;;==Create constant electron moments for QN, inertialess electrons
      if efield_algorithm eq 1 or efield_algorithm eq 2 then begin
         moments0 = moments1*0.0
-        moments0[1,*] = vx0d0   ;x drift velocity
-        moments0[2,*] = vxthd0^2 ;x thermal velocity
-        moments0[5,*] = vy0d0    ;y drift velocity
-        moments0[6,*] = vythd0^2 ;y thermal velocity
-        moments0[9,*] = vz0d0    ;z drift velocity
+        moments0[1,*] = vx0d0     ;x drift velocity
+        moments0[2,*] = vxthd0^2  ;x thermal velocity
+        moments0[5,*] = vy0d0     ;y drift velocity
+        moments0[6,*] = vythd0^2  ;y thermal velocity
+        moments0[9,*] = vz0d0     ;z drift velocity
         moments0[10,*] = vzthd0^2 ;z thermal velocity
      endif
 
@@ -88,6 +94,7 @@ function analyze_moments, path=path
            vxpd1 = moments1[1,*]
            vypd1 = moments1[5,*]
            vzpd1 = moments1[9,*]
+           Exp = Ex0
            Eyp = Ey0
            Ezp = Ez0
         end
@@ -98,8 +105,9 @@ function analyze_moments, path=path
            vxpd1 = moments1[1,*]
            vypd1 = -moments1[9,*]
            vzpd1 = moments1[5,*]
+           Exp = Ex0
            Eyp = -Ez0
-           Ezp = By0
+           Ezp = Ey0
         end
         (B0 eq Bx0): begin
            vxpd0 = -moments0[9,*]
@@ -108,6 +116,7 @@ function analyze_moments, path=path
            vxpd1 = -moments1[9,*]
            vypd1 = moments1[5,*]
            vzpd1 = moments1[1,*]
+           Exp = -Ez0
            Eyp = Ey0
            Ezp = Ex0
         end
@@ -157,9 +166,9 @@ function analyze_moments, path=path
 
         ;;==Simulated values
         ;;--Collision frequencies and Psi
-        nu0 = moments1[5,*]*0.0 + coll_rate0      ;From Input value
-        ;; nu1 = Eyp/(moments1[5,*])*(qd1/md1) ;Ped drift
-        nu1 = (Eyp/vypd1)*(qd1/md1) ;From Ped drift        
+        nu0 = moments1[5,*]*0.0 + coll_rate0                        ;From Input value
+        ;; nu1 = (Eyp/vypd1)*(qd1/md1) ;From Ped drift        
+        nu1 = (qd1/md1)*(Exp*vxpd1 + Eyp*vypd1)/(vxpd1^2 + vypd1^2) ;From perp drift
         Psi = abs(nu0*nu1/(wc0*wc1))
         driver = (Eyp/B0)/(1+Psi)
         ;;--parallel mobilities
@@ -239,8 +248,9 @@ function analyze_moments, path=path
         ;;==Simulated values
         ;;--Collision frequencies and Psi
         ;; nu0 = wc0*vypd0/vxpd0               ;From Hall drift
-        nu0 = (Ezp/vzpd0)*(qd0/md0)         ;From parallel drift
-        nu1 = (Eyp/vypd1)*(qd1/md1)         ;From Ped drift
+        nu0 = (Ezp/vzpd0)*(qd0/md0)                                 ;From parallel drift
+        ;; nu1 = (Eyp/vypd1)*(qd1/md1)         ;From Ped drift
+        nu1 = (qd1/md1)*(Exp*vxpd1 + Eyp*vypd1)/(vxpd1^2 + vypd1^2) ;From perp drift
         ;; nu0 = 0.5*qd0*Eyp/(md0*vypd0)*(1 + sqrt(1-(2*md0*vypd0*wc0/(qd0*Eyp))^2))
         ;; nu1 = 0.5*qd1*Eyp/(md1*vypd1)*(1 + sqrt(1-(2*md1*vypd1*wc1/(qd1*Eyp))^2))
         ;; nu0 = 0.5*qd0*Eyp/(md0*vypd0)*(1 - sqrt(1-(2*md0*vypd0*wc0/(qd0*Eyp))^2))

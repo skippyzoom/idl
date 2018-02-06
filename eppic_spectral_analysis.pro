@@ -194,7 +194,8 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
               min_value = max(imgplane,/nan)-30
               max_value = max(imgplane,/nan)
               k_range = [0,2*!pi]
-              w_range = 0.5*[-info.params.coll_rate1,+info.params.coll_rate1]
+              max_abs_nu = max(abs(reform(info.moments.dist1.nu[0,nt/2:*])))
+              w_range = 0.5*[-max_abs_nu,+max_abs_nu]
               aspect_ratio = (k_range[1]-k_range[0])/ $
                              (w_range[1]-w_range[0])
               eppic_xyw_graphics, imgplane,xdata,ydata, $
