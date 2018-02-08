@@ -70,7 +70,7 @@ function read_ph5_plane, data_name, $
   ;;==Get the size of the subset
   nt = n_elements(h5_file)
 
-  ;;==Check if the data is EPPIC Fourier-transformed data
+  ;;==Set up array for EPPIC Fourier-transformed data
   if keyword_set(eppic_ft_data) then begin
      tmp = get_h5_data(h5_file_ref,data_name+'_index')
      if n_elements(tmp) ne 0 then begin
@@ -101,8 +101,9 @@ function read_ph5_plane, data_name, $
         endcase
         data = make_array(nxp,nyp,nt,type=type)
         tmp = !NULL
-     endif
+     endif else n_dim = 0
   endif $
+  ;;==Set up array for standard EPPIC data
   else begin
      tmp = get_h5_data(h5_file_ref,data_name)
      if n_elements(tmp) ne 0 then begin
@@ -131,7 +132,7 @@ function read_ph5_plane, data_name, $
         endcase 
         data = make_array(nxp,nyp,nt,type=type)
         tmp = !NULL
-     endif
+     endif else n_dim = 0
   endelse   
   if nt eq 1 then data = reform(data,[size(data,/dim),1])
 
