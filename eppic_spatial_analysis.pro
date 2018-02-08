@@ -37,45 +37,10 @@ pro eppic_spatial_analysis, info,movies=movies
            nt = imgsize[3]
 
            ;;==Set up 2-D auxiliary data
-           case 1B of 
-              strcmp(info.planes[ip],'xy') || strcmp(info.planes[ip],'yx'): begin
-                 xdata = info.xvec
-                 ydata = info.yvec
-                 xrng = info.xrng
-                 yrng = info.yrng
-                 dx = info.params.dx
-                 dy = info.params.dy
-                 r_ang = info.rot.xy*!dtor
-                 r_mat = [[cos(r_ang),-sin(r_ang)], $
-                          [sin(r_ang),cos(r_ang)]]
-                 E0 = r_mat ## [info.params.Ex0_external,info.params.Ey0_external]
-              end
-              strcmp(info.planes[ip],'xz') || strcmp(info.planes[ip],'zx'): begin
-                 xdata = info.xvec
-                 ydata = info.zvec
-                 xrng = info.xrng
-                 yrng = info.zrng
-                 dx = info.params.dx
-                 dy = info.params.dz
-                 r_ang = info.rot.xz*!dtor
-                 r_mat = [[cos(r_ang),-sin(r_ang)], $
-                          [sin(r_ang),cos(r_ang)]]
-                 E0 = r_mat ## [info.params.Ex0_external,info.params.Ez0_external]
-              end
-              strcmp(info.planes[ip],'yz') || strcmp(info.planes[ip],'zy'): begin
-                 xdata = info.yvec
-                 ydata = info.zvec
-                 xrng = info.yrng
-                 yrng = info.zrng
-                 dx = info.params.dy
-                 dy = info.params.dz
-                 r_ang = info.rot.yz*!dtor
-                 r_mat = [[cos(r_ang),-sin(r_ang)], $
-                          [sin(r_ang),cos(r_ang)]]
-                 E0 = r_mat ## [info.params.Ey0_external,info.params.Ez0_external]
-              end
-           endcase
-
+           pl_ctx = build_plane_context(info, $
+                                        plane = info.planes[ip], $
+                                        context = 'spatial')
+STOP
            ;;==Save string for filenames
            if info.params.ndim_space eq 2 then plane_string = '' $
            else plane_string = '_'+info.planes[ip]

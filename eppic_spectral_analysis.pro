@@ -54,27 +54,10 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
            nt = imgsize[3]
 
            ;;==Set up 2-D auxiliary data
-           case 1B of 
-              strcmp(info.planes[ip],'xy') || strcmp(info.planes[ip],'yx'): begin
-                 xdata = (2*!pi/(info.xdif*nx))*(findgen(nx)-0.5*nx)
-                 ydata = (2*!pi/(info.ydif*ny))*(findgen(ny)-0.5*ny)
-                 xrng = info.xrng
-                 yrng = info.yrng
-              end
-              strcmp(info.planes[ip],'xz') || strcmp(info.planes[ip],'zx'): begin
-                 xdata = (2*!pi/(info.xdif*nx))*(findgen(nx)-0.5*nx)
-                 ydata = (2*!pi/(info.zdif*nz))*(findgen(nz)-0.5*nz)
-                 xrng = info.xrng
-                 yrng = info.zrng
-              end
-              strcmp(info.planes[ip],'yz') || strcmp(info.planes[ip],'zy'): begin
-                 xdata = (2*!pi/(info.ydif*ny))*(findgen(ny)-0.5*ny)
-                 ydata = (2*!pi/(info.zdif*nz))*(findgen(nz)-0.5*nz)
-                 xrng = info.yrng
-                 yrng = info.zrng
-              end
-           endcase
-
+           pl_ctx = build_plane_context(info, $
+                                        plane = info.planes[ip], $
+                                        context = 'spectral')
+STOP
            ;;==Save string for filenames
            if info.params.ndim_space eq 2 then plane_string = '' $
            else plane_string = '_'+info.planes[ip]
