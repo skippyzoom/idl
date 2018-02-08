@@ -9,58 +9,36 @@ pro eppic_spatial_analysis, info,movies=movies
      ;;==Extract current quantity name
      data_name = info.data_names[id]
      
-     ;;==Read data
-     if keyword_set(movies) then $
-        data = (load_eppic_data(data_name,path=info.path))[data_name] $
-     else $
-        data = (load_eppic_data(data_name,path=info.path, $
-                                timestep=info.timestep))[data_name]
+     ;;==Extract appropriate background density
+     if strcmp(data_name,'den',3) then $
+        n0 = info.params['n0d'+strmid(data_name,3)] $
+     else n0 = info.params.n0d1
 
-     ;;==Get data dimensions
-     data_size = size(data)
-     n_dims = data_size[0]
-     nt = data_size[n_dims]
-     nz = 1
-     ny = 1
-     nx = 1
-     switch n_dims-1 of
-        3: nz = data_size[3]
-        2: ny = data_size[2]
-        1: nx = data_size[1]
-     endswitch
+     ;;==Loop over 2-D image planes
+     for ip=0,n_elements(info.planes)-1 do begin
 
-     ;;==Check dimensions
-     if n_dims gt 2 then begin
+        ;;==Read 2-D image data
+        if keyword_set(movies) then timestep = lindgen(nt_max) $
+        else timestep = info.timestep
+        imgplane = read_ph5_plane(data_name, $
+                                  ext = '.h5', $
+                                  timestep = timestep, $
+                                  plane = info.planes[ip], $
+                                  type = 4, $
+                                  path = expand_path(info.path+path_sep()+'parallel'), $
+                                  /verbose)
 
-        ;;==Make physically 3-D data logically 4-D data
-        data_is_2D = 0B
+        ;;==Check dimensions
+        imgsize = size(imgplane)
+        n_dims = imgsize[0]
         if n_dims eq 3 then begin
-           data_is_2D = 1B
-           data = reform(data,[nx,ny,1,nt])
-           n_dims = size(data,/n_dim)
-           info.planes = 'xy'
-           info['perp_to_B'] = 'xy'
-        endif
+           nx = imgsize[1]
+           ny = imgsize[2]
+           nt = imgsize[3]
 
-        ;;==Transpose data
-        xyzt = info.xyz
-        tmp = indgen(n_dims)
-        n_xyzt = n_elements(xyzt)
-        if n_xyzt lt 4 then xyzt = [xyzt,tmp[n_xyzt,*]]
-        data = transpose(data,xyzt)
-
-        ;;==Extract appropriate background density
-        if strcmp(data_name,'den',3) then $
-           n0 = info.params['n0d'+strmid(data_name,3)] $
-        else n0 = info.params.n0d1
-
-        ;;==Loop over 2-D image planes
-        for ip=0,n_elements(info.planes)-1 do begin
-
-           ;;==Set up 2-D image
+           ;;==Set up 2-D auxiliary data
            case 1B of 
               strcmp(info.planes[ip],'xy') || strcmp(info.planes[ip],'yx'): begin
-                 imgplane = reform(data[*,*,info.zctr,*])
                  xdata = info.xvec
                  ydata = info.yvec
                  xrng = info.xrng
@@ -73,7 +51,6 @@ pro eppic_spatial_analysis, info,movies=movies
                  E0 = r_mat ## [info.params.Ex0_external,info.params.Ey0_external]
               end
               strcmp(info.planes[ip],'xz') || strcmp(info.planes[ip],'zx'): begin
-                 imgplane = reform(data[*,info.yctr,*,*])
                  xdata = info.xvec
                  ydata = info.zvec
                  xrng = info.xrng
@@ -83,10 +60,9 @@ pro eppic_spatial_analysis, info,movies=movies
                  r_ang = info.rot.xz*!dtor
                  r_mat = [[cos(r_ang),-sin(r_ang)], $
                           [sin(r_ang),cos(r_ang)]]
-                 E0 = r_mat ## [params.info.Ex0_external,params.info.Ez0_external]
+                 E0 = r_mat ## [info.params.Ex0_external,info.params.Ez0_external]
               end
               strcmp(info.planes[ip],'yz') || strcmp(info.planes[ip],'zy'): begin
-                 imgplane = reform(data[info.xctr,*,*,*])
                  xdata = info.yvec
                  ydata = info.zvec
                  xrng = info.yrng
@@ -96,12 +72,12 @@ pro eppic_spatial_analysis, info,movies=movies
                  r_ang = info.rot.yz*!dtor
                  r_mat = [[cos(r_ang),-sin(r_ang)], $
                           [sin(r_ang),cos(r_ang)]]
-                 E0 = r_mat ## [params.info.Ey0_external,params.info.Ez0_external]
+                 E0 = r_mat ## [info.params.Ey0_external,info.params.Ez0_external]
               end
            endcase
 
            ;;==Save string for filenames
-           if data_is_2D then plane_string = '' $
+           if info.params.ndim_space eq 2 then plane_string = '' $
            else plane_string = '_'+info.planes[ip]
 
            ;;==Rotate data
@@ -117,10 +93,10 @@ pro eppic_spatial_analysis, info,movies=movies
               scale = 100
               basename = info.filepath+path_sep()+ $
                          data_name+image_string
-              ;; min_value = -max(abs(scale*imgplane))
-              ;; max_value = +max(abs(scale*imgplane))
-              min_value = -9
-              max_value = +9
+              min_value = -max(abs(scale*imgplane))
+              max_value = +max(abs(scale*imgplane))
+              ;; min_value = -9
+              ;; max_value = +9
               eppic_xyt_graphics, scale*imgplane,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
@@ -153,10 +129,10 @@ pro eppic_spatial_analysis, info,movies=movies
               ct = get_custom_ct(1)
               basename = info.filepath+path_sep()+ $
                          data_name+image_string
-              ;; min_value = -max(abs(scale*imgplane[*,*,1:*]))
-              ;; max_value = +max(abs(scale*imgplane[*,*,1:*]))
-              min_value = -600
-              max_value = +600
+              min_value = -max(abs(scale*imgplane[*,*,1:*]))
+              max_value = +max(abs(scale*imgplane[*,*,1:*]))
+              ;; min_value = -600
+              ;; max_value = +600
               eppic_xyt_graphics, scale*imgplane,xdata,ydata, $
                                   info, $
                                   xrng = xrng, $
@@ -215,10 +191,10 @@ pro eppic_spatial_analysis, info,movies=movies
                  scale = 1e3
                  basename = info.filepath+path_sep()+ $
                             'efield_x'+field_string+image_string
-                 ;; min_value = -max(abs(scale*Ex[*,*,1:*]))
-                 ;; max_value = +max(abs(scale*Ex[*,*,1:*]))
-                 min_value = -24
-                 max_value = +24
+                 min_value = -max(abs(scale*Ex[*,*,1:*]))
+                 max_value = +max(abs(scale*Ex[*,*,1:*]))
+                 ;; min_value = -24
+                 ;; max_value = +24
                  eppic_xyt_graphics, scale*Ex,xdata,ydata, $
                                      info, $
                                      xrng = xrng, $
@@ -235,10 +211,10 @@ pro eppic_spatial_analysis, info,movies=movies
                                      movie = keyword_set(movies)
                  basename = info.filepath+path_sep()+ $
                             'efield_y'+field_string+image_string
-                 ;; min_value = -max(abs(scale*Ey[*,*,1:*]))
-                 ;; max_value = +max(abs(scale*Ey[*,*,1:*]))
-                 min_value = -24
-                 max_value = +24
+                 min_value = -max(abs(scale*Ey[*,*,1:*]))
+                 max_value = +max(abs(scale*Ey[*,*,1:*]))
+                 ;; min_value = -24
+                 ;; max_value = +24
                  eppic_xyt_graphics, scale*Ey,xdata,ydata, $
                                      info, $
                                      xrng = xrng, $
@@ -305,9 +281,16 @@ pro eppic_spatial_analysis, info,movies=movies
                  endif    ;;--movies
               endfor      ;;--field_types
            endif          ;;--phi           
-        endfor            ;;--planes
-     endif $              ;;--n_dims
-     else print, "[EPPIC_SPATIAL_ANALYSIS] Could not create an image."
+        endif $           ;;--n_dims
+        else begin
+           print, "[EPPIC_SPATIAL_ANALYSIS] Could not create an image."
+           print, "                         data_name = ",data_name
+           print, "                         plane = ",info.planes[ip]
+        endelse
+     endfor            ;;--planes
+
+     ;;==Free memory
+     imgplane = !NULL
 
   endfor ;;--data_names
 

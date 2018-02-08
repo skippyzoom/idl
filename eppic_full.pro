@@ -60,10 +60,12 @@ pro eppic_full, path=path, $
   axis_style = 2
 
   ;;==Create a list of 2-D planes for 3-D data
-  planes = ['xy','xz','yz']
+  if params.ndim_space eq 3 then planes = ['xy','xz','yz'] $
+  else planes = 'xy'
 
   ;;==Declare the plane perpendicular to B
-  perp_to_B = 'xy'
+  ;; perp_to_B = 'xy'
+  perp_to_B = 'yz'
 
   ;==Build unrotated, untransposed E0 vector
   E0 = dictionary('x',params.Ex0_external, $
@@ -74,12 +76,16 @@ pro eppic_full, path=path, $
   xyz = [0,1,2]
 
   ;;==Declare rotation direction for images
-  rot = dictionary('xy',270, $
-                   'xz',  0, $
-                   'yz',  0)
+  ;; rot = dictionary('xy',270, $
+  ;;                  'xz',  0, $
+  ;;                  'yz',  0)
+  rot = dictionary('xy',0, $
+                   'xz',0, $
+                   'yz',0)
 
   ;;==Choose EPPIC spatial output quantities to analyze
   data_names = list('phi','den0','den1')
+  ;; data_names = list('den0')
 
   ;;==Declare panel positions for spatial data
   position = multi_position(layout[*], $
@@ -87,8 +93,11 @@ pro eppic_full, path=path, $
                             buffer = [0.00,0.10])
 
   ;;==Declare data ranges for spatial data image panels
+  ;; rngs = [[0,grid.nx-1], $
+  ;;         [grid.ny/2,grid.ny-1], $
+  ;;         [0,grid.nz-1]]
   rngs = [[0,grid.nx-1], $
-          [grid.ny/2,grid.ny-1], $
+          [0,grid.ny-1], $
           [0,grid.nz-1]]
   ctrs = [grid.nx/2,grid.ny/2,grid.nz/2]
   vecs = {x:grid.x, y:grid.y, z:grid.z}
@@ -135,6 +144,7 @@ pro eppic_full, path=path, $
 
   ;;==Choose EPPIC spectral output quantities to analyze
   data_names = list('denft0','denft1')
+  ;; data_names = list('denft0')
 
   ;;==Declare panel positions for spectral data
   position = multi_position(layout[*], $
@@ -183,7 +193,7 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
 
   ;;==Create images from spectral data
-  ;; eppic_spectral_analysis, info,full_transform=0B,movies=0B
+  eppic_spectral_analysis, info,full_transform=0B,movies=0B
 
   ;;==Create images from spectral data
   eppic_spectral_analysis, info,full_transform=1B,movies=0B
