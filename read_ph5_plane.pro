@@ -139,7 +139,7 @@ function read_ph5_plane, data_name, $
   if n_dim eq 2 || n_dim eq 3 then begin
 
      ;;==Loop over all available time steps
-     if keyword_set(verbose) then print,"[READ_PH5_DATA] Reading ",data_name,"..."
+     if keyword_set(verbose) then print,"[READ_PH5_PLANE] Reading ",data_name,"..."
 
      ;;==Set counted for missing data
      null_count = 0L
@@ -251,7 +251,7 @@ function read_ph5_plane, data_name, $
 
      ;;==Let user know about missing data (not necessarily an error)
      if keyword_set(verbose) && null_count gt 0 then $
-        print, "[READ_PH5_DATA] Warning: Did not find '", $
+        print, "[READ_PH5_PLANE] Warning: Did not find '", $
                data_name+"' in ", $
                strcompress(null_count,/remove_all),"/", $
                strcompress(nt,/remove_all)," files."
@@ -260,6 +260,9 @@ function read_ph5_plane, data_name, $
      return, data
 
   endif $                       ;n_dims eq 2 or 3
-  else print, "[READ_PH5_DATA] Only works for input data with 2 or 3 spatial dimensions."
+  else if n_dim eq 0 then $
+     print, "[READ_PH5_PLANE] Could not read ",data_name $
+  else $
+     print, "[READ_PH5_PLANE] Only works for input data with 2 or 3 spatial dimensions."
 
 end
