@@ -15,14 +15,14 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
         ;;==Read 2-D image data
         if keyword_set(movies) then timestep = lindgen(nt_max) $
         else timestep = info.timestep
-        imgplane = read_ph5_plane(data_name, $
-                                  ext = '.h5', $
-                                  timestep = timestep, $
-                                  plane = info.planes[ip], $
-                                  type = 6, $
-                                  /eppic_ft_data, $
-                                  path = expand_path(info.path+path_sep()+'parallel'), $
-                                  /verbose)
+        data = read_ph5_plane(data_name, $
+                              ext = '.h5', $
+                              timestep = timestep, $
+                              plane = info.planes[ip], $
+                              type = 6, $
+                              /eppic_ft_data, $
+                              path = expand_path(info.path+path_sep()+'parallel'), $
+                              /verbose)
 
         ;;==Check successful read
         using_spatial_data = 0B
@@ -32,13 +32,13 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
            pos = strpos(data_name,'ft')
            data_name = strmid(data_name,0,pos)+strmid(data_name,pos+2)
 
-           imgplane = read_ph5_plane(data_name, $
-                                     ext = '.h5', $
-                                     timestep = timestep, $
-                                     plane = info.planes[ip], $
-                                     type = 4, $
-                                     path = expand_path(info.path+path_sep()+'parallel'), $
-                                     /verbose)
+           data = read_ph5_plane(data_name, $
+                                 ext = '.h5', $
+                                 timestep = timestep, $
+                                 plane = info.planes[ip], $
+                                 type = 4, $
+                                 path = expand_path(info.path+path_sep()+'parallel'), $
+                                 /verbose)
 
            ;;==Check successful read
            using_spatial_data = (size(data,/n_dim) ne 0) ? 1B : 0B
@@ -46,7 +46,7 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
         endif
 
         ;;==Check dimensions
-        imgsize = size(imgplane)
+        imgsize = size(data)
         n_dims = imgsize[0]
         if n_dims eq 3 then begin
            nx = imgsize[1]
@@ -54,9 +54,9 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
            nt = imgsize[3]
 
            ;;==Set up 2-D auxiliary data
-           pl_ctx = build_plane_context(info, $
-                                        plane = info.planes[ip], $
-                                        context = 'spectral')
+           imgplane = build_imgplane(data,info, $
+                                     plane = info.planes[ip], $
+                                     context = 'spectral')
 STOP
            ;;==Save string for filenames
            if info.params.ndim_space eq 2 then plane_string = '' $

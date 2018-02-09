@@ -20,16 +20,23 @@ pro eppic_spatial_analysis, info,movies=movies
         ;;==Read 2-D image data
         if keyword_set(movies) then timestep = lindgen(nt_max) $
         else timestep = info.timestep
-        imgplane = read_ph5_plane(data_name, $
-                                  ext = '.h5', $
-                                  timestep = timestep, $
-                                  plane = info.planes[ip], $
-                                  type = 4, $
-                                  path = expand_path(info.path+path_sep()+'parallel'), $
-                                  /verbose)
+        ;; imgplane = read_ph5_plane(data_name, $
+        ;;                           ext = '.h5', $
+        ;;                           timestep = timestep, $
+        ;;                           plane = info.planes[ip], $
+        ;;                           type = 4, $
+        ;;                           path = expand_path(info.path+path_sep()+'parallel'), $
+        ;;                           /verbose)
+        data = read_ph5_plane(data_name, $
+                              ext = '.h5', $
+                              timestep = timestep, $
+                              plane = info.planes[ip], $
+                              type = 4, $
+                              path = expand_path(info.path+path_sep()+'parallel'), $
+                              /verbose)
 
         ;;==Check dimensions
-        imgsize = size(imgplane)
+        imgsize = size(data)
         n_dims = imgsize[0]
         if n_dims eq 3 then begin
            nx = imgsize[1]
@@ -37,19 +44,19 @@ pro eppic_spatial_analysis, info,movies=movies
            nt = imgsize[3]
 
            ;;==Set up 2-D auxiliary data
-           pl_ctx = build_plane_context(info, $
-                                        plane = info.planes[ip], $
-                                        context = 'spatial')
+           imgplane = build_imgplane(data,info, $
+                                     plane = info.planes[ip], $
+                                     context = 'spatial')
 STOP
            ;;==Save string for filenames
            if info.params.ndim_space eq 2 then plane_string = '' $
            else plane_string = '_'+info.planes[ip]
 
-           ;;==Rotate data
-           if info.haskey('rot') then rotate_plane, imgplane, $
-                                                    xdata=xdata,ydata=ydata, $
-                                                    xrng=xrng,yrng=yrng, $
-                                                    info.rot[info.planes[ip]]/90
+           ;; ;;==Rotate data
+           ;; if info.haskey('rot') then rotate_plane, imgplane, $
+           ;;                                          xdata=pl_ctx.xdata,ydata=pl_ctx.ydata, $
+           ;;                                          xrng=pl_ctx.xrange,yrng=pl_ctx.yrange, $
+           ;;                                          info.rot[info.planes[ip]]/90
 
 
            ;;==Create graphics of densities

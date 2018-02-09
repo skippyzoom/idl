@@ -91,7 +91,7 @@ pro eppic_full, path=path, $
 
   ;;==Declare data ranges for spatial data image panels
   ranges = {x:[0,grid.nx-1], $
-            y:[0,grid.ny-1], $
+            y:[grid.ny/2,grid.ny-1], $
             z:[0,grid.nz-1]}
   center = {x:grid.nx/2, $
             y:grid.ny/2, $
@@ -125,7 +125,7 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
 
   ;;==Create images from spatial data
-  eppic_spatial_analysis, info
+  ;; eppic_spatial_analysis, info
 
   ;;==Create movies from spatial data
   ;; eppic_spatial_analysis, info,/movies
