@@ -147,6 +147,7 @@ function read_ph5_data, data_name, $
               2: begin
                  ft_array[ft_struct.ikx,ft_struct.iky] = $
                     ft_struct.val
+                 ft_size = size(ft_array)
                  if ft_size[0] eq 1 then $
                     ft_array = reform(ft_array,ft_size[1],1)
               end
