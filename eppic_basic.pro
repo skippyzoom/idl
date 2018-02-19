@@ -11,7 +11,7 @@ pro eppic_basic, path=path, $
                  directory=directory, $
                  moments=moments, $
                  phi=phi, $
-                 dens=den, $
+                 dens=dens, $
                  denft=denft, $
                  all=all
 
@@ -64,6 +64,9 @@ pro eppic_basic, path=path, $
   nt = 9
   timestep = params.nout*(nt_max/(nt-1))*lindgen(nt)
   layout = [3,3]
+  ;; timestep = params.nout*[0,1]
+  ;; layout = [1,2]
+
                                 ;--------------------;
                                 ; 2-D images of data ;
                                 ;--------------------;
@@ -97,18 +100,19 @@ pro eppic_basic, path=path, $
   endif
 
   ;;==Fourier-transformed densities
-  if keyword_set(denft) then begin
-     for id=0,params.ndist-1 do begin
-        dist = strcompress(id,/remove_all)
-        data['FT Density (dist '+dist+')'] = dictionary('name','denft'+dist, $
-                                                        'rgb_table', 5, $
-                                                        'min_value', -0.1, $
-                                                        'max_value', 0.1, $
-                                                        'origin', hash('yz',0), $
-                                                        'fft_direction', 0, $
-                                                        'rotate_direction', 2)
-     endfor
-  endif
+  ;;-->NOT WORKING FOR SOME RUNS
+  ;; if keyword_set(denft) then begin
+  ;;    for id=0,params.ndist-1 do begin
+  ;;       dist = strcompress(id,/remove_all)
+  ;;       data['FT Density (dist '+dist+')'] = dictionary('name','denft'+dist, $
+  ;;                                                       'rgb_table', 5, $
+  ;;                                                       'min_value', -0.1, $
+  ;;                                                       'max_value', 0.1, $
+  ;;                                                       'origin', hash('yz',0), $
+  ;;                                                       'fft_direction', 0, $
+  ;;                                                       'rotate_direction', 2)
+  ;;    endfor
+  ;; endif
 
   ;;==Get an array of keys into the data hash
   d_keys = data.keys()
@@ -131,8 +135,8 @@ pro eppic_basic, path=path, $
      basic_multi_image, data_name, $
                         timestep = timestep, $
                         rgb_table = data[ikey].rgb_table, $
-                        min_value = data[ikey].min_value, $
-                        max_value = data[ikey].max_value, $
+                        ;; min_value = data[ikey].min_value, $
+                        ;; max_value = data[ikey].max_value, $
                         fft_direction = data[ikey].fft_direction, $
                         rotate_direction = data[ikey].rotate_direction, $
                         layout = layout, $
