@@ -1,3 +1,13 @@
+;+
+; Create multi-panel images from an input array.
+; This function assumes that the input is arranged
+; as (nx,ny,nt), and loops over the nt dimension.
+;
+; RETURN VALUE: This function returns an object 
+; array of image handles which the caller can use
+; to add colorbars, text, etc. That means that it
+; is the caller's responsibility to save the image.
+;-
 function multi_image, imgdata,xdata,ydata,_EXTRA=ex
 
   ;;==Make sure image data exists

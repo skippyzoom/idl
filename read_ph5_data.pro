@@ -55,6 +55,9 @@ function read_ph5_data, data_name, $
      errmsg = "Found no files with extension "+ext
      message, errmsg
   endelse
+
+  ;;==Declare the reference file
+  h5_file_ref = expand_path(path+path_sep()+'parallel000000.h5')
   
   ;;==Select a subset of time steps, if requested
   if n_elements(timestep) ne 0 then h5_file = h5_file[timestep/nout]
@@ -64,7 +67,8 @@ function read_ph5_data, data_name, $
 
   ;;==Check if the data is EPPIC Fourier-transformed data
   if keyword_set(eppic_ft_data) then begin
-     tmp = get_h5_data(h5_file[0],data_name+'_index')
+     ;; tmp = get_h5_data(h5_file[0],data_name+'_index')
+     tmp = get_h5_data(h5_file_ref,data_name+'_index')
      if n_elements(tmp) ne 0 then begin
         n_dim = (size(tmp))[1]
         case n_dim of
@@ -85,7 +89,8 @@ function read_ph5_data, data_name, $
      endif
   endif $
   else begin
-     tmp = get_h5_data(h5_file[0],data_name)
+     ;; tmp = get_h5_data(h5_file[0],data_name)
+     tmp = get_h5_data(h5_file_ref,data_name)
      if n_elements(tmp) ne 0 then begin
         n_dim = (size(tmp))[0]
         case n_dim of
@@ -94,6 +99,7 @@ function read_ph5_data, data_name, $
            3: data = make_array(nx/nout_avg,ny/nout_avg,nz/nout_avg,nt,type=type)
         endcase
         tmp = !NULL
+        if nt eq 1 then data = reform(data,[size(data,/dim),1])
      endif
   endelse
 

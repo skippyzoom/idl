@@ -41,6 +41,7 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
      if n_elements(yrange) eq 0 then yrange = !NULL
      if n_elements(data_name) eq 0 then data_name = 'data'
      if n_elements(image_string) eq 0 then image_string = ''
+     if n_elements(basename) eq 0 then basename = data_name+'-xyt-'+image_string
      if n_elements(expand) eq 0 then expand = 1.0
      if n_elements(rescale) eq 0 then rescale = 1.0
 
@@ -117,6 +118,7 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
                              tickdir = 1, $
                              ticklen = 0.2, $
                              major = 7, $
+                             title = colorbar_title, $
                              font_name = info.font_name, $
                              font_size = 8.0)
 
@@ -128,8 +130,6 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
                    font_size = 5.0)
 
         ;;==Save image
-        ;; image_save, img[0],filename=info.filepath+path_sep()+ $
-        ;;             data_name+image_string+'.pdf'
         image_save, img[0],filename=basename+'.pdf'
 
      endelse

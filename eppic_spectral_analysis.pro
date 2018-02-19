@@ -8,111 +8,62 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
 
      ;;==Extract currect quantity name
      data_name = info.data_names[id]
-     
-     ;;==Read data
-     if keyword_set(movies) || keyword_set(full_transform) then $
-        data = (load_eppic_data(data_name,path=info.path))[data_name] $
-     else $
-        data = (load_eppic_data(data_name,path=info.path, $
-                                timestep=info.timestep))[data_name]
 
-     ;;==Check successful read
-     data_is_spatial = 0B
-     if size(data,/n_dim) eq 0 then begin
+     ;;==Loop over 2-D image planes
+     for ip=0,n_elements(info.planes)-1 do begin
 
-        ;;==Extract the name of the non-FT quantity
-        pos = strpos(data_name,'ft')
-        data_name = strmid(data_name,0,pos)+strmid(data_name,pos+2)
-
-        ;;==Read data
-        if keyword_set(movies) || keyword_set(full_transform) then $
-           data = (load_eppic_data(data_name,path=info.path))[data_name] $
-        else $
-           data = (load_eppic_data(data_name,path=info.path, $
-                                   timestep=info.timestep))[data_name]
+        ;;==Read 2-D image data
+        if keyword_set(movies) then timestep = lindgen(nt_max) $
+        else timestep = info.timestep
+        data = read_ph5_plane(data_name, $
+                              ext = '.h5', $
+                              timestep = timestep, $
+                              plane = info.planes[ip], $
+                              type = 6, $
+                              /eppic_ft_data, $
+                              path = expand_path(info.path+path_sep()+'parallel'), $
+                              /verbose)
 
         ;;==Check successful read
-        data_is_spatial = (size(data,/n_dim) ne 0) ? 1B : 0B
+        using_spatial_data = 0B
+        if size(data,/n_dim) eq 0 then begin
 
-     endif
+           ;;==Extract the name of the non-FT quantity
+           pos = strpos(data_name,'ft')
+           data_name = strmid(data_name,0,pos)+strmid(data_name,pos+2)
 
-     ;;==Get data size and dimensions
-     data_size = size(data)
-     n_dims = data_size[0]
-     nt = data_size[n_dims]
-     nz = 1
-     ny = 1
-     nx = 1
-     switch n_dims-1 of
-        3: nz = data_size[3]
-        2: ny = data_size[2]
-        1: nx = data_size[1]
-     endswitch
+           data = read_ph5_plane(data_name, $
+                                 ext = '.h5', $
+                                 timestep = timestep, $
+                                 plane = info.planes[ip], $
+                                 type = 4, $
+                                 path = expand_path(info.path+path_sep()+'parallel'), $
+                                 /verbose)
 
-     ;;==Check dimensions
-     if n_dims gt 2 then begin
+           ;;==Check successful read
+           using_spatial_data = (size(data,/n_dim) ne 0) ? 1B : 0B
 
-        ;;==Make physically 3-D data logically 4-D data
-        data_is_2D = 0B
-        if n_dims eq 3 then begin
-           data_is_2D = 1B
-           data = reform(data,[nx,ny,1,nt])
-           n_dims = size(data,/n_dim)
-           info.planes = 'xy'
-           perp_to_B = 'xy'
         endif
 
-        ;; ;;==Restrict time range --> DEV
-        ;; data = data[*,*,*,nt/2:nt-1]
+        ;;==Check dimensions
+        imgsize = size(data)
+        n_dims = imgsize[0]
+        if n_dims eq 3 then begin
+           nx = imgsize[1]
+           ny = imgsize[2]
+           nt = imgsize[3]
 
-        ;;==Transpose data
-        xyzt = info.xyz
-        tmp = indgen(n_dims)
-        n_xyzt = n_elements(xyzt)
-        if n_xyzt lt 4 then xyzt = [xyzt,tmp[n_xyzt,*]]
-        data = transpose(data,xyzt)
-
-        ;;==Get new dimensions
-        data_size = size(data)
-        nt = data_size[n_dims]
-        nz = data_size[3]
-        ny = data_size[2]
-        nx = data_size[1]
-
-        ;;==Loop over 2-D image planes
-        for ip=0,n_elements(info.planes)-1 do begin
-
-           ;;==Set up 2-D image
-           case 1B of 
-              strcmp(info.planes[ip],'xy') || strcmp(info.planes[ip],'yx'): begin
-                 imgplane = reform(data[*,*,info.zctr,*])
-                 xdata = (2*!pi/(info.xdif*nx))*(findgen(nx)-0.5*nx)
-                 ydata = (2*!pi/(info.ydif*ny))*(findgen(ny)-0.5*ny)
-                 xrng = info.xrng
-                 yrng = info.yrng
-              end
-              strcmp(info.planes[ip],'xz') || strcmp(info.planes[ip],'zx'): begin
-                 imgplane = reform(data[*,info.yctr,*,*])
-                 xdata = (2*!pi/(info.xdif*nx))*(findgen(nx)-0.5*nx)
-                 ydata = (2*!pi/(info.zdif*nz))*(findgen(nz)-0.5*nz)
-                 xrng = info.xrng
-                 yrng = info.zrng
-              end
-              strcmp(info.planes[ip],'yz') || strcmp(info.planes[ip],'zy'): begin
-                 imgplane = reform(data[info.xctr,*,*,*])
-                 xdata = (2*!pi/(info.ydif*ny))*(findgen(ny)-0.5*ny)
-                 ydata = (2*!pi/(info.zdif*nz))*(findgen(nz)-0.5*nz)
-                 xrng = info.yrng
-                 yrng = info.zrng
-              end
-           endcase
-
+           ;;==Set up 2-D auxiliary data
+           imgplane = build_imgplane(data,info, $
+                                     plane = info.planes[ip], $
+                                     context = 'spectral')
+STOP
            ;;==Save string for filenames
-           if data_is_2D then plane_string = '' $
+           if info.params.ndim_space eq 2 then plane_string = '' $
            else plane_string = '_'+info.planes[ip]
 
            ;;==Transform spatial data at each time step
-           if data_is_spatial then begin
+           if using_spatial_data then begin
               for it=0,nt-1 do begin
                  imgplane[*,*,it] = fft(imgplane[*,*,it],/overwrite)
               endfor              
@@ -123,7 +74,6 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
 
               ;;==Get new dimensions
               img_size = size(imgplane)
-              nz = img_size[3]
               ny = img_size[2]
               nx = img_size[1]
 
@@ -149,6 +99,8 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
               imgplane = imgplane/max(imgplane)
               ;;--Convert to dB
               imgplane = 10*alog10(imgplane)
+              ;;--Set non-finite values to a finite 'missing' value
+              imgplane[where(finite(imgplane) eq 0)] = -1e10
 
               ;;==Interpolate
               theta_range = [0,360]
@@ -186,8 +138,39 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
                                   max_value = 0, $
                                   basename = basename
 
+
+              ;;==Create images of Fourier-transformed data
+              basename = info.filepath+path_sep()+ $
+                         data_name+'_w'+plane_string
+              min_value = max(imgplane,/nan)-30
+              max_value = max(imgplane,/nan)
+              k_range = [0,2*!pi]
+              max_abs_nu = max(abs(reform(info.moments.dist1.nu[0,nt/2:*])))
+              w_range = 0.5*[-max_abs_nu,+max_abs_nu]
+              aspect_ratio = (k_range[1]-k_range[0])/ $
+                             (w_range[1]-w_range[0])
+              eppic_xyw_graphics, imgplane,xdata,ydata, $
+                                  w_vals, $
+                                  info, $
+                                  xrng = xrng, $
+                                  yrng = yrng, $
+                                  xrange = k_range, $
+                                  yrange = w_range, $
+                                  rgb_table = 39, $
+                                  aspect_ratio = aspect_ratio, $
+                                  min_value = min_value, $
+                                  max_value = max_value, $
+                                  basename = basename, $
+                                  colorbar_title = "Power [dB]", $
+                                  center = [nx/2,ny/2]
+
            endif $
            else begin
+
+              ;;==Get new dimensions
+              img_size = size(imgplane)
+              ny = img_size[2]
+              nx = img_size[1]
 
               ;;==Set up data
               ;;--Extract the real part
@@ -199,15 +182,19 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
               imgplane[nx/2-dc_width:nx/2+dc_width, $
                        ny/2-dc_width:ny/2+dc_width,*] = 0.0
               ;;--Smooth
-              imgplane = smooth(imgplane,[5,5,1],/edge_wrap)
+              s_width = 3
+              if s_width gt 1 then $
+                 imgplane = smooth(imgplane,[s_width,s_width,1],/edge_wrap)
               ;;--Normalize
               imgplane = imgplane/max(imgplane)
               ;;--Convert to dB
               imgplane = 10*alog10(imgplane)
+              ;;--Set non-finite values to a finite 'missing' value
+              imgplane[where(finite(imgplane) eq 0)] = -1e10
 
               ;;==Create images of Fourier-transformed data
               basename = info.filepath+path_sep()+ $
-                         data_name+plane_string
+                         data_name+'_t'+plane_string
               min_value = max(imgplane,/nan)-30
               max_value = max(imgplane,/nan)
               eppic_xyt_graphics, imgplane,xdata,ydata, $
@@ -263,9 +250,16 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
 
            endelse
 
-        endfor   ;;--planes
-     endif $     ;;--n_dims
-     else print, "[EPPIC_SPECTRAL_ANALYSIS] Could not create an image."
+        endif $           ;;--n_dims
+        else begin
+           print, "[EPPIC_SPECTRAL_ANALYSIS] Could not create an image."
+           print, "                          data_name = ",data_name
+           print, "                          plane = ",info.planes[ip]
+        endelse
+     endfor            ;;--planes
+
+     ;;==Free memory
+     imgplane = !NULL
 
   endfor ;;--data_names
 

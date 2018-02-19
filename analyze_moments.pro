@@ -20,6 +20,12 @@
 ;    so that B0 is aligned with z. It does this to simplify
 ;    some calculations that require vector components (e.g.,
 ;    nu0 and nu1)
+; -- This function appears to calculate nu1 from the unmagnetized,
+;    cold perpendicular drift equation but that's really just a
+;    way to get the Pedersen drift correct even when the simula-
+;    tion domain is rotated from the physical domain (e.g., 
+;    the user set up the run with simulation axes x & y
+;    corresponding to physical axes y & -x)
 ;-
 
 function analyze_moments, path=path
@@ -67,16 +73,18 @@ function analyze_moments, path=path
      vythd1 = float(params.vythd1)
      vzthd1 = float(params.vzthd1)
      if (n_elements(kb) eq 0) then if (md0 lt 1e-8) then kb = 1.38e-23 else kb = 1
+     if (efield_algorithm eq 1) || (efield_algorithm eq 2) then hybrid_run = 1B
 
      ;;==Create constant electron moments for QN, inertialess electrons
-     if efield_algorithm eq 1 or efield_algorithm eq 2 then begin
+     ;; if efield_algorithm eq 1 or efield_algorithm eq 2 then begin
+     if keyword_set(hybrid_run) then begin
         moments0 = moments1*0.0
-        moments0[1,*] = vx0d0   ;x drift velocity
-        moments0[2,*] = vxthd0^2 ;x thermal velocity
-        moments0[5,*] = vy0d0    ;y drift velocity
-        moments0[6,*] = vythd0^2 ;y thermal velocity
-        moments0[9,*] = vz0d0    ;z drift velocity
-        moments0[10,*] = vzthd0^2 ;z thermal velocity
+        moments0[1,*] = vx0d0     ;x drift velocity
+        moments0[2,*] = vxthd0^2  ;x thermal velocity squared
+        moments0[5,*] = vy0d0     ;y drift velocity
+        moments0[6,*] = vythd0^2  ;y thermal velocity squared
+        moments0[9,*] = vz0d0     ;z drift velocity
+        moments0[10,*] = vzthd0^2 ;z thermal velocity squared
      endif
 
      ;;==Transform coordinates for 3-D
@@ -88,6 +96,7 @@ function analyze_moments, path=path
            vxpd1 = moments1[1,*]
            vypd1 = moments1[5,*]
            vzpd1 = moments1[9,*]
+           Exp = Ex0
            Eyp = Ey0
            Ezp = Ez0
         end
@@ -98,8 +107,9 @@ function analyze_moments, path=path
            vxpd1 = moments1[1,*]
            vypd1 = -moments1[9,*]
            vzpd1 = moments1[5,*]
+           Exp = Ex0
            Eyp = -Ez0
-           Ezp = By0
+           Ezp = Ey0
         end
         (B0 eq Bx0): begin
            vxpd0 = -moments0[9,*]
@@ -108,177 +118,124 @@ function analyze_moments, path=path
            vxpd1 = -moments1[9,*]
            vypd1 = moments1[5,*]
            vzpd1 = moments1[1,*]
+           Exp = -Ez0
            Eyp = Ey0
            Ezp = Ex0
         end
      endcase
-                                ;--------;
-                                ; Hybrid ;
-                                ;--------;
-     if (efield_algorithm eq 1) || (efield_algorithm eq 2) then begin
 
-        ;;==Theoretical values
-        ;;--cyclotron frequencies
-        wc0  = qd0*B0/md0
-        wc1  = qd1*B0/md1
-        ;;--parallel mobilities
-        if (coll_rate0 ne 0) then $
-           mu0_start = qd0/coll_rate0/md0 $
-        else mu0_start = 0
-        if (coll_rate1 ne 0) then $
-           mu1_start = qd1/coll_rate1/md1 $
-        else mu1_start = 0
+     ;;==Check for E0 strictly parallel to B0
+     if Ezp gt 0 && (Exp+Eyp) eq 0 then E0_par = 1B
 
-        ;;--Pedersen mobilities and drift
-        ped0_start = mu0_start/(1+wc0^2/(coll_rate0*1.0)^2)
-        ped1_start = mu1_start/(1+wc1^2/(coll_rate1*1.0)^2)
-        v_ped0_start= Eyp*ped0_start
-        v_ped1_start= Eyp*ped1_start
-        ;;--Hall mobilities and drift
-        hall0_start = qd0*wc0/(md0*(wc0^2+coll_rate0^2))
-        hall1_start = qd1*wc1/(md1*(wc1^2+coll_rate1^2))
-        v_hall0_start = Eyp*hall0_start
-        v_hall1_start = Eyp*hall1_start
-        ;;--Temperatures and acoustic speed
-        ;; T0_start = 0.5*(md0/kb)*(vxthd0^2+vythd0^2+vzthd0^2)
-        ;; T1_start = 0.5*(md1/kb)*(vxthd1^2+vythd1^2+vzthd1^2)
-        Tx0_start = (md0/kb)*vxthd0^2
-        Ty0_start = (md0/kb)*vythd0^2
-        Tz0_start = (md0/kb)*vzthd0^2
-        T0_start = (Tx0_start+Ty0_start+Tz0_start)/3.0
-        Tx1_start = (md1/kb)*vxthd1^2
-        Ty1_start = (md1/kb)*vythd1^2
-        Tz1_start = (md1/kb)*vzthd1^2
-        T1_start = (Tx1_start+Ty1_start+Tz1_start)/3.0
-        Cs_start = sqrt(kb*(T0_start + T1_start)/md1)
-        ;;--Psi
-        Psi_start = abs(coll_rate0*coll_rate1/(wc0*wc1))
-        driver = (Eyp/B0)/(1+Psi_start)
+                                ;--------------------;
+                                ; Theoretical values ;
+                                ;--------------------;
 
-        ;;==Simulated values
-        ;;--Collision frequencies and Psi
-        nu0 = moments1[5,*]*0.0 + coll_rate0      ;From Input value
-        ;; nu1 = Eyp/(moments1[5,*])*(qd1/md1) ;Ped drift
-        nu1 = (Eyp/vypd1)*(qd1/md1) ;From Ped drift        
-        Psi = abs(nu0*nu1/(wc0*wc1))
-        driver = (Eyp/B0)/(1+Psi)
-        ;;--parallel mobilities
-        !NULL = where(nu0 ne 0.0,count)
-        if (count ne 0) then $
-           mu0 = qd0/nu0/md0 $
-        else mu0 = 0.0
-        !NULL = where(nu1 ne 0.0,count)
-        if (count ne 0) then $
-           mu1 = qd1/nu1/md1 $
-        else mu1 = 0.0
-        ;;--Pedersen mobilities and drift
-        ped0 = mu0/(1+wc0^2/(nu0*1.0)^2)
-        ped1 = mu1/(1+wc1^2/(nu1*1.0)^2)
-        v_ped0 = Eyp*ped0
-        v_ped1 = Eyp*ped1
-        ;;--Hall mobilities and drift
-        hall0 = qd0*wc0/(md0*(wc0^2+nu0^2))
-        hall1 = qd1*wc1/(md1*(wc1^2+nu1^2))
-        v_hall0 = Eyp*hall0
-        v_hall1 = Eyp*hall1
-        ;;--Temperatures and acoustic speed
-        ;; T0 = (moments0[2,*] + moments0[6,*] + moments0[10,*])/3. * md0/kb
-        ;; T1 = (moments1[2,*] + moments1[6,*] + moments1[10,*])/3. * md1/kb
-        Tx0 = (md0/kb)*moments0[2,*]
-        Ty0 = (md0/kb)*moments0[6,*]
-        Tz0 = (md0/kb)*moments0[10,*]
-        T0 = (Tx0+Ty0+Tz0)/3.0
-        Tx1 = (md1/kb)*moments1[2,*]
-        Ty1 = (md1/kb)*moments1[6,*]
-        Tz1 = (md1/kb)*moments1[10,*]
-        T1 = (Tx1+Ty1+Tz1)/3.0
-        Cs = sqrt(kb*(T0+T1)/md1)
-     endif $                    ;hybrid
+     ;;==Cyclotron frequencies
+     wc0  = qd0*B0/md0
+     wc1  = qd1*B0/md1
 
-                                ;----------;
-                                ; Pure PIC ;
-                                ;----------;
+     ;;==Parallel mobilities
+     if (coll_rate0 ne 0) then $
+        mu0_start = qd0/coll_rate0/md0 $
+     else mu0_start = 0.0
+     if (coll_rate1 ne 0) then $
+        mu1_start = qd1/coll_rate1/md1 $
+     else mu1_start = 0.0
+
+     ;;==Pedersen mobilities and drift
+     ;; ped0_start = mu0_start/(1+wc0^2/(float(coll_rate0))^2)
+     ;; ped1_start = mu1_start/(1+wc1^2/(float(coll_rate1))^2)
+     ped0_start = mu0_start/(1+(wc0/coll_rate0)^2)
+     ped1_start = mu1_start/(1+(wc1/coll_rate1)^2)
+     v_ped0_start= Eyp*ped0_start
+     v_ped1_start= Eyp*ped1_start
+
+     ;;==Hall mobilities and drift
+     hall0_start = qd0*wc0/(md0*(wc0^2+coll_rate0^2))
+     hall1_start = qd1*wc1/(md1*(wc1^2+coll_rate1^2))
+     v_hall0_start = Eyp*hall0_start
+     v_hall1_start = Eyp*hall1_start
+
+     ;;==Temperatures and acoustic speed
+     Tx0_start = (md0/kb)*vxthd0^2
+     Ty0_start = (md0/kb)*vythd0^2
+     Tz0_start = (md0/kb)*vzthd0^2
+     T0_start = (Tx0_start+Ty0_start+Tz0_start)/float(params.ndim_space)
+     Tx1_start = (md1/kb)*vxthd1^2
+     Ty1_start = (md1/kb)*vythd1^2
+     Tz1_start = (md1/kb)*vzthd1^2
+     T1_start = (Tx1_start+Ty1_start+Tz1_start)/float(params.ndim_space)
+     Cs_start = sqrt(kb*(T0_start + T1_start)/md1)
+
+     ;;==Psi
+     Psi_start = abs(coll_rate0*coll_rate1/(wc0*wc1))
+     driver = (Eyp/B0)/(1+Psi_start)
+
+
+                                ;------------------;
+                                ; Simulated values ;
+                                ;------------------;
+
+     ;;==Collision frequencies and Psi
+     ;; if (efield_algorithm eq 1) || (efield_algorithm eq 2) then $
+     if keyword_set(hybrid_run) then $
+        nu0 = moments1[5,*]*0.0 + coll_rate0 $                    ;From input value
      else begin
-        ;;==Theoretical values
-        ;;--cyclotron frequencies
-        wc0  = qd0*B0/md0
-        wc1  = qd1*B0/md1
-        ;;--parallel mobilities
-        if (coll_rate0 ne 0) then $
-           mu0_start = qd0/coll_rate0/md0 $
-        else mu0_start = 0
-        if (coll_rate1 ne 0) then $
-           mu1_start = qd1/coll_rate1/md1 $
-        else mu1_start = 0
-        ;;--Pedersen mobilities and drift
-        ped0_start = mu0_start/(1+wc0^2/(coll_rate0)^2)
-        ped1_start = mu1_start/(1+wc1^2/(coll_rate1)^2)
-        v_ped0_start= Eyp*ped0_start
-        v_ped1_start= Eyp*ped1_start
-        ;;--Hall mobilities and drift
-        hall0_start = qd0*wc0/(md0*(wc0^2+coll_rate0^2))
-        hall1_start = qd1*wc1/(md1*(wc1^2+coll_rate1^2))
-        v_hall0_start = Eyp*hall0_start
-        v_hall1_start = Eyp*hall1_start
-        ;;--Temperatures and acoustic speed
-        ;; T0_start = 0.5*(md0/kb)*(vxthd0^2+vythd0^2+vzthd0^2)
-        ;; T1_start = 0.5*(md1/kb)*(vxthd1^2+vythd1^2+vzthd1^2)
-        Tx0_start = (md0/kb)*vxthd0^2
-        Ty0_start = (md0/kb)*vythd0^2
-        Tz0_start = (md0/kb)*vzthd0^2
-        T0_start = (Tx0_start+Ty0_start+Tz0_start)/3.0
-        Tx1_start = (md1/kb)*vxthd1^2
-        Ty1_start = (md1/kb)*vythd1^2
-        Tz1_start = (md1/kb)*vzthd1^2
-        T1_start = (Tx1_start+Ty1_start+Tz1_start)/3.0
-        Cs_start = sqrt(kb*(T0_start + T1_start)/md1)
-        ;;--Psi
-        Psi_start = abs(coll_rate0*coll_rate1/(wc0*wc1))
-        driver = (Eyp/B0)/(1+Psi_start)
+        if keyword_set(E0_par) then nu0 = (Ezp/vzpd0)*(qd0/md0) $ ;From parallel drift
+        else nu0 = wc0*vypd0/vxpd0                                ;From Hall drift
+     endelse
+     ;; nu1 = (Eyp/vypd1)*(qd1/md1)                               ;From Ped drift
+     nu1 = (qd1/md1)*(Exp*vxpd1 + Eyp*vypd1)/(vxpd1^2 + vypd1^2)  ;From perp drift
+     if 0 then begin
+        ;;-->Can I get a more general expression from the drift equation?
+        nu0 = 0.5*qd0*Eyp/(md0*vypd0)*(1 + sqrt(1-(2*md0*vypd0*wc0/(qd0*Eyp))^2))
+        nu1 = 0.5*qd1*Eyp/(md1*vypd1)*(1 + sqrt(1-(2*md1*vypd1*wc1/(qd1*Eyp))^2))
+        nu0 = 0.5*qd0*Eyp/(md0*vypd0)*(1 - sqrt(1-(2*md0*vypd0*wc0/(qd0*Eyp))^2))
+        nu1 = 0.5*qd1*Eyp/(md1*vypd1)*(1 - sqrt(1-(2*md1*vypd1*wc1/(qd1*Eyp))^2))
+     endif
+     Psi = abs(nu0*nu1/(wc0*wc1))
+     driver = (Eyp/B0)/(1+Psi)
 
-        ;;==Simulated values
-        ;;--Collision frequencies and Psi
-        ;; nu0 = wc0*vypd0/vxpd0               ;From Hall drift
-        nu0 = (Ezp/vzpd0)*(qd0/md0)         ;From parallel drift
-        nu1 = (Eyp/vypd1)*(qd1/md1)         ;From Ped drift
-        ;; nu0 = 0.5*qd0*Eyp/(md0*vypd0)*(1 + sqrt(1-(2*md0*vypd0*wc0/(qd0*Eyp))^2))
-        ;; nu1 = 0.5*qd1*Eyp/(md1*vypd1)*(1 + sqrt(1-(2*md1*vypd1*wc1/(qd1*Eyp))^2))
-        ;; nu0 = 0.5*qd0*Eyp/(md0*vypd0)*(1 - sqrt(1-(2*md0*vypd0*wc0/(qd0*Eyp))^2))
-        ;; nu1 = 0.5*qd1*Eyp/(md1*vypd1)*(1 - sqrt(1-(2*md1*vypd1*wc1/(qd1*Eyp))^2))
-        Psi = abs(nu0*nu1/(wc0*wc1))
-        driver = (Eyp/B0)/(1+Psi)
-        ;;--parallel mobilities
-        !NULL = where(nu0 ne 0.0,count)
-        if (count ne 0) then $
-           mu0 = qd0/nu0/md0 $
-        else mu0 = 0.0
-        !NULL = where(nu1 ne 0.0,count)
-        if (count ne 0) then $
-           mu1 = qd1/nu1/md1 $
-        else mu1 = 0.0
-        ;;--Pedersen mobilities and drift
-        ped0 = mu0/(1+wc0^2/(nu0*1.0)^2)
-        ped1 = mu1/(1+wc1^2/(nu1*1.0)^2)
-        v_ped0 = Eyp*ped0
-        v_ped1 = Eyp*ped1
-        ;;--Hall mobilities and drift
-        hall0 = qd0*wc0/(md0*(wc0^2+nu0^2))
-        hall1 = qd1*wc1/(md1*(wc1^2+nu1^2))
-        v_hall0 = Eyp*hall0
-        v_hall1 = Eyp*hall1
-        ;;--Temperatures and acoustic speed
-        ;; T0 = (moments0[2,*] + moments0[6,*] + moments0[10,*])/3. * md0/kb
-        ;; T1 = (moments1[2,*] + moments1[6,*] + moments1[10,*])/3. * md1/kb
-        Tx0 = (md0/kb)*moments0[2,*]
-        Ty0 = (md0/kb)*moments0[6,*]
-        Tz0 = (md0/kb)*moments0[10,*]
-        T0 = (Tx0+Ty0+Tz0)/3.0
-        Tx1 = (md1/kb)*moments1[2,*]
-        Ty1 = (md1/kb)*moments1[6,*]
-        Tz1 = (md1/kb)*moments1[10,*]
-        T1 = (Tx1+Ty1+Tz1)/3.0
-        Cs = sqrt(kb*(T0+T1)/md1)
-     endelse                    ;pure PIC
+     ;;==Parallel mobilities
+     !NULL = where(nu0 ne 0.0,count)
+     if (count ne 0) then $
+        mu0 = qd0/nu0/md0 $
+     else mu0 = 0.0*nu0
+     !NULL = where(nu1 ne 0.0,count)
+     if (count ne 0) then $
+        mu1 = qd1/nu1/md1 $
+     else mu1 = 0.0*nu1
+
+     ;;==Pedersen mobilities and drift
+     ;; ped0 = mu0/(1+wc0^2/(nu0)^2)
+     ;; ped1 = mu1/(1+wc1^2/(nu1)^2)
+     ped0 = mu0/(1+(wc0/nu0)^2)
+     ped1 = mu1/(1+(wc1/nu1)^2)
+     v_ped0 = Eyp*ped0
+     v_ped1 = Eyp*ped1
+
+     ;;==Hall mobilities and drift
+     hall0 = qd0*wc0/(md0*(wc0^2+nu0^2))
+     hall1 = qd1*wc1/(md1*(wc1^2+nu1^2))
+     v_hall0 = Eyp*hall0
+     v_hall1 = Eyp*hall1
+
+     ;;==Temperatures and acoustic speed
+     Tx0 = (md0/kb)*moments0[2,*]
+     Ty0 = (md0/kb)*moments0[6,*]
+     Tz0 = (md0/kb)*moments0[10,*]
+     T0 = (Tx0+Ty0+Tz0)/float(params.ndim_space)
+     Tx1 = (md1/kb)*moments1[2,*]
+     Ty1 = (md1/kb)*moments1[6,*]
+     Tz1 = (md1/kb)*moments1[10,*]
+     T1 = (Tx1+Ty1+Tz1)/float(params.ndim_space)
+     Cs = sqrt(kb*(T0+T1)/md1)
+
+
+                                ;----------------;
+                                ; Create structs ; 
+                                ;----------------;
 
      dist0 = {vx_m1:reform(moments0[1,*]), $
               vx_m2:reform(moments0[2,*]), $
@@ -348,7 +305,7 @@ function analyze_moments, path=path
      moment_struct = {dist0:dist0, dist1:dist1, $
                       Psi_start:Psi_start, Psi:Psi, $
                       Cs_start:Cs_start, Cs:Cs, driver:driver}
-     
+
      return, moment_struct
   endif $
   else begin
