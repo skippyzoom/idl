@@ -1,4 +1,3 @@
-
 ;+
 ; Graphics output for an EPPIC run.
 ; This routine contains more complicated
