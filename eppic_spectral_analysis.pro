@@ -56,8 +56,9 @@ pro eppic_spectral_analysis, info,movies=movies,full_transform=full_transform
            ;;==Set up 2-D auxiliary data
            imgplane = build_imgplane(data,info, $
                                      plane = info.planes[ip], $
-                                     context = 'spectral')
-STOP
+                                     context = 'spectral', $
+                                     using_spatial_data = using_spatial_data)
+
            ;;==Save string for filenames
            if info.params.ndim_space eq 2 then plane_string = '' $
            else plane_string = '_'+info.planes[ip]
@@ -65,7 +66,7 @@ STOP
            ;;==Transform spatial data at each time step
            if using_spatial_data then begin
               for it=0,nt-1 do begin
-                 imgplane[*,*,it] = fft(imgplane[*,*,it],/overwrite)
+                 imgplane.f[*,*,it] = fft(imgplane.f[*,*,it],/overwrite)
               endfor              
               data_name += 'fft'
            endif
@@ -73,44 +74,50 @@ STOP
            if keyword_set(full_transform) then begin
 
               ;;==Get new dimensions
-              img_size = size(imgplane)
+              img_size = size(imgplane.f)
               ny = img_size[2]
               nx = img_size[1]
 
               ;;==Transform the time dimension
               nw = next_power2(nt)
               temp = make_array(nx,ny,nw,type=6,value=0.0)
-              temp[*,*,0:nt-1] = imgplane
-              imgplane = fft(temp,dim=3)
+              temp[*,*,0:nt-1] = imgplane.f
+              imgplane.f = fft(temp,dim=3)
               temp = !NULL
 
               ;;==Set up data
               ;;--Extract the real part
-              imgplane = real_part(imgplane)^2
+              imgplane.f = real_part(imgplane.f)^2
               ;;--Recenter
-              imgplane = shift(imgplane,nx/2,ny/2,nw/2)
+              imgplane.f = shift(imgplane.f,nx/2,ny/2,nw/2)
               ;;--Zero the near-DC components (crude high-pass filter)
               dc_width = 8
-              imgplane[nx/2-dc_width:nx/2+dc_width, $
-                       ny/2-dc_width:ny/2+dc_width,*] = 0.0
+              tmp = imgplane.f
+              tmp[nx/2-dc_width:nx/2+dc_width, $
+                  ny/2-dc_width:ny/2+dc_width,*] = 0.0
+              imgplane.f = tmp
+              tmp = !NULL
               ;;--Smooth
-              imgplane = smooth(imgplane,[5,5,1],/edge_wrap)
+              imgplane.f = smooth(imgplane.f,[5,5,1],/edge_wrap)
               ;;--Normalize
-              imgplane = imgplane/max(imgplane)
+              imgplane.f = imgplane.f/max(imgplane.f)
               ;;--Convert to dB
-              imgplane = 10*alog10(imgplane)
+              imgplane.f = 10*alog10(imgplane.f)
               ;;--Set non-finite values to a finite 'missing' value
-              imgplane[where(finite(imgplane) eq 0)] = -1e10
+              tmp = imgplane.f
+              tmp[where(finite(imgplane.f) eq 0)] = -1e10
+              imgplane.f = tmp
+              tmp = !NULL
 
               ;;==Interpolate
               theta_range = [0,360]
-              rtp = xyz_rtp(imgplane[*,*,0],dx=info.xdif,dy=info.ydif, $
+              rtp = xyz_rtp(imgplane.f[*,*,0],dx=imgplane.dx,dy=imgplane.dy, $
                             theta_range = theta_range)
               nk = n_elements(rtp.r_vals)
               n_theta = n_elements(rtp.t_vals)
               ktw = fltarr(nk,n_theta,nw)
               for iw=0,nw-1 do begin
-                 rtp = xyz_rtp(imgplane[*,*,iw],dx=info.xdif,dy=info.ydif, $
+                 rtp = xyz_rtp(imgplane.f[*,*,iw],dx=imgplane.dx,dy=imgplane.dy, $
                                theta_range = theta_range)
                  ktw[*,*,iw] = rtp.data
               endfor
@@ -142,18 +149,18 @@ STOP
               ;;==Create images of Fourier-transformed data
               basename = info.filepath+path_sep()+ $
                          data_name+'_w'+plane_string
-              min_value = max(imgplane,/nan)-30
-              max_value = max(imgplane,/nan)
+              min_value = max(imgplane.f,/nan)-30
+              max_value = max(imgplane.f,/nan)
               k_range = [0,2*!pi]
               max_abs_nu = max(abs(reform(info.moments.dist1.nu[0,nt/2:*])))
               w_range = 0.5*[-max_abs_nu,+max_abs_nu]
               aspect_ratio = (k_range[1]-k_range[0])/ $
                              (w_range[1]-w_range[0])
-              eppic_xyw_graphics, imgplane,xdata,ydata, $
+              eppic_xyw_graphics, imgplane.f,imgplane.x,imgplane.y, $
                                   w_vals, $
                                   info, $
-                                  xrng = xrng, $
-                                  yrng = yrng, $
+                                  xrng = imgplane.xr, $
+                                  yrng = imgplane.yr, $
                                   xrange = k_range, $
                                   yrange = w_range, $
                                   rgb_table = 39, $
@@ -168,39 +175,45 @@ STOP
            else begin
 
               ;;==Get new dimensions
-              img_size = size(imgplane)
+              img_size = size(imgplane.f)
               ny = img_size[2]
               nx = img_size[1]
 
               ;;==Set up data
               ;;--Extract the real part
-              imgplane = real_part(imgplane)^2
+              imgplane.f = real_part(imgplane.f)^2
               ;;--Recenter
-              imgplane = shift(imgplane,nx/2,ny/2,0)
+              imgplane.f = shift(imgplane.f,nx/2,ny/2,0)
               ;;--Zero the near-DC components (crude high-pass filter)
               dc_width = 8
-              imgplane[nx/2-dc_width:nx/2+dc_width, $
-                       ny/2-dc_width:ny/2+dc_width,*] = 0.0
+              tmp = imgplane.f
+              tmp[nx/2-dc_width:nx/2+dc_width, $
+                  ny/2-dc_width:ny/2+dc_width,*] = 0.0
+              imgplane.f = tmp
+              tmp = !NULL
               ;;--Smooth
               s_width = 3
               if s_width gt 1 then $
-                 imgplane = smooth(imgplane,[s_width,s_width,1],/edge_wrap)
+                 imgplane.f = smooth(imgplane.f,[s_width,s_width,1],/edge_wrap)
               ;;--Normalize
-              imgplane = imgplane/max(imgplane)
+              imgplane.f = imgplane.f/max(imgplane.f)
               ;;--Convert to dB
-              imgplane = 10*alog10(imgplane)
+              imgplane.f = 10*alog10(imgplane.f)
               ;;--Set non-finite values to a finite 'missing' value
-              imgplane[where(finite(imgplane) eq 0)] = -1e10
+              tmp = imgplane.f
+              tmp[where(finite(imgplane.f) eq 0)] = -1e10
+              imgplane.f = tmp
+              tmp = !NULL
 
               ;;==Create images of Fourier-transformed data
               basename = info.filepath+path_sep()+ $
                          data_name+'_t'+plane_string
-              min_value = max(imgplane,/nan)-30
-              max_value = max(imgplane,/nan)
-              eppic_xyt_graphics, imgplane,xdata,ydata, $
+              min_value = max(imgplane.f,/nan)-30
+              max_value = max(imgplane.f,/nan)
+              eppic_xyt_graphics, imgplane.f,imgplane.x,imgplane.y, $
                                   info, $
-                                  xrng = xrng, $
-                                  yrng = yrng, $
+                                  xrng = imgplane.xr, $
+                                  yrng = imgplane.yr, $
                                   xrange = [-2*!pi,2*!pi], $
                                   yrange = [0,2*!pi], $
                                   rgb_table = 39, $
@@ -216,13 +229,13 @@ STOP
 
               ;;==Interpolate
               theta_range = [0,180]
-              rtp = xyz_rtp(imgplane[*,*,0],dx=info.xdif,dy=info.ydif, $
+              rtp = xyz_rtp(imgplane.f[*,*,0],dx=imgplane.dx,dy=imgplane.dy, $
                             theta_range = theta_range)
               nk = n_elements(rtp.r_vals)
               n_theta = n_elements(rtp.t_vals)
               ktt = fltarr(nk,n_theta,nt)
               for it=0,nt-1 do begin
-                 rtp = xyz_rtp(imgplane[*,*,it],dx=info.xdif,dy=info.ydif, $
+                 rtp = xyz_rtp(imgplane.f[*,*,it],dx=imgplane.dx,dy=imgplane.dy, $
                                theta_range = theta_range)
                  ktt[*,*,it] = rtp.data
               endfor
@@ -232,8 +245,8 @@ STOP
                          data_name+'-ktt'+plane_string
               aspect_ratio = (rtp.r_vals[nk-1]-rtp.r_vals[0])/ $
                              (rtp.t_vals[n_theta-1]-rtp.t_vals[0])
-              min_value = max(imgplane,/nan)-30
-              max_value = max(imgplane,/nan)
+              min_value = max(imgplane.f,/nan)-30
+              max_value = max(imgplane.f,/nan)
               eppic_xyt_graphics, ktt,rtp.r_vals,rtp.t_vals, $
                                   info, $
                                   aspect_ratio = aspect_ratio, $
@@ -259,7 +272,7 @@ STOP
      endfor            ;;--planes
 
      ;;==Free memory
-     imgplane = !NULL
+     imgplane.f = !NULL
 
   endfor ;;--data_names
 

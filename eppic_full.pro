@@ -50,7 +50,7 @@ pro eppic_full, path=path, $
   ;; timestep = params.nout*(nt_max/(nt-1))*lindgen(nt)
   ;; layout = [3,3]
   ;; timestep = params.nout*[1,nt_max/4,nt_max/2,3*nt_max/4,nt_max-1]
-  timestep = params.nout*[1,nt_max-1]
+  timestep = params.nout*[nt_max/2,nt_max-1]
   nt = n_elements(timestep)
   layout = [1,nt]
   string_time = string(1e3*params.dt*timestep,format='(f8.2)')
@@ -91,7 +91,8 @@ pro eppic_full, path=path, $
 
   ;;==Declare data ranges for spatial data image panels
   ranges = {x:[0,grid.nx-1], $
-            y:[grid.ny/2,grid.ny-1], $
+            ;; y:[grid.ny/2,grid.ny-1], $
+            y:[0,grid.ny-1], $
             z:[0,grid.nz-1]}
   center = {x:grid.nx/2, $
             y:grid.ny/2, $
@@ -165,7 +166,7 @@ pro eppic_full, path=path, $
   eppic_spectral_analysis, info,full_transform=0B,movies=0B
 
   ;;==Create images from spectral data
-  ;; eppic_spectral_analysis, info,full_transform=1B,movies=0B
+  eppic_spectral_analysis, info,full_transform=1B,movies=0B
 
   ;;==Create images from spectral data
   ;; eppic_spectral_analysis, info,/movies

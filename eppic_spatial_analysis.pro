@@ -20,13 +20,6 @@ pro eppic_spatial_analysis, info,movies=movies
         ;;==Read 2-D image data
         if keyword_set(movies) then timestep = lindgen(nt_max) $
         else timestep = info.timestep
-        ;; imgplane = read_ph5_plane(data_name, $
-        ;;                           ext = '.h5', $
-        ;;                           timestep = timestep, $
-        ;;                           plane = info.planes[ip], $
-        ;;                           type = 4, $
-        ;;                           path = expand_path(info.path+path_sep()+'parallel'), $
-        ;;                           /verbose)
         data = read_ph5_plane(data_name, $
                               ext = '.h5', $
                               timestep = timestep, $
@@ -47,17 +40,10 @@ pro eppic_spatial_analysis, info,movies=movies
            imgplane = build_imgplane(data,info, $
                                      plane = info.planes[ip], $
                                      context = 'spatial')
-STOP
+
            ;;==Save string for filenames
            if info.params.ndim_space eq 2 then plane_string = '' $
            else plane_string = '_'+info.planes[ip]
-
-           ;; ;;==Rotate data
-           ;; if info.haskey('rot') then rotate_plane, imgplane, $
-           ;;                                          xdata=pl_ctx.xdata,ydata=pl_ctx.ydata, $
-           ;;                                          xrng=pl_ctx.xrange,yrng=pl_ctx.yrange, $
-           ;;                                          info.rot[info.planes[ip]]/90
-
 
            ;;==Create graphics of densities
            image_string = plane_string
@@ -65,14 +51,14 @@ STOP
               scale = 100
               basename = info.filepath+path_sep()+ $
                          data_name+image_string
-              min_value = -max(abs(scale*imgplane))
-              max_value = +max(abs(scale*imgplane))
+              min_value = -max(abs(scale*imgplane.f))
+              max_value = +max(abs(scale*imgplane.f))
               ;; min_value = -9
               ;; max_value = +9
-              eppic_xyt_graphics, scale*imgplane,xdata,ydata, $
+              eppic_xyt_graphics, scale*imgplane.f,imgplane.x,imgplane.y, $
                                   info, $
-                                  xrng = xrng, $
-                                  yrng = yrng, $
+                                  xrng = imgplane.xr, $
+                                  yrng = imgplane.yr, $
                                   rgb_table = 5, $
                                   min_value = min_value, $
                                   max_value = max_value, $
@@ -86,8 +72,8 @@ STOP
               if strcmp(info.planes[ip],info.perp_to_B) then begin
                  image_string = plane_string
                  basename = info.filepath+path_sep()+'den_rms'+image_string
-                 mean_field_plots, xdata,ydata, $
-                                   scale*imgplane,scale*n0*(1+imgplane), $
+                 mean_field_plots, imgplane.x,imgplane.y, $
+                                   scale*imgplane.f,scale*n0*(1+imgplane.f), $
                                    rms = [0,0,1,1], $
                                    basename = basename
               endif ;;--perp_to_B
@@ -101,14 +87,14 @@ STOP
               ct = get_custom_ct(1)
               basename = info.filepath+path_sep()+ $
                          data_name+image_string
-              min_value = -max(abs(scale*imgplane[*,*,1:*]))
-              max_value = +max(abs(scale*imgplane[*,*,1:*]))
+              min_value = -max(abs(scale*imgplane.f[*,*,1:*]))
+              max_value = +max(abs(scale*imgplane.f[*,*,1:*]))
               ;; min_value = -600
               ;; max_value = +600
-              eppic_xyt_graphics, scale*imgplane,xdata,ydata, $
+              eppic_xyt_graphics, scale*imgplane.f,imgplane.x,imgplane.y, $
                                   info, $
-                                  xrng = xrng, $
-                                  yrng = yrng, $
+                                  xrng = imgplane.xr, $
+                                  yrng = imgplane.yr, $
                                   rgb_table = 70, $
                                   min_value = min_value, $
                                   max_value = max_value, $
@@ -120,12 +106,12 @@ STOP
                                   movie = keyword_set(movies)
 
               ;;==Calculate E-field components
-              Ex = fltarr(size(imgplane,/dim))
-              Ey = fltarr(size(imgplane,/dim))
+              Ex = fltarr(size(imgplane.f,/dim))
+              Ey = fltarr(size(imgplane.f,/dim))
               for it=0,nt-1 do begin
-                 gradf = gradient(imgplane[*,*,it], $
-                                  dx = dx*info.params.nout_avg, $
-                                  dy = dy*info.params.nout_avg)
+                 gradf = gradient(imgplane.f[*,*,it], $
+                                  dx = imgplane.dx*info.params.nout_avg, $
+                                  dy = imgplane.dy*info.params.nout_avg)
                  Ex[*,*,it] = -1.0*gradf.x
                  Ey[*,*,it] = -1.0*gradf.y
               endfor              
@@ -139,8 +125,8 @@ STOP
                  field_string = '-P'
                  add_E0 = strcmp(field_types[ii],'full')
                  if add_E0 then begin
-                    Ex += E0[0]
-                    Ey += E0[1]
+                    Ex += imgplane.E0[0]
+                    Ey += imgplane.E0[1]
                     field_string = '-F'
                  endif
 
@@ -167,10 +153,10 @@ STOP
                  max_value = +max(abs(scale*Ex[*,*,1:*]))
                  ;; min_value = -24
                  ;; max_value = +24
-                 eppic_xyt_graphics, scale*Ex,xdata,ydata, $
+                 eppic_xyt_graphics, scale*Ex,imgplane.x,imgplane.y, $
                                      info, $
-                                     xrng = xrng, $
-                                     yrng = yrng, $
+                                     xrng = imgplane.xr, $
+                                     yrng = imgplane.yr, $
                                      rgb_table = 70, $
                                      min_value = min_value, $
                                      max_value = max_value, $
@@ -187,10 +173,10 @@ STOP
                  max_value = +max(abs(scale*Ey[*,*,1:*]))
                  ;; min_value = -24
                  ;; max_value = +24
-                 eppic_xyt_graphics, scale*Ey,xdata,ydata, $
+                 eppic_xyt_graphics, scale*Ey,imgplane.x,imgplane.y, $
                                      info, $
-                                     xrng = xrng, $
-                                     yrng = yrng, $
+                                     xrng = imgplane.xr, $
+                                     yrng = imgplane.yr, $
                                      rgb_table = 70, $
                                      min_value = min_value, $
                                      max_value = max_value, $
@@ -206,10 +192,10 @@ STOP
                  min_value = 0
                  ;; max_value = max(scale*Er[*,*,1:*])
                  max_value = 24
-                 eppic_xyt_graphics, scale*Er,xdata,ydata, $
+                 eppic_xyt_graphics, scale*Er,imgplane.x,imgplane.y, $
                                      info, $
-                                     xrng = xrng, $
-                                     yrng = yrng, $
+                                     xrng = imgplane.xr, $
+                                     yrng = imgplane.yr, $
                                      rgb_table = 3, $
                                      min_value = min_value, $
                                      max_value = max_value, $
@@ -225,10 +211,10 @@ STOP
                  ct = get_custom_ct(2)
                  min_value = -!pi
                  max_value = +!pi
-                 eppic_xyt_graphics, Et,xdata,ydata, $
+                 eppic_xyt_graphics, Et,imgplane.x,imgplane.y, $
                                      info, $
-                                     xrng = xrng, $
-                                     yrng = yrng, $
+                                     xrng = imgplane.xr, $
+                                     yrng = imgplane.yr, $
                                      rgb_table = [[ct.r],[ct.g],[ct.b]], $
                                      min_value = min_value, $
                                      max_value = max_value, $
@@ -246,7 +232,7 @@ STOP
                        image_string = plane_string
                        basename = info.filepath+path_sep()+ $
                                   'efield_means'+field_string+image_string
-                       mean_field_plots, xdata,ydata, $
+                       mean_field_plots, imgplane.x,imgplane.y, $
                                          scale*Ex,scale*Ey, $
                                          basename=basename
                     endif ;;--perp_to_B
