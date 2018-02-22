@@ -1,4 +1,7 @@
-function build_imgplane, fdata,info,plane=plane,context=context
+function build_imgplane, fdata,info, $
+                         plane=plane, $
+                         context=context, $
+                         using_spatial_data=using_spatial_data
 
   dsize = size(fdata)
   n_dims = dsize[0]
@@ -72,8 +75,14 @@ function build_imgplane, fdata,info,plane=plane,context=context
         ydata = dif[1]*findgen(len[1])
      end
      1: begin
-        xdata = (2*!pi/(dif[0]*len[0]))*(findgen(len[0])-0.5*len[0])
-        ydata = (2*!pi/(dif[1]*len[1]))*(findgen(len[1])-0.5*len[1])
+        if using_spatial_data then begin
+           xdata = (2*!pi/(dif[0]*len[0]))*(findgen(len[0])-0.5*len[0])
+           ydata = (2*!pi/(dif[1]*len[1]))*(findgen(len[1])-0.5*len[1])
+        endif else begin
+           len *= info.params.nout_avg
+           xdata = (2*!pi/(dif[0]*len[0]))*(findgen(len[0])-0.5*len[0])
+           ydata = (2*!pi/(dif[1]*len[1]))*(findgen(len[1])-0.5*len[1])
+        endelse           
      end
   endcase
 
