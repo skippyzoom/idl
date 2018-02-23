@@ -18,8 +18,10 @@ pro eppic_spatial_analysis, info,movies=movies
      for ip=0,n_elements(info.planes)-1 do begin
 
         ;;==Read 2-D image data
-        if keyword_set(movies) then timestep = lindgen(nt_max) $
-        else timestep = info.timestep
+        if keyword_set(movies) then $
+           timestep = lindgen(info.nt_max) $
+        else $
+           timestep = info.timestep
         data = read_ph5_plane(data_name, $
                               ext = '.h5', $
                               timestep = timestep, $

@@ -136,8 +136,8 @@ pro eppic_full, path=path, $
                                 ;-----------------------------;
 
   ;;==Choose EPPIC spectral output quantities to analyze
-  data_names = list('denft0','denft1')
-  ;; data_names = list('denft0')
+  data_names = list('den0','den1')
+  force_spatial_data = 1B
 
   ;;==Declare panel positions for spectral data
   position = multi_position(layout[*], $
@@ -163,12 +163,15 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
 
   ;;==Create images from spectral data
-  eppic_spectral_analysis, info,full_transform=0B,movies=0B
+  ;; eppic_spectral_analysis, info, $
+  ;;                          force_spatial_data=force_spatial_data
 
   ;;==Create images from spectral data
-  eppic_spectral_analysis, info,full_transform=1B,movies=0B
+  eppic_spectral_analysis, info, $
+                           force_spatial_data=force_spatial_data, $
+                           /full_transform
 
-  ;;==Create images from spectral data
+  ;;==Create movies from spectral data
   ;; eppic_spectral_analysis, info,/movies
 
 end
