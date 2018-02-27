@@ -50,7 +50,9 @@ pro eppic_full, path=path, $
   ;; timestep = params.nout*(nt_max/(nt-1))*lindgen(nt)
   ;; layout = [3,3]
   ;; timestep = params.nout*[1,nt_max/4,nt_max/2,3*nt_max/4,nt_max-1]
-  timestep = params.nout*[nt_max/2,nt_max-1]
+  ;; timestep = params.nout*[nt_max/2,nt_max-1]
+  tmp_nt_max = 143
+  timestep = params.nout*[tmp_nt_max/2,tmp_nt_max-1]
   nt = n_elements(timestep)
   layout = [1,nt]
   string_time = string(1e3*params.dt*timestep,format='(f8.2)')
@@ -64,8 +66,8 @@ pro eppic_full, path=path, $
   else planes = 'xy'
 
   ;;==Declare the plane perpendicular to B
-  ;; perp_to_B = 'xy'
-  perp_to_B = 'yz'
+  perp_to_B = 'xy'
+  ;; perp_to_B = 'yz'
 
   ;==Build unrotated, untransposed E0 vector
   E0 = dictionary('x',params.Ex0_external, $
@@ -126,7 +128,7 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
 
   ;;==Create images from spatial data
-  ;; eppic_spatial_analysis, info
+  eppic_spatial_analysis, info
 
   ;;==Create movies from spatial data
   ;; eppic_spatial_analysis, info,/movies
@@ -167,11 +169,13 @@ pro eppic_full, path=path, $
   ;;                          force_spatial_data=force_spatial_data
 
   ;;==Create images from spectral data
-  eppic_spectral_analysis, info, $
-                           force_spatial_data=force_spatial_data, $
-                           /full_transform
+  ;; eppic_spectral_analysis, info, $
+  ;;                          force_spatial_data=force_spatial_data, $
+  ;;                          /full_transform
 
   ;;==Create movies from spectral data
   ;; eppic_spectral_analysis, info,/movies
 
+  ;;==Add a newline after each run
+  print, " "
 end

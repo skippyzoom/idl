@@ -50,6 +50,9 @@ pro mean_field_plots, xdata,ydata,Fx,Fy, $
      axes = ['x','y']
      n_axes = n_elements(axes)
 
+     ;;==Set format colors
+     colors = ['k','b','r','g','c','m']
+     
      ;;==Loop over all panels
      for id=0,3 do begin
 
@@ -68,14 +71,14 @@ pro mean_field_plots, xdata,ydata,Fx,Fy, $
 
         ;;==Create plot
         plt = objarr(nt)
-        plt[0] = plot(xdata,gdata[*,0],'k-', $
+        plt[0] = plot(xdata,gdata[*,0],colors[0]+'-', $
                       axis_style = 1, $
                       xstyle = 1, $
                       position = position[*,id], $
                       /buffer, $
                       current = (id gt 0))
         for it=1,nt-1 do $
-           plt[it] = plot(xdata,gdata[*,it],/overplot)
+           plt[it] = plot(xdata,gdata[*,it],colors[it]+'-',/overplot)
 
         ;;==Add legend?
      endfor
