@@ -19,7 +19,7 @@ pro eppic_spatial_analysis, info,movies=movies
 
         ;;==Read 2-D image data
         if keyword_set(movies) then $
-           timestep = lindgen(info.nt_max) $
+           timestep = info.params.nout*lindgen(info.nt_max) $
         else $
            timestep = info.timestep
         data = read_ph5_plane(data_name, $
@@ -71,15 +71,17 @@ pro eppic_spatial_analysis, info,movies=movies
                                   rescale = 0.8, $
                                   movie = keyword_set(movies)
 
-              if strcmp(info.planes[ip],info.perp_to_B) then begin
-                 image_string = plane_string
-                 basename = info.filepath+path_sep()+'den_rms'+image_string
-                 mean_field_plots, imgplane.x,imgplane.y, $
-                                   scale*imgplane.f,scale*n0*(1+imgplane.f), $
-                                   info, $
-                                   rms = [0,0,1,1], $
-                                   basename = basename
-              endif ;;--perp_to_B
+              if ~keyword_set(movies) then begin
+                 if strcmp(info.planes[ip],info.perp_to_B) then begin
+                    image_string = plane_string
+                    basename = info.filepath+path_sep()+'den_rms'+image_string
+                    mean_field_plots, imgplane.x,imgplane.y, $
+                                      scale*imgplane.f,scale*n0*(1+imgplane.f), $
+                                      info, $
+                                      rms = [0,0,1,1], $
+                                      basename = basename
+                 endif ;;--perp_to_B
+              endif    ;;--(not)movies
            endif
 
            if strcmp(data_name,'phi') then begin
@@ -240,9 +242,13 @@ pro eppic_spatial_analysis, info,movies=movies
                                          info, $
                                          basename=basename
                     endif ;;--perp_to_B
-                 endif    ;;--movies
+                 endif    ;;--(not)movies
               endfor      ;;--field_types
            endif          ;;--phi           
+
+           ;;==Free memory
+           imgplane = !NULL
+
         endif $           ;;--n_dims
         else begin
            print, "[EPPIC_SPATIAL_ANALYSIS] Could not create an image."
@@ -250,9 +256,6 @@ pro eppic_spatial_analysis, info,movies=movies
            print, "                         plane = ",info.planes[ip]
         endelse
      endfor            ;;--planes
-
-     ;;==Free memory
-     imgplane = !NULL
 
   endfor ;;--data_names
 

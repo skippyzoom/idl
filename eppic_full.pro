@@ -83,8 +83,8 @@ pro eppic_full, path=path, $
   ;;                  'yz',0)
 
   ;;==Choose EPPIC spatial output quantities to analyze
-  data_names = list('phi','den0','den1')
-  ;; data_names = list('den0')
+  ;; data_names = list('phi','den0','den1')
+  data_names = list('den1')
 
   ;;==Declare panel positions for spatial data
   position = multi_position(layout[*], $
@@ -128,17 +128,17 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
 
   ;;==Create images from spatial data
-  eppic_spatial_analysis, info
+  ;; eppic_spatial_analysis, info
 
   ;;==Create movies from spatial data
-  ;; eppic_spatial_analysis, info,/movies
+  eppic_spatial_analysis, info,/movies
 
                                 ;-----------------------------;
                                 ; 2-D images of spectral data ;
                                 ;-----------------------------;
 
   ;;==Choose EPPIC spectral output quantities to analyze
-  data_names = list('den0','den1')
+  ;; data_names = list('den0','den1')
   force_spatial_data = 1B
 
   ;;==Declare panel positions for spectral data
@@ -169,12 +169,13 @@ pro eppic_full, path=path, $
   ;;                          force_spatial_data=force_spatial_data
 
   ;;==Create images from spectral data
-  ;; eppic_spectral_analysis, info, $
-  ;;                          force_spatial_data=force_spatial_data, $
-  ;;                          /full_transform
+  eppic_spectral_analysis, info, $
+                           force_spatial_data=force_spatial_data, $
+                           /full_transform
 
   ;;==Create movies from spectral data
-  ;; eppic_spectral_analysis, info,/movies
+  eppic_spectral_analysis, info, $
+                           /movies
 
   ;;==Add a newline after each run
   print, " "

@@ -17,40 +17,12 @@ pro eppic_spectral_analysis, info, $
 
         ;;==Read 2-D image data
         if keyword_set(movies) || keyword_set(full_transform) then $
-           timestep = lindgen(info.nt_max) $
+           timestep = info.params.nout*lindgen(info.nt_max) $
         else $
            timestep = info.timestep
 
-        ;; if ~keyword_set(force_spatial_data) then $
-        ;;    data = read_ph5_plane(data_name, $
-        ;;                          ext = '.h5', $
-        ;;                          timestep = timestep, $
-        ;;                          plane = info.planes[ip], $
-        ;;                          type = 6, $
-        ;;                          /eppic_ft_data, $
-        ;;                          path = expand_path(info.path+path_sep()+'parallel'), $
-        ;;                          /verbose)
-
-        ;; ;;==Check successful read
-        ;; using_spatial_data = 0B
-        ;; if size(data,/n_dim) eq 0 then begin
-
-        ;;    ;;==Extract the name of the non-FT quantity
-        ;;    pos = strpos(data_name,'ft')
-        ;;    data_name = strmid(data_name,0,pos)+strmid(data_name,pos+2)
-
-        ;;    data = read_ph5_plane(data_name, $
-        ;;                          ext = '.h5', $
-        ;;                          timestep = timestep, $
-        ;;                          plane = info.planes[ip], $
-        ;;                          type = 4, $
-        ;;                          path = expand_path(info.path+path_sep()+'parallel'), $
-        ;;                          /verbose)
-
-        ;;    ;;==Check successful read
-        ;;    using_spatial_data = (size(data,/n_dim) ne 0) ? 1B : 0B
-
-        ;; endif
+        ;;==Initialize spatial-data boolean
+        using_spatial_data = 0B
 
         if keyword_set(force_spatial_data) then begin
 
@@ -87,7 +59,6 @@ pro eppic_spectral_analysis, info, $
                                  /verbose)
 
            ;;==Check successful read
-           using_spatial_data = 0B
            if size(data,/n_dim) eq 0 then begin
 
               ;;==Restore the name of the non-FT quantity
@@ -106,7 +77,6 @@ pro eppic_spectral_analysis, info, $
            endif
         endelse
 
-STOP                            ; PROBLEM WITH FT DATA??
         ;;==Check dimensions
         imgsize = size(data)
         n_dims = imgsize[0]
@@ -124,11 +94,15 @@ STOP                            ; PROBLEM WITH FT DATA??
            ;;==Save string for filenames
            if info.params.ndim_space eq 2 then plane_string = '' $
            else plane_string = '_'+info.planes[ip]
-if keyword_set(full_transform) then STOP
+
            ;;==Transform spatial data at each time step
            if using_spatial_data then begin
               for it=0,nt-1 do begin
-                 imgplane.f[*,*,it] = fft(imgplane.f[*,*,it],/overwrite)
+                 tmp = imgplane.f
+                 tmp[*,*,it] = fft(tmp[*,*,it],/overwrite)
+                 imgplane.f = tmp
+                 tmp = !NULL
+                 ;; imgplane.f[*,*,it] = fft(imgplane.f[*,*,it],/overwrite)
               endfor              
               data_name += 'fft'
            endif
@@ -139,7 +113,7 @@ if keyword_set(full_transform) then STOP
               img_size = size(imgplane.f)
               ny = img_size[2]
               nx = img_size[1]
-STOP
+
               ;;==Transform the time dimension
               nw = next_power2(nt)
               tmp = make_array(nx,ny,nw,type=6,value=0.0)
@@ -147,14 +121,12 @@ STOP
               tmp = fft(tmp,dim=3)
               imgplane.f = tmp
               tmp = !NULL
-STOP
+
               ;;==Set up data
               ;;--Extract the real part
               imgplane.f = real_part(imgplane.f)^2
-STOP
               ;;--Recenter
               imgplane.f = shift(imgplane.f,nx/2,ny/2,nw/2)
-STOP
               ;;--Zero the near-DC components (crude high-pass filter)
               dc_width = 8
               tmp = imgplane.f
@@ -162,22 +134,18 @@ STOP
                   ny/2-dc_width:ny/2+dc_width,*] = 0.0
               imgplane.f = tmp
               tmp = !NULL
-STOP
               ;;--Smooth
               imgplane.f = smooth(imgplane.f,[5,5,1],/edge_wrap)
-STOP
               ;;--Normalize
               imgplane.f = imgplane.f/max(imgplane.f)
-STOP
               ;;--Convert to dB
               imgplane.f = 10*alog10(imgplane.f)
-STOP
               ;;--Set non-finite values to a finite 'missing' value
               tmp = imgplane.f
               tmp[where(finite(imgplane.f) eq 0)] = -1e10
               imgplane.f = tmp
               tmp = !NULL
-STOP
+
               ;;==Interpolate
               theta_range = [0,360]
               rtp = xyz_rtp(imgplane.f[*,*,0],dx=imgplane.dx,dy=imgplane.dy, $
@@ -205,7 +173,6 @@ STOP
               ;; aspect_ratio *= 1.2
               basename = info.filepath+path_sep()+ $
                          data_name+'-ktw'+plane_string
-STOP, "KTW"
               eppic_ktw_graphics, ktw,rtp,info, $
                                   lambda = [3.0,4.0,10.0], $
                                   yrange = vp_range, $
@@ -226,7 +193,6 @@ STOP, "KTW"
               w_range = 0.5*[-max_abs_nu,+max_abs_nu]
               aspect_ratio = (k_range[1]-k_range[0])/ $
                              (w_range[1]-w_range[0])
-STOP, "XYW"
               eppic_xyw_graphics, imgplane.f,imgplane.x,imgplane.y, $
                                   w_vals, $
                                   info, $
@@ -334,6 +300,9 @@ STOP, "XYW"
 
            endelse
 
+           ;;==Free memory
+           imgplane.f = !NULL
+
         endif $           ;;--n_dims
         else begin
            print, "[EPPIC_SPECTRAL_ANALYSIS] Could not create an image."
@@ -341,9 +310,6 @@ STOP, "XYW"
            print, "                          plane = ",info.planes[ip]
         endelse
      endfor            ;;--planes
-
-     ;;==Free memory
-     imgplane.f = !NULL
 
   endfor ;;--data_names
 
