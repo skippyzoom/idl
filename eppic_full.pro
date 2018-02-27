@@ -52,7 +52,7 @@ pro eppic_full, path=path, $
   ;; timestep = params.nout*[1,nt_max/4,nt_max/2,3*nt_max/4,nt_max-1]
   ;; timestep = params.nout*[nt_max/2,nt_max-1]
   tmp_nt_max = 143
-  timestep = params.nout*[tmp_nt_max/2,tmp_nt_max-1]
+  timestep = params.nout*[0,tmp_nt_max/2,tmp_nt_max-1]
   nt = n_elements(timestep)
   layout = [1,nt]
   string_time = string(1e3*params.dt*timestep,format='(f8.2)')

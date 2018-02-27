@@ -8,6 +8,7 @@
 ; This routine is based on plot_efield_means.pro
 ;-
 pro mean_field_plots, xdata,ydata,Fx,Fy, $
+                      info, $
                       rms_=rms_, $
                       basename=basename
 
@@ -75,6 +76,7 @@ pro mean_field_plots, xdata,ydata,Fx,Fy, $
                       axis_style = 1, $
                       xstyle = 1, $
                       position = position[*,id], $
+                      font_name = info.font_name, $
                       /buffer, $
                       current = (id gt 0))
         for it=1,nt-1 do $
@@ -82,6 +84,13 @@ pro mean_field_plots, xdata,ydata,Fx,Fy, $
 
         ;;==Add legend?
      endfor
+
+     ;;==Add path label
+     txt = text(0.00,0.03,info.path, $
+                alignment = 0.0, $
+                target = plt, $
+                font_name = info.font_name, $
+                font_size = 5.0)
 
      ;;==Save plot
      image_save, plt[0],filename=basename+'.pdf',/landscape

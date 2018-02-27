@@ -76,6 +76,7 @@ pro eppic_spatial_analysis, info,movies=movies
                  basename = info.filepath+path_sep()+'den_rms'+image_string
                  mean_field_plots, imgplane.x,imgplane.y, $
                                    scale*imgplane.f,scale*n0*(1+imgplane.f), $
+                                   info, $
                                    rms = [0,0,1,1], $
                                    basename = basename
               endif ;;--perp_to_B
@@ -236,6 +237,7 @@ pro eppic_spatial_analysis, info,movies=movies
                                   'efield_means'+field_string+image_string
                        mean_field_plots, imgplane.x,imgplane.y, $
                                          scale*Ex,scale*Ey, $
+                                         info, $
                                          basename=basename
                     endif ;;--perp_to_B
                  endif    ;;--movies
