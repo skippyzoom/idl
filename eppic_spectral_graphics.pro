@@ -17,7 +17,7 @@ pro eppic_spectral_graphics, imgplane,info
         imgplane.f = tmp
         tmp = !NULL
      endfor              
-     info.current_name += 'fft'
+     info.image_name += 'fft'
   endif
 
   if info.full_transform then begin
@@ -85,7 +85,7 @@ pro eppic_spectral_graphics, imgplane,info
                     (vp_range[1]-vp_range[0])
      ;; aspect_ratio *= 1.2
      basename = info.filepath+path_sep()+ $
-                info.current_name+'-ktw'+info.plane_string
+                info.image_name+'-ktw'+info.plane_string
      eppic_ktw_graphics, ktw,rtp,info, $
                          lambda = [3.0,4.0,10.0], $
                          yrange = vp_range, $
@@ -98,7 +98,7 @@ pro eppic_spectral_graphics, imgplane,info
 
      ;;==Create images of Fourier-transformed data
      basename = info.filepath+path_sep()+ $
-                info.current_name+'_w'+info.plane_string
+                info.image_name+'_w'+info.plane_string
      min_value = max(imgplane.f,/nan)-30
      max_value = max(imgplane.f,/nan)
      k_range = [0,2*!pi]
@@ -157,7 +157,7 @@ pro eppic_spectral_graphics, imgplane,info
 
      ;;==Create images of Fourier-transformed data
      basename = info.filepath+path_sep()+ $
-                info.current_name+'_t'+info.plane_string
+                info.image_name+'_t'+info.plane_string
      min_value = max(imgplane.f,/nan)-30
      max_value = max(imgplane.f,/nan)
      eppic_xyt_graphics, imgplane.f,imgplane.x,imgplane.y, $
@@ -193,7 +193,7 @@ pro eppic_spectral_graphics, imgplane,info
 
      ;;==Create images of interpolated data
      basename = info.filepath+path_sep()+ $
-                info.current_name+'-ktt'+info.plane_string
+                info.image_name+'-ktt'+info.plane_string
      aspect_ratio = (rtp.r_vals[nk-1]-rtp.r_vals[0])/ $
                     (rtp.t_vals[n_theta-1]-rtp.t_vals[0])
      min_value = max(imgplane.f,/nan)-30

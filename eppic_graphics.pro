@@ -43,22 +43,20 @@ pro eppic_graphics, info
                               eppic_ft_data = rctx.ft, $
                               path = info.datapath, $
                               /verbose)
+        info['image_name'] = rctx.name
+        rctx = !NULL
 
         ;;==Check dimensions
         if size(data,/n_dim) eq 3 then begin
 
-           ;;==Set up 2-D auxiliary data
-           ;; imgplane = build_imgplane(data,info, $
-           ;;                           plane = info.planes[ip], $
-           ;;                           context = data_context, $
-           ;;                           using_spatial_data = using_spatial_data)
+           ;;==Manipulate image data and set up auxiliary data
            axis_scale = strcmp(info.data_context,'spatial') ? $
                         1 : info.params.nout_avg
            imgplane = build_imgplane(data,info, $
                                      plane = info.planes[ip], $
                                      context = data_context, $
                                      axis_scale = axis_scale)
-STOP
+
            ;;==Save string for filenames
            if info.params.ndim_space eq 2 then $
               info['plane_string'] = '' $
