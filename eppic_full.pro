@@ -17,7 +17,7 @@ pro eppic_full, path=path, $
   ;;==Open a log file
   if keyword_set(log) then begin
      if isa(log,/number) then log = 'eppic_full.log'
-     openw, wlun,path+log,/get_lun
+     openw, wlun,path+path_sep()+log,/get_lun
   endif $
   else wlun = -1
 
@@ -183,7 +183,7 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
   info['dc_width'] = 8
   info['missing'] = -1e10
-  ;; info['data_context'] = 'spectral'
+  info['data_context'] = 'spectral'
   info['graphics_context'] = 'spectral'
   info['full_transform'] = 0B
   ;; info['force_spatial_data'] = 0B
