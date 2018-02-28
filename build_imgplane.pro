@@ -1,7 +1,14 @@
+;+
+; Extract a plane of simulation data (trivial for 2-D
+; simulation runs) to pass to imaging routines, and
+; construct other appropriate quantities such as image
+; axes. The resulting array will have (2+1)D in space 
+; and time.
+;-
 function build_imgplane, fdata,info, $
                          plane=plane, $
                          context=context, $
-                         using_spatial_data=using_spatial_data
+                         axis_scale=axis_scale
 
   dsize = size(fdata)
   n_dims = dsize[0]
@@ -9,8 +16,6 @@ function build_imgplane, fdata,info, $
 
   if n_elements(info) eq 0 then $ ;-->Consider making this function independent of info
      message, "[BUILD_IMGPLANE] Please supply info dictionary."
-  if n_dims ne 3 then $         ;-->Eventually want to handle (3+1)-D data
-     message, "[BUILD_IMGPLANE] Currently only supports (2+1)-D data."
 
   ;;==Defaults and guards
   if n_elements(plane) eq 0 then plane = 'xy'
@@ -29,10 +34,10 @@ function build_imgplane, fdata,info, $
 
   ;;==Alert user to context error and set default
   if context_error then begin
-     print, "[BUILD_PLANE_CONTEXT] Currently supported contexts:"
-     print, "                      0 or 'spatial' (default)"
-     print, "                      1 or 'spectral'"
-     print, "                      Using default."
+     print, "[BUILD_IMGPLANE] Currently supported contexts:"
+     print, "                 0 or 'spatial' (default)"
+     print, "                 1 or 'spectral'"
+     print, "                 Using default."
      context = 0
   endif
 
@@ -44,19 +49,19 @@ function build_imgplane, fdata,info, $
   ;;==Build context
   case 1B of 
      strcmp(plane,'xy') || strcmp(plane,'yx'): begin
-        len = [info.grid.nx,info.grid.ny]
+        len = [info.grid.nx,info.grid.ny]*axis_scale
         dif = [info.grid.dx,info.grid.dy]
         rng = [[info.ranges.x],[info.ranges.y]]
         E0 = r_mat ## [info.params.Ex0_external,info.params.Ey0_external]
      end
      strcmp(plane,'xz') || strcmp(plane,'zx'): begin
-        len = [info.grid.nx,info.grid.nz]
+        len = [info.grid.nx,info.grid.nz]*axis_scale
         dif = [info.grid.dx,info.grid.dz]
         rng = [[info.ranges.x],[info.ranges.z]]
         E0 = r_mat ## [info.params.Ex0_external,info.params.Ez0_external]
      end
      strcmp(plane,'yz') || strcmp(plane,'zy'): begin
-        len = [info.grid.ny,info.grid.nz]
+        len = [info.grid.ny,info.grid.nz]*axis_scale
         dif = [info.grid.dy,info.grid.dz]
         rng = [[info.ranges.y],[info.ranges.z]]
         E0 = r_mat ## [info.params.Ey0_external,info.params.Ez0_external]
@@ -75,11 +80,10 @@ function build_imgplane, fdata,info, $
         ydata = dif[1]*findgen(len[1])
      end
      1: begin
-        if using_spatial_data then begin
+        if strcmp(info.data_context,'spatial') then begin
            xdata = (2*!pi/(dif[0]*len[0]))*(findgen(len[0])-0.5*len[0])
            ydata = (2*!pi/(dif[1]*len[1]))*(findgen(len[1])-0.5*len[1])
         endif else begin
-           len *= info.params.nout_avg
            xdata = (2*!pi/(dif[0]*len[0]))*(findgen(len[0])-0.5*len[0])
            ydata = (2*!pi/(dif[1]*len[1]))*(findgen(len[1])-0.5*len[1])
         endelse           

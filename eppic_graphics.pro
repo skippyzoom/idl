@@ -9,8 +9,6 @@ pro eppic_graphics, info
 
   ;;==Set data context (spatial or spectral)
   data_context = info.data_context
-  ;; if info.force_spatial_data then info.data_context = 'spatial'
-  ;; if info.force_spectral_data then info.data_context = 'spectral'  
 
   ;;==Loop over requested data quantities
   for id=0,n_elements(info.data_names)-1 do begin
@@ -36,25 +34,6 @@ pro eppic_graphics, info
            timestep = info.timestep
 
         ;;==Read 2-D image data
-        ;; if info.force_spectral_data || strcmp(info.data_context,'spectral') then begin
-        ;;    data_name_in = data_name
-        ;;    last_char = strmid(data_name,0,1,/reverse_offset)
-        ;;    !NULL = where(strcmp(last_char,strcompress(sindgen(10),/remove_all)),count)
-        ;;    if count eq 1 then $
-        ;;       data_name = strmid(data_name,0,strlen(data_name)-1)+'ft'+last_char $
-        ;;    else $
-        ;;       data_name = data_name+'ft'
-        ;;    data_type = 6
-        ;; endif $
-        ;; else data_type = 4
-        ;; data = read_ph5_plane(data_name, $
-        ;;                       ext = '.h5', $
-        ;;                       timestep = timestep, $
-        ;;                       plane = info.planes[ip], $
-        ;;                       type = data_type, $
-        ;;                       eppic_ft_data = strcmp(info.data_context,'spectral'), $
-        ;;                       path = expand_path(info.path+path_sep()+'parallel'), $
-        ;;                       /verbose)
         rctx = build_read_context(info)
         data = read_ph5_plane(rctx.name, $
                               ext = '.h5', $
@@ -66,17 +45,20 @@ pro eppic_graphics, info
                               /verbose)
 
         ;;==Check dimensions
-        ;; imgsize = size(data)
-        ;; n_dims = imgsize[0]
-        ;; if n_dims eq 3 then begin
         if size(data,/n_dim) eq 3 then begin
 
            ;;==Set up 2-D auxiliary data
+           ;; imgplane = build_imgplane(data,info, $
+           ;;                           plane = info.planes[ip], $
+           ;;                           context = data_context, $
+           ;;                           using_spatial_data = using_spatial_data)
+           axis_scale = strcmp(info.data_context,'spatial') ? $
+                        1 : info.params.nout_avg
            imgplane = build_imgplane(data,info, $
                                      plane = info.planes[ip], $
                                      context = data_context, $
-                                     using_spatial_data = using_spatial_data)
-
+                                     axis_scale = axis_scale)
+STOP
            ;;==Save string for filenames
            if info.params.ndim_space eq 2 then $
               info['plane_string'] = '' $

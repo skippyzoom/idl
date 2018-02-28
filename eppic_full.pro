@@ -183,9 +183,9 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
   info['dc_width'] = 8
   info['missing'] = -1e10
-  info['data_context'] = 'spectral'
+  ;; info['data_context'] = 'spectral'
   info['graphics_context'] = 'spectral'
-  info['full_transform'] = 1B
+  info['full_transform'] = 0B
   ;; info['force_spatial_data'] = 0B
   ;; info['force_spectral_data'] = 0B
 
