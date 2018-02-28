@@ -3,13 +3,12 @@
 ; and close the file. This function will first check if the data
 ; set exists and exit gracefully if it doesn't.
 ;-
-function get_h5_data, fileName,dataName
+function get_h5_data, filename,dataname
 
-  allFields = h5_parse(fileName)
-  available = string_exists(tag_names(allFields),dataName,/fold_case)
+  available = string_exists(tag_names(h5_parse(filename)),dataname,/fold_case)
   if available then begin
-     fileID = h5f_open(fileName)
-     dataID = h5d_open(fileID,dataName)
+     fileID = h5f_open(filename)
+     dataID = h5d_open(fileID,dataname)
      data = h5d_read(dataID)
      h5d_close, dataID
      h5f_close, fileID
