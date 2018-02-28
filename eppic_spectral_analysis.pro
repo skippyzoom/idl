@@ -252,7 +252,8 @@ pro eppic_spectral_analysis, info, $
                                   xrng = imgplane.xr, $
                                   yrng = imgplane.yr, $
                                   xrange = [-2*!pi,2*!pi], $
-                                  yrange = [0,2*!pi], $
+                                  ;; yrange = [0,2*!pi], $
+                                  yrange = [-2*!pi,2*!pi], $
                                   rgb_table = 39, $
                                   min_value = min_value, $
                                   max_value = max_value, $

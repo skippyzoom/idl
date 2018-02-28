@@ -7,14 +7,22 @@
 ; Created on 18Dec2017 (may)
 ;-
 pro eppic_full, path=path, $
-                directory=directory
+                directory=directory, $
+                log=log
 
   ;;==Navigate to working directory
   if n_elements(path) eq 0 then path = './'
   cd, path
 
+  ;;==Open a log file
+  if keyword_set(log) then begin
+     if isa(log,/number) then log = 'eppic_full.log'
+     openw, wlun,path+log,/get_lun
+  endif $
+  else wlun = -1
+
   ;;==Echo working directory
-  print, "[EPPIC_FULL] In ",path
+  printf, wlun,"[EPPIC_FULL] In ",path
 
   ;;==Set up global graphics options
   font_name = 'Times'
@@ -105,6 +113,7 @@ pro eppic_full, path=path, $
 
   ;;==Build info dictionary
   info = dictionary()
+  info['wlun'] = wlun
   info['ranges'] = ranges
   info['center'] = center
   info['vectors'] = vectors
@@ -126,12 +135,18 @@ pro eppic_full, path=path, $
   info['nt_max'] = nt_max
   info['title'] = string_time
   info['data_names'] = data_names
+  info['data_context'] = 'spatial'
+  info['graphics_context'] = 'spatial'
+  info['movies'] = 0B
 
   ;;==Create images from spatial data
   ;; eppic_spatial_analysis, info
 
   ;;==Create movies from spatial data
-  eppic_spatial_analysis, info,/movies
+  ;; eppic_spatial_analysis, info,/movies
+
+  ;; ;;-->DEV
+  ;; eppic_graphics, info
 
                                 ;-----------------------------;
                                 ; 2-D images of spectral data ;
@@ -163,20 +178,39 @@ pro eppic_full, path=path, $
   info['vectors'] = vectors
   info['position'] = position
   info['data_names'] = data_names
+  info['dc_width'] = 8
+  info['missing'] = -1e10
+  info['graphics_context'] = 'spectral'
+  info['full_transform'] = 1B
+  info['force_spatial_data'] = 0B
+  info['force_spectral_data'] = 0B
+
+  ;;-->DEV
+  eppic_graphics, info
 
   ;;==Create images from spectral data
   ;; eppic_spectral_analysis, info, $
   ;;                          force_spatial_data=force_spatial_data
 
   ;;==Create images from spectral data
-  eppic_spectral_analysis, info, $
-                           force_spatial_data=force_spatial_data, $
-                           /full_transform
+  ;; eppic_spectral_analysis, info, $
+  ;;                          force_spatial_data=force_spatial_data, $
+  ;;                          /full_transform
 
   ;;==Create movies from spectral data
-  eppic_spectral_analysis, info, $
-                           /movies
+  ;; eppic_spectral_analysis, info, $
+  ;;                          /movies
+
+  ;;==Print closing message
+  printf, wlun,"[EPPIC_FULL] Finished"
 
   ;;==Add a newline after each run
-  print, " "
+  printf, wlun," "
+
+  ;;==Close log file
+  if keyword_set(log) then begin
+     close, wlun
+     free_lun, wlun
+  endif
+
 end
