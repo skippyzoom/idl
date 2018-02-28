@@ -130,12 +130,15 @@ pro eppic_full, path=path, $
   info['axis_style'] = 2
   info['path'] = path
   info['filepath'] = filepath
+  info['datapath'] = expand_path(info.path+path_sep()+'parallel')
+  info['datatest'] = 'parallel000000.h5'
   info['planes'] = planes
   info['timestep'] = timestep
   info['nt_max'] = nt_max
   info['title'] = string_time
   info['data_names'] = data_names
   info['data_context'] = 'spatial'
+  info['flexible_data'] = 1B
   info['graphics_context'] = 'spatial'
   info['movies'] = 0B
 
@@ -180,10 +183,11 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
   info['dc_width'] = 8
   info['missing'] = -1e10
+  info['data_context'] = 'spectral'
   info['graphics_context'] = 'spectral'
   info['full_transform'] = 1B
-  info['force_spatial_data'] = 0B
-  info['force_spectral_data'] = 0B
+  ;; info['force_spatial_data'] = 0B
+  ;; info['force_spectral_data'] = 0B
 
   ;;-->DEV
   eppic_graphics, info

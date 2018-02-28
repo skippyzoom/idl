@@ -5,23 +5,12 @@
 ; a value for each member (i.e., some higher routine has
 ; set defaults). 
 ;-
-;; pro eppic_graphics, info, $
-;;                     movies=movies, $
-;;                     full_transform=full_transform, $
-;;                     force_spatial_data=force_spatial_data, $
-;;                     force_spectral_data=force_spectral_data
 pro eppic_graphics, info
-
-  ;;==Store keywords in info
-  ;; info['movies'] = keyword_set(movies)
-  ;; info['full_transform'] = keyword_set(full_transform)
 
   ;;==Set data context (spatial or spectral)
   data_context = info.data_context
-  ;; if keyword_set(force_spatial_data) then info.data_context = 'spatial'
-  ;; if keyword_set(force_spectral_data) then info.data_context = 'spectral'  
-  if info.force_spatial_data then info.data_context = 'spatial'
-  if info.force_spectral_data then info.data_context = 'spectral'  
+  ;; if info.force_spatial_data then info.data_context = 'spatial'
+  ;; if info.force_spectral_data then info.data_context = 'spectral'  
 
   ;;==Loop over requested data quantities
   for id=0,n_elements(info.data_names)-1 do begin
@@ -41,38 +30,40 @@ pro eppic_graphics, info
      for ip=0,n_elements(info.planes)-1 do begin
 
         ;;==Determine which time steps to read
-        ;; if keyword_set(movies) || keyword_set(full_transform) then $
         if info.movies || info.full_transform then $
            timestep = info.params.nout*lindgen(info.nt_max) $
         else $
            timestep = info.timestep
 
         ;;==Read 2-D image data
-        ;; if keyword_set(force_spectral_data) || strcmp(data_context,'spectral') then begin
-        if info.force_spectral_data || strcmp(info.data_context,'spectral') then begin
-           data_name_in = data_name
-           last_char = strmid(data_name,0,1,/reverse_offset)
-           !NULL = where(strcmp(last_char,strcompress(sindgen(10),/remove_all)),count)
-           if count eq 1 then $
-              data_name = strmid(data_name,0,strlen(data_name)-1)+'ft'+last_char $
-           else $
-              data_name = data_name+'ft'
-           data_type = 6
-        endif $
-        else data_type = 4
-STOP
-        data = read_ph5_plane(data_name, $
+        ;; if info.force_spectral_data || strcmp(info.data_context,'spectral') then begin
+        ;;    data_name_in = data_name
+        ;;    last_char = strmid(data_name,0,1,/reverse_offset)
+        ;;    !NULL = where(strcmp(last_char,strcompress(sindgen(10),/remove_all)),count)
+        ;;    if count eq 1 then $
+        ;;       data_name = strmid(data_name,0,strlen(data_name)-1)+'ft'+last_char $
+        ;;    else $
+        ;;       data_name = data_name+'ft'
+        ;;    data_type = 6
+        ;; endif $
+        ;; else data_type = 4
+        ;; data = read_ph5_plane(data_name, $
+        ;;                       ext = '.h5', $
+        ;;                       timestep = timestep, $
+        ;;                       plane = info.planes[ip], $
+        ;;                       type = data_type, $
+        ;;                       eppic_ft_data = strcmp(info.data_context,'spectral'), $
+        ;;                       path = expand_path(info.path+path_sep()+'parallel'), $
+        ;;                       /verbose)
+        rctx = build_read_context(info)
+        data = read_ph5_plane(rctx.name, $
                               ext = '.h5', $
                               timestep = timestep, $
                               plane = info.planes[ip], $
-                              type = data_type, $
-                              eppic_ft_data = strcmp(info.data_context,'spectral'), $
-                              path = expand_path(info.path+path_sep()+'parallel'), $
+                              type = rctx.type, $
+                              eppic_ft_data = rctx.ft, $
+                              path = info.datapath, $
                               /verbose)
-        ;;-->DEV
-        ;;   Implement a smarter algorithm to read spatial data if an
-        ;;   attempt to read spectral data fails, and vice versa. See
-        ;;   eppic_spectral_analysis.pro
 
         ;;==Check dimensions
         ;; imgsize = size(data)

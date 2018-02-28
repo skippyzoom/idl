@@ -1,3 +1,6 @@
+;+
+; Spectral graphics of EPPIC data
+;-
 pro eppic_spectral_graphics, imgplane,info
 
   ;;==Get image sizes
