@@ -204,7 +204,7 @@ pro eppic_spatial_graphics, imgplane,info
 
         ;;==Make plots in the plane perpendicular to B
         if ~keyword_set(movies) then begin
-           if strcmp(info.planes[ip],info.perp_to_B) then begin
+           if strcmp(info.current_plane,info.perp_to_B) then begin
               image_string = info.plane_string
               basename = info.filepath+path_sep()+ $
                          'efield_means'+field_string+image_string

@@ -73,8 +73,8 @@ pro eppic_full, path=path, $
   else planes = 'xy'
 
   ;;==Declare the plane perpendicular to B
-  ;; perp_to_B = 'xy'
-  perp_to_B = 'yz'
+  perp_to_B = 'xy'
+  ;; perp_to_B = 'yz'
 
   ;==Build unrotated, untransposed E0 vector
   E0 = dictionary('x',params.Ex0_external, $
@@ -91,7 +91,7 @@ pro eppic_full, path=path, $
 
   ;;==Choose EPPIC spatial output quantities to analyze
   ;; data_names = list('phi','den0','den1')
-  data_names = list('den1')
+  data_names = list('den1','phi')
 
   ;;==Declare panel positions for spatial data
   position = multi_position(layout[*], $
@@ -101,8 +101,8 @@ pro eppic_full, path=path, $
   ;;==Declare data ranges for spatial data image panels
   ;;  NB: ranges span [x0,xf) rather than [x0,xf-1].
   ranges = {x:[0,grid.nx], $
-            ;; y:[grid.ny/2,grid.ny], $
-            y:[0,grid.ny], $
+            y:[grid.ny/2,grid.ny], $
+            ;; y:[0,grid.ny], $
             z:[0,grid.nz]}
   center = {x:grid.nx/2, $
             y:grid.ny/2, $
