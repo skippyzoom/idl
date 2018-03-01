@@ -184,6 +184,7 @@ pro eppic_full, path=path, $
   info['data_context'] = 'spectral'
   info['graphics_context'] = 'spectral'
   info['full_transform'] = 0B
+  info['fft_smooth'] = 3
 
   ;;-->DEV
   eppic_graphics, info

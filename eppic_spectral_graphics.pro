@@ -40,6 +40,8 @@ pro eppic_spectral_graphics, imgplane,info
      imgplane.f = real_part(imgplane.f)^2
      ;;--Recenter
      imgplane.f = shift(imgplane.f,nx/2,ny/2,nw/2)
+     imgplane.x -= imgplane.dx*nx/2
+     imgplane.y -= imgplane.dy*ny/2
      ;;--Zero the near-DC components (crude high-pass filter)
      dc_width = info.dc_width
      tmp = imgplane.f
@@ -48,7 +50,9 @@ pro eppic_spectral_graphics, imgplane,info
      imgplane.f = tmp
      tmp = !NULL
      ;;--Smooth
-     imgplane.f = smooth(imgplane.f,[5,5,1],/edge_wrap)
+     fft_smooth = info.fft_smooth
+     if fft_smooth gt 1 then $
+        imgplane.f = smooth(imgplane.f,[fft_smooth,fft_smooth,1],/edge_wrap)
      ;;--Normalize
      imgplane.f = imgplane.f/max(imgplane.f)
      ;;--Convert to dB
@@ -134,24 +138,26 @@ pro eppic_spectral_graphics, imgplane,info
      imgplane.f = real_part(imgplane.f)^2
      ;;--Recenter
      imgplane.f = shift(imgplane.f,nx/2,ny/2,0)
+     imgplane.x -= imgplane.dx*nx/2
+     imgplane.y -= imgplane.dy*ny/2
      ;;--Zero the near-DC components (crude high-pass filter)
-     dc_width = 8
+     dc_width = info.dc_width
      tmp = imgplane.f
      tmp[nx/2-dc_width:nx/2+dc_width, $
          ny/2-dc_width:ny/2+dc_width,*] = 0.0
      imgplane.f = tmp
      tmp = !NULL
      ;;--Smooth
-     s_width = 3
-     if s_width gt 1 then $
-        imgplane.f = smooth(imgplane.f,[s_width,s_width,1],/edge_wrap)
+     fft_smooth = info.fft_smooth
+     if fft_smooth gt 1 then $
+        imgplane.f = smooth(imgplane.f,[fft_smooth,fft_smooth,1],/edge_wrap)
      ;;--Normalize
      imgplane.f = imgplane.f/max(imgplane.f)
      ;;--Convert to dB
      imgplane.f = 10*alog10(imgplane.f)
      ;;--Set non-finite values to a finite 'missing' value
      tmp = imgplane.f
-     tmp[where(finite(imgplane.f) eq 0)] = -1e10
+     tmp[where(finite(imgplane.f) eq 0)] = info.missing
      imgplane.f = tmp
      tmp = !NULL
 
