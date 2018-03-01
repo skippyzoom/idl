@@ -100,10 +100,11 @@ pro eppic_full, path=path, $
                             buffer = [0.00,0.10])
 
   ;;==Declare data ranges for spatial data image panels
-  ranges = {x:[0,grid.nx-1], $
-            ;; y:[grid.ny/2,grid.ny-1], $
-            y:[0,grid.ny-1], $
-            z:[0,grid.nz-1]}
+  ;;  NB: ranges span [x0,xf) rather than [x0,xf-1].
+  ranges = {x:[0,grid.nx], $
+            ;; y:[grid.ny/2,grid.ny], $
+            y:[0,grid.ny], $
+            z:[0,grid.nz]}
   center = {x:grid.nx/2, $
             y:grid.ny/2, $
             z:grid.nz/2}
@@ -165,9 +166,6 @@ pro eppic_full, path=path, $
                             buffer = [0.0,0.2])
 
   ;;==Declare data ranges for spectral data
-  ranges = {x:[0,grid.nx*params.nout_avg-1], $
-            y:[0,grid.ny*params.nout_avg-1], $
-            z:[0,grid.nz*params.nout_avg-1]}
   center = {x:0, $
             y:0, $
             z:0}
@@ -186,8 +184,6 @@ pro eppic_full, path=path, $
   info['data_context'] = 'spectral'
   info['graphics_context'] = 'spectral'
   info['full_transform'] = 0B
-  ;; info['force_spatial_data'] = 0B
-  ;; info['force_spectral_data'] = 0B
 
   ;;-->DEV
   eppic_graphics, info

@@ -35,8 +35,8 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
      if n_elements(rgb_table) eq 0 then rgb_table = 0
      if n_elements(min_value) eq 0 then min_value = !NULL
      if n_elements(max_value) eq 0 then max_value = !NULL
-     if n_elements(xrng) eq 0 then xrng = [0,nx-1]
-     if n_elements(yrng) eq 0 then yrng = [0,ny-1]
+     if n_elements(xrng) eq 0 then xrng = [0,nx]
+     if n_elements(yrng) eq 0 then yrng = [0,ny]
      if n_elements(xrange) eq 0 then xrange = !NULL
      if n_elements(yrange) eq 0 then yrange = !NULL
      if n_elements(data_name) eq 0 then data_name = 'data'
@@ -51,11 +51,11 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
      ydata_in = ydata
 
      ;;==Extract axis subsets
-     xdata = xdata[xrng[0]:xrng[1]]
-     ydata = ydata[yrng[0]:yrng[1]]
+     xdata = xdata[xrng[0]:xrng[1]-1]
+     ydata = ydata[yrng[0]:yrng[1]-1]
 
      ;;==Extract subimage
-     gdata = pdata[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
+     gdata = pdata[xrng[0]:xrng[1]-1,yrng[0]:yrng[1]-1,*]
 
      if keyword_set(movie) then begin
 

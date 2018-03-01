@@ -50,12 +50,9 @@ pro eppic_graphics, info
         if size(data,/n_dim) eq 3 then begin
 
            ;;==Manipulate image data and set up auxiliary data
-           axis_scale = strcmp(info.data_context,'spatial') ? $
-                        1 : info.params.nout_avg
            imgplane = build_imgplane(data,info, $
                                      plane = info.planes[ip], $
-                                     context = data_context, $
-                                     axis_scale = axis_scale)
+                                     context = graphics_context)
 
            ;;==Save string for filenames
            if info.params.ndim_space eq 2 then $
