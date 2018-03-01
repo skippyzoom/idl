@@ -9,6 +9,9 @@ pro eppic_spatial_graphics, imgplane,info
   ny = imgsize[2]
   nt = imgsize[3]
 
+  ;;==Initialize string for descriptive image names
+  image_string = ''
+
   ;;==Transform spectral data at each time step
   if strcmp(info.data_context,'spectral') then begin
      for it=0,nt-1 do begin
@@ -17,16 +20,18 @@ pro eppic_spatial_graphics, imgplane,info
         imgplane.f = tmp
         tmp = !NULL
      endfor              
-     info.image_name += 'fft'
+     ;; info.image_name += 'ift'
+     image_string += 'ift'
   endif
 
   ;;==Create graphics of densities
-  image_string = info.plane_string
+  ;; image_string = info.plane_string
+  image_string += info.plane_string
   if strcmp(info.current_name,'den',3) then begin
      n0 = info.params['n0d'+strmid(info.current_name,3)]
      scale = 100
      basename = info.filepath+path_sep()+ $
-                info.current_name+image_string
+                info.image_name+image_string
      min_value = -max(abs(scale*imgplane.f))
      max_value = +max(abs(scale*imgplane.f))
      ;; min_value = -9
@@ -62,10 +67,10 @@ pro eppic_spatial_graphics, imgplane,info
 
      ;;==Create graphics of electrostatic potential
      scale = 1e3
-     image_string = info.plane_string
+     ;; image_string = info.plane_string
      ct = get_custom_ct(1)
      basename = info.filepath+path_sep()+ $
-                info.current_name+image_string
+                info.image_name+image_string
      min_value = -max(abs(scale*imgplane.f[*,*,1:*]))
      max_value = +max(abs(scale*imgplane.f[*,*,1:*]))
      ;; min_value = -600

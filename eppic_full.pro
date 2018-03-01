@@ -138,12 +138,12 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
   info['flexible_data'] = 1B
   info['full_transform'] = 0B   ;DEV: Need to set in defaults routine
-  info['data_context'] = 'spatial'
+  info['data_context'] = 'spectral'
   info['graphics_context'] = 'spatial'
   info['movies'] = 0B
 
   ;;==Run graphics routines
-  ;; eppic_graphics, info
+  eppic_graphics, info
 
                                 ;-----------------------------;
                                 ; 2-D images of spectral data ;
@@ -179,7 +179,7 @@ pro eppic_full, path=path, $
   info['fft_smooth'] = 3
 
   ;;==Run graphics routines
-  eppic_graphics, info
+  ;; eppic_graphics, info
 
   ;;==Print closing message
   printf, wlun,"[EPPIC_FULL] Finished"
