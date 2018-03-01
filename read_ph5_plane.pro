@@ -21,6 +21,7 @@ function read_ph5_plane, data_name, $
                          eppic_ft_data=eppic_ft_data, $
                          run_dir=run_dir, $
                          path=path, $
+                         lun=lun, $
                          verbose=verbose
 
   ;;==Defaults and guards
@@ -32,6 +33,7 @@ function read_ph5_plane, data_name, $
   path = terminal_slash(path)
   if n_elements(run_dir) eq 0 then $
      run_dir = strmid(path,0,strpos(path,'parallel',/reverse_search))
+  if n_elements(lun) eq 0 then lun = -1
 
   ;;==Read in run parameters
   params = set_eppic_params(path=run_dir)
@@ -139,7 +141,7 @@ function read_ph5_plane, data_name, $
   if n_dim eq 2 || n_dim eq 3 then begin
 
      ;;==Loop over all available time steps
-     if keyword_set(verbose) then print,"[READ_PH5_PLANE] Reading ",data_name,"..."
+     if keyword_set(verbose) then printf, lun,"[READ_PH5_PLANE] Reading ",data_name,"..."
 
      ;;==Set counted for missing data
      null_count = 0L
@@ -251,7 +253,7 @@ function read_ph5_plane, data_name, $
 
      ;;==Let user know about missing data (not necessarily an error)
      if keyword_set(verbose) && null_count gt 0 then $
-        print, "[READ_PH5_PLANE] Warning: Did not find '", $
+        printf, lun,"[READ_PH5_PLANE] Warning: Did not find '", $
                data_name+"' in ", $
                strcompress(null_count,/remove_all),"/", $
                strcompress(nt,/remove_all)," files."
@@ -261,8 +263,8 @@ function read_ph5_plane, data_name, $
 
   endif $                       ;n_dims eq 2 or 3
   else if n_dim eq 0 then $
-     print, "[READ_PH5_PLANE] Could not read ",data_name $
+     printf, lun,"[READ_PH5_PLANE] Could not read ",data_name $
   else $
-     print, "[READ_PH5_PLANE] Only works for input data with 2 or 3 spatial dimensions."
+     printf, lun,"[READ_PH5_PLANE] Only works for input data with 2 or 3 spatial dimensions."
 
 end

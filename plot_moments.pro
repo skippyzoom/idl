@@ -10,7 +10,7 @@ pro plot_moments, moments, $
                   font_size=font_size, $
                   raw_moments=raw_moments
 
-  ;;==Check lun keyword
+  ;;==Defaults and guards
   if n_elements(lun) eq 0 then lun = -1
 
   ;;==Convert moments struct to dictionary

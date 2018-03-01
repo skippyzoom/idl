@@ -41,6 +41,7 @@ pro eppic_graphics, info
                                  type = rctx.type, $
                                  eppic_ft_data = rctx.ft, $
                                  path = info.datapath, $
+                                 lun = info.wlun, $
                                  /verbose)
            info['image_name'] = rctx.name
         endif

@@ -22,10 +22,8 @@ pro image_save, image,filename=filename,lun=lun,_EXTRA=ex
            'svg', $                ;Scalable Vector Graphics
            'tif','tiff']           ;TIFF image
 
-  ;;==Check lun keyword
+  ;;==Defaults and guards
   if n_elements(lun) eq 0 then lun = -1
-
-  ;;==Declare default image name
   if n_elements(filename) eq 0 then filename = "new_image.png"
 
   ;;==Get file extension from filename
