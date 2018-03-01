@@ -59,8 +59,7 @@ pro eppic_full, path=path, $
   ;; layout = [3,3]
   ;; timestep = params.nout*[1,nt_max/4,nt_max/2,3*nt_max/4,nt_max-1]
   ;; timestep = params.nout*[nt_max/2,nt_max-1]
-  tmp_nt_max = 143
-  timestep = params.nout*[0,tmp_nt_max/2,tmp_nt_max-1]
+  timestep = params.nout*[0,nt_max/2,nt_max-1]
   nt = n_elements(timestep)
   layout = [1,nt]
   string_time = string(1e3*params.dt*timestep,format='(f8.2)')
@@ -74,8 +73,8 @@ pro eppic_full, path=path, $
   else planes = 'xy'
 
   ;;==Declare the plane perpendicular to B
-  perp_to_B = 'xy'
-  ;; perp_to_B = 'yz'
+  ;; perp_to_B = 'xy'
+  perp_to_B = 'yz'
 
   ;==Build unrotated, untransposed E0 vector
   E0 = dictionary('x',params.Ex0_external, $
@@ -138,19 +137,20 @@ pro eppic_full, path=path, $
   info['nt_max'] = nt_max
   info['title'] = string_time
   info['data_names'] = data_names
-  info['data_context'] = 'spatial'
   info['flexible_data'] = 1B
+  info['full_transform'] = 0B   ;DEV: Need to set in defaults routine
+  info['data_context'] = 'spatial'
   info['graphics_context'] = 'spatial'
   info['movies'] = 0B
+
+  ;;-->DEV
+  eppic_graphics, info
 
   ;;==Create images from spatial data
   ;; eppic_spatial_analysis, info
 
   ;;==Create movies from spatial data
   ;; eppic_spatial_analysis, info,/movies
-
-  ;; ;;-->DEV
-  ;; eppic_graphics, info
 
                                 ;-----------------------------;
                                 ; 2-D images of spectral data ;
@@ -181,13 +181,13 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
   info['dc_width'] = 8
   info['missing'] = -1e10
-  info['data_context'] = 'spectral'
+  info['data_context'] = 'spatial'
   info['graphics_context'] = 'spectral'
   info['full_transform'] = 0B
   info['fft_smooth'] = 3
 
   ;;-->DEV
-  eppic_graphics, info
+  ;; eppic_graphics, info
 
   ;;==Create images from spectral data
   ;; eppic_spectral_analysis, info, $

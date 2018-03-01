@@ -18,14 +18,12 @@ pro eppic_graphics, info
 
      ;;==Store current name in info
      info['current_name'] = data_name
-     
-     ;;==Extract appropriate background density
-     if strcmp(data_name,'den',3) then $
-        n0 = info.params['n0d'+strmid(data_name,3)] $
-     else n0 = info.params.n0d1
 
      ;;==Loop over 2-D image planes
      for ip=0,n_elements(info.planes)-1 do begin
+
+        ;;==Store current plane in info
+        info['current_plane'] = info.planes[ip]
 
         ;;==Determine which time steps to read
         if info.movies || info.full_transform then $
