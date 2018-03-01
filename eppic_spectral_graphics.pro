@@ -17,7 +17,7 @@ pro eppic_spectral_graphics, imgplane,info
         imgplane.f = tmp
         tmp = !NULL
      endfor              
-     info.image_name += 'fft'
+     info.image_name += '-fft'
   endif
 
   if info.full_transform then begin

@@ -20,18 +20,20 @@ pro eppic_spatial_graphics, imgplane,info
         imgplane.f = tmp
         tmp = !NULL
      endfor              
-     ;; info.image_name += 'ift'
-     image_string += 'ift'
+     image_string += '-ift'
   endif
 
+  ;;==Append plane to image string
+  ;; image_string += info.plane_string
+
   ;;==Create graphics of densities
-  ;; image_string = info.plane_string
-  image_string += info.plane_string
   if strcmp(info.current_name,'den',3) then begin
      n0 = info.params['n0d'+strmid(info.current_name,3)]
      scale = 100
+     ;; basename = info.filepath+path_sep()+ $
+     ;;            info.image_name+image_string
      basename = info.filepath+path_sep()+ $
-                info.image_name+image_string
+                info.image_name+image_string+info.plane_string
      min_value = -max(abs(scale*imgplane.f))
      max_value = +max(abs(scale*imgplane.f))
      ;; min_value = -9
@@ -53,7 +55,9 @@ pro eppic_spatial_graphics, imgplane,info
      if ~keyword_set(movies) then begin
         if strcmp(info.current_plane,info.perp_to_B) then begin
            image_string = info.plane_string
-           basename = info.filepath+path_sep()+'den_rms'+image_string
+           ;; basename = info.filepath+path_sep()+'den_rms'+image_string
+           basename = info.filepath+path_sep()+ $
+                      info.image_name+image_string+'_rms'+info.plane_string
            mean_field_plots, imgplane.x,imgplane.y, $
                              scale*imgplane.f,scale*n0*(1+imgplane.f), $
                              info, $
@@ -70,7 +74,7 @@ pro eppic_spatial_graphics, imgplane,info
      ;; image_string = info.plane_string
      ct = get_custom_ct(1)
      basename = info.filepath+path_sep()+ $
-                info.image_name+image_string
+                info.image_name+image_string+info.plane_string
      min_value = -max(abs(scale*imgplane.f[*,*,1:*]))
      max_value = +max(abs(scale*imgplane.f[*,*,1:*]))
      ;; min_value = -600
@@ -131,8 +135,10 @@ pro eppic_spatial_graphics, imgplane,info
 
         ;;==Create graphics of electric field
         scale = 1e3
+        ;; basename = info.filepath+path_sep()+ $
+        ;;            'efield_x'+field_string+image_string
         basename = info.filepath+path_sep()+ $
-                   'efield_x'+field_string+image_string
+                   'efield'+field_string+'_x'+image_string+info.plane_string
         min_value = -max(abs(scale*Ex[*,*,1:*]))
         max_value = +max(abs(scale*Ex[*,*,1:*]))
         ;; min_value = -24
@@ -151,8 +157,10 @@ pro eppic_spatial_graphics, imgplane,info
                             expand = 3, $
                             rescale = 0.8, $
                             movie = keyword_set(movies)
+        ;; basename = info.filepath+path_sep()+ $
+        ;;            'efield_y'+field_string+image_string
         basename = info.filepath+path_sep()+ $
-                   'efield_y'+field_string+image_string
+                   'efield'+field_string+'_y'+image_string+info.plane_string
         min_value = -max(abs(scale*Ey[*,*,1:*]))
         max_value = +max(abs(scale*Ey[*,*,1:*]))
         ;; min_value = -24
@@ -171,8 +179,10 @@ pro eppic_spatial_graphics, imgplane,info
                             expand = 3, $
                             rescale = 0.8, $
                             movie = keyword_set(movies)
+        ;; basename = info.filepath+path_sep()+ $
+        ;;            'efield_r'+field_string+image_string
         basename = info.filepath+path_sep()+ $
-                   'efield_r'+field_string+image_string
+                   'efield'+field_string+'_r'+image_string+info.plane_string
         min_value = 0
         ;; max_value = max(scale*Er[*,*,1:*])
         max_value = 24
@@ -190,8 +200,10 @@ pro eppic_spatial_graphics, imgplane,info
                             expand = 3, $
                             rescale = 0.8, $
                             movie = keyword_set(movies)
+        ;; basename = info.filepath+path_sep()+ $
+        ;;            'efield_t'+field_string+image_string
         basename = info.filepath+path_sep()+ $
-                   'efield_t'+field_string+image_string
+                   'efield'+field_string+'_t'+image_string+info.plane_string
         ct = get_custom_ct(2)
         min_value = -!pi
         max_value = +!pi
@@ -214,8 +226,10 @@ pro eppic_spatial_graphics, imgplane,info
         if ~keyword_set(movies) then begin
            if strcmp(info.current_plane,info.perp_to_B) then begin
               image_string = info.plane_string
-              basename = info.filepath+path_sep()+ $
-                         'efield_means'+field_string+image_string
+              ;; basename = info.filepath+path_sep()+ $
+              ;;            'efield_means'+field_string+image_string
+           basename = info.filepath+path_sep()+ $
+                      'efield'+image_string+'_rms'+info.plane_string
               mean_field_plots, imgplane.x,imgplane.y, $
                                 scale*Ex,scale*Ey, $
                                 info, $
