@@ -3,11 +3,15 @@
 ; (e.g., collision frequencies and temperatures)
 ;-
 pro plot_moments, moments, $
+                  lun=lun, $
                   params=params, $
                   path=path, $
                   font_name=font_name, $
                   font_size=font_size, $
                   raw_moments=raw_moments
+
+  ;;==Check lun keyword
+  if n_elements(lun) eq 0 then lun = -1
 
   ;;==Convert moments struct to dictionary
   if isa(moments,'struct') then m_dict = dictionary(moments,/extract)
@@ -202,7 +206,7 @@ pro plot_moments, moments, $
   endfor
 
   ;;==Save
-  image_save, plt,filename=path+path_sep()+'common_moments.pdf'
+  image_save, plt,filename=path+path_sep()+'common_moments.pdf',lun=lun
   plt = !NULL
 
 end
