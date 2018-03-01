@@ -33,15 +33,17 @@ pro eppic_graphics, info
 
         ;;==Read 2-D image data
         rctx = build_read_context(info)
-        data = read_ph5_plane(rctx.name, $
-                              ext = '.h5', $
-                              timestep = timestep, $
-                              plane = info.planes[ip], $
-                              type = rctx.type, $
-                              eppic_ft_data = rctx.ft, $
-                              path = info.datapath, $
-                              /verbose)
-        info['image_name'] = rctx.name
+        if rctx.read then begin
+           data = read_ph5_plane(rctx.name, $
+                                 ext = '.h5', $
+                                 timestep = timestep, $
+                                 plane = info.planes[ip], $
+                                 type = rctx.type, $
+                                 eppic_ft_data = rctx.ft, $
+                                 path = info.datapath, $
+                                 /verbose)
+           info['image_name'] = rctx.name
+        endif
         rctx = !NULL
 
         ;;==Check dimensions
@@ -70,8 +72,8 @@ pro eppic_graphics, info
         endif $           ;;--n_dims
         else begin
            printf, info.wlun,"[EPPIC_GRAPHICS] Could not create an image."
-           printf, info.wlun,"                          data_name = ",data_name
-           printf, info.wlun,"                          plane = ",info.planes[ip]
+           printf, info.wlun,"                 data_name = ",data_name
+           printf, info.wlun,"                 plane = ",info.planes[ip]
         endelse
 
      endfor            ;;--planes

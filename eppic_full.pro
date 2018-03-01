@@ -90,8 +90,7 @@ pro eppic_full, path=path, $
   ;;                  'yz',0)
 
   ;;==Choose EPPIC spatial output quantities to analyze
-  ;; data_names = list('phi','den0','den1')
-  data_names = list('den1','phi')
+  data_names = list('phi','den0','den1')
 
   ;;==Declare panel positions for spatial data
   position = multi_position(layout[*], $
@@ -143,22 +142,15 @@ pro eppic_full, path=path, $
   info['graphics_context'] = 'spatial'
   info['movies'] = 0B
 
-  ;;-->DEV
-  eppic_graphics, info
-
-  ;;==Create images from spatial data
-  ;; eppic_spatial_analysis, info
-
-  ;;==Create movies from spatial data
-  ;; eppic_spatial_analysis, info,/movies
+  ;;==Run graphics routines
+  ;; eppic_graphics, info
 
                                 ;-----------------------------;
                                 ; 2-D images of spectral data ;
                                 ;-----------------------------;
 
   ;;==Choose EPPIC spectral output quantities to analyze
-  ;; data_names = list('den0','den1')
-  force_spatial_data = 1B
+  data_names = list('den0','den1')
 
   ;;==Declare panel positions for spectral data
   position = multi_position(layout[*], $
@@ -181,26 +173,13 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
   info['dc_width'] = 8
   info['missing'] = -1e10
-  info['data_context'] = 'spatial'
+  info['data_context'] = 'spectral'
   info['graphics_context'] = 'spectral'
   info['full_transform'] = 0B
   info['fft_smooth'] = 3
 
-  ;;-->DEV
-  ;; eppic_graphics, info
-
-  ;;==Create images from spectral data
-  ;; eppic_spectral_analysis, info, $
-  ;;                          force_spatial_data=force_spatial_data
-
-  ;;==Create images from spectral data
-  ;; eppic_spectral_analysis, info, $
-  ;;                          force_spatial_data=force_spatial_data, $
-  ;;                          /full_transform
-
-  ;;==Create movies from spectral data
-  ;; eppic_spectral_analysis, info, $
-  ;;                          /movies
+  ;;==Run graphics routines
+  eppic_graphics, info
 
   ;;==Print closing message
   printf, wlun,"[EPPIC_FULL] Finished"

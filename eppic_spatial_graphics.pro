@@ -1,3 +1,6 @@
+;+
+; Spatial graphics of EPPIC data
+;-
 pro eppic_spatial_graphics, imgplane,info
 
   ;;==Get image sizes
