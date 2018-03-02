@@ -7,10 +7,10 @@
 ; The purpose of using this function in place of
 ; read_ph5_data.pro is to save memory in cases of
 ; large data sets. It will return an array with 
-; dimensions (nx,ny,nt): for 2-D data, it returns 
-; the full data set; for 3-D data, it returns a 
-; logically 2-D data set comprising data in the 
-; requested plane as a function of time.
+; dimensions (nx,ny,nt): for spatially  2-D data, 
+; it returns the full data set; for 3-D data, it 
+; returns a logically 3-D data set comprising data 
+; in the requested plane as a function of time.
 ;-
 function read_ph5_plane, data_name, $
                          ext=ext, $
