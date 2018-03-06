@@ -134,7 +134,7 @@ pro plot_moments, moments, $
      else $
         filename = path+path_sep()+dist_keys[id]+'_moments.pdf'
 
-     image_save, plt,filename=filename
+     image_save, plt,filename=filename,lun=lun
      plt = !NULL
 
   endfor
