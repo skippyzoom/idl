@@ -29,20 +29,20 @@ pro eppic_spatial_graphics, imgplane,info
   ;;==Create graphics of densities
   if strcmp(info.current_name,'den',3) then begin
      n0 = info.params['n0d'+strmid(info.current_name,3)]
+     imgplane.f = smooth(imgplane.f,[3,3,1],/edge_wrap)
      scale = 100
-     ;; basename = info.filepath+path_sep()+ $
-     ;;            info.image_name+image_string
      basename = info.filepath+path_sep()+ $
                 info.image_name+image_string+info.plane_string
-     min_value = -max(abs(scale*imgplane.f))
-     max_value = +max(abs(scale*imgplane.f))
-     ;; min_value = -9
-     ;; max_value = +9
+     ;; min_value = -max(abs(scale*imgplane.f))
+     ;; max_value = +max(abs(scale*imgplane.f))
+     min_value = -6
+     max_value = +6
      eppic_xyt_graphics, scale*imgplane.f,imgplane.x,imgplane.y, $
                          info, $
+                         lun = info.wlun, $
                          xrng = imgplane.xr, $
                          yrng = imgplane.yr, $
-                         rgb_table = 5, $
+                         rgb_table = 74, $
                          min_value = min_value, $
                          max_value = max_value, $
                          basename = basename, $
@@ -50,17 +50,17 @@ pro eppic_spatial_graphics, imgplane,info
                          colorbar_title = "$\delta n/n_0$ [%]",$
                          expand = 3, $
                          rescale = 0.8, $
-                         movie = keyword_set(movies)
+                         movie = info.movies
 
-     if ~keyword_set(movies) then begin
+     if ~info.movies then begin
         if strcmp(info.current_plane,info.perp_to_B) then begin
            image_string = info.plane_string
-           ;; basename = info.filepath+path_sep()+'den_rms'+image_string
            basename = info.filepath+path_sep()+ $
                       info.image_name+image_string+'_rms'+info.plane_string
            mean_field_plots, imgplane.x,imgplane.y, $
                              scale*imgplane.f,scale*n0*(1+imgplane.f), $
                              info, $
+                             lun = info.wlun, $
                              rms = [0,0,1,1], $
                              basename = basename
         endif       ;;--perp_to_B
@@ -81,6 +81,7 @@ pro eppic_spatial_graphics, imgplane,info
      ;; max_value = +600
      eppic_xyt_graphics, scale*imgplane.f,imgplane.x,imgplane.y, $
                          info, $
+                         lun = info.wlun, $
                          xrng = imgplane.xr, $
                          yrng = imgplane.yr, $
                          rgb_table = 70, $
@@ -91,7 +92,7 @@ pro eppic_spatial_graphics, imgplane,info
                          colorbar_title = "$\phi$ [mV]",$
                          expand = 3, $
                          rescale = 0.8, $
-                         movie = keyword_set(movies)
+                         movie = info.movies
 
      ;;==Calculate E-field components
      Ex = fltarr(size(imgplane.f,/dim))
@@ -105,13 +106,13 @@ pro eppic_spatial_graphics, imgplane,info
      endfor              
 
      ;;==Create images for perturbed and full field
-     field_types = list('pert','full')
-     n_types = field_types.count()
+     field_type = list('pert','full')
+     n_types = field_type.count()
      for ii=0,n_types-1 do begin
 
         ;;==Add background field, if requested
         field_string = '-P'
-        add_E0 = strcmp(field_types[ii],'full')
+        add_E0 = strcmp(field_type[ii],'full')
         if add_E0 then begin
            Ex += imgplane.E0[0]
            Ey += imgplane.E0[1]
@@ -135,16 +136,17 @@ pro eppic_spatial_graphics, imgplane,info
 
         ;;==Create graphics of electric field
         scale = 1e3
-        ;; basename = info.filepath+path_sep()+ $
-        ;;            'efield_x'+field_string+image_string
         basename = info.filepath+path_sep()+ $
                    'efield'+field_string+'_x'+image_string+info.plane_string
         min_value = -max(abs(scale*Ex[*,*,1:*]))
         max_value = +max(abs(scale*Ex[*,*,1:*]))
         ;; min_value = -24
         ;; max_value = +24
+        colorbar_title = strcmp(field_type[ii],'full') ? $
+                         "$E_x$ [mV/m]" : "$\delta E_x$ [mV/m]"
         eppic_xyt_graphics, scale*Ex,imgplane.x,imgplane.y, $
                             info, $
+                            lun = info.wlun, $
                             xrng = imgplane.xr, $
                             yrng = imgplane.yr, $
                             rgb_table = 70, $
@@ -152,21 +154,21 @@ pro eppic_spatial_graphics, imgplane,info
                             max_value = max_value, $
                             basename = basename, $
                             /clip_y_axes, $
-                            ;; colorbar_title = "$E_x$ [mV/m]",$
-                            colorbar_title = "$\delta E_x$ [mV/m]",$
+                            colorbar_title = colorbar_title,$
                             expand = 3, $
                             rescale = 0.8, $
-                            movie = keyword_set(movies)
-        ;; basename = info.filepath+path_sep()+ $
-        ;;            'efield_y'+field_string+image_string
+                            movie = info.movies
         basename = info.filepath+path_sep()+ $
                    'efield'+field_string+'_y'+image_string+info.plane_string
         min_value = -max(abs(scale*Ey[*,*,1:*]))
         max_value = +max(abs(scale*Ey[*,*,1:*]))
         ;; min_value = -24
         ;; max_value = +24
+        colorbar_title = strcmp(field_type[ii],'full') ? $
+                         "$E_y$ [mV/m]" : "$\delta E_y$ [mV/m]"
         eppic_xyt_graphics, scale*Ey,imgplane.x,imgplane.y, $
                             info, $
+                            lun = info.wlun, $
                             xrng = imgplane.xr, $
                             yrng = imgplane.yr, $
                             rgb_table = 70, $
@@ -174,20 +176,20 @@ pro eppic_spatial_graphics, imgplane,info
                             max_value = max_value, $
                             basename = basename, $
                             /clip_y_axes, $
-                            ;; colorbar_title = "$E_y$ [mV/m]",$
-                            colorbar_title = "$\delta E_y$ [mV/m]",$
+                            colorbar_title = colorbar_title,$
                             expand = 3, $
                             rescale = 0.8, $
-                            movie = keyword_set(movies)
-        ;; basename = info.filepath+path_sep()+ $
-        ;;            'efield_r'+field_string+image_string
+                            movie = info.movies
         basename = info.filepath+path_sep()+ $
                    'efield'+field_string+'_r'+image_string+info.plane_string
         min_value = 0
         ;; max_value = max(scale*Er[*,*,1:*])
         max_value = 24
+        colorbar_title = strcmp(field_type[ii],'full') ? $
+                         "$|E|$ [mV/m]" : "$|\delta E|$ [mV/m]"
         eppic_xyt_graphics, scale*Er,imgplane.x,imgplane.y, $
                             info, $
+                            lun = info.wlun, $
                             xrng = imgplane.xr, $
                             yrng = imgplane.yr, $
                             rgb_table = 3, $
@@ -195,20 +197,20 @@ pro eppic_spatial_graphics, imgplane,info
                             max_value = max_value, $
                             basename = basename, $
                             /clip_y_axes, $
-                            ;; colorbar_title = "$|E|$ [mV/m]",$
-                            colorbar_title = "$|\delta E|$ [mV/m]",$
+                            colorbar_title = colorbar_title, $
                             expand = 3, $
                             rescale = 0.8, $
-                            movie = keyword_set(movies)
-        ;; basename = info.filepath+path_sep()+ $
-        ;;            'efield_t'+field_string+image_string
+                            movie = info.movies
         basename = info.filepath+path_sep()+ $
                    'efield'+field_string+'_t'+image_string+info.plane_string
         ct = get_custom_ct(2)
         min_value = -!pi
         max_value = +!pi
+        colorbar_title = strcmp(field_type[ii],'full') ? $
+                         "$\tan^{-1}(E)$ [rad]" : "$tan^{-1}(\delta E)$ [rad]"
         eppic_xyt_graphics, Et,imgplane.x,imgplane.y, $
                             info, $
+                            lun = info.wlun, $
                             xrng = imgplane.xr, $
                             yrng = imgplane.yr, $
                             rgb_table = [[ct.r],[ct.g],[ct.b]], $
@@ -216,27 +218,25 @@ pro eppic_spatial_graphics, imgplane,info
                             max_value = max_value, $
                             basename = basename, $
                             /clip_y_axes, $
-                            ;; colorbar_title = "$\tan^{-1}(E)$ [rad]",$
-                            colorbar_title = "$tan^{-1}(\delta E)$ [rad]",$
+                            colorbar_title = colorbar_title,$
                             expand = 3, $
                             rescale = 0.8, $
-                            movie = keyword_set(movies)
+                            movie = info.movies
 
         ;;==Make plots in the plane perpendicular to B
-        if ~keyword_set(movies) then begin
+        if ~info.movies then begin
            if strcmp(info.current_plane,info.perp_to_B) then begin
               image_string = info.plane_string
-              ;; basename = info.filepath+path_sep()+ $
-              ;;            'efield_means'+field_string+image_string
-           basename = info.filepath+path_sep()+ $
-                      'efield'+image_string+'_rms'+info.plane_string
+              basename = info.filepath+path_sep()+ $
+                         'efield'+image_string+'_mean'+info.plane_string
               mean_field_plots, imgplane.x,imgplane.y, $
                                 scale*Ex,scale*Ey, $
                                 info, $
-                                basename=basename
+                                lun = info.wlun, $
+                                basename = basename
            endif       ;;--perp_to_B
         endif          ;;--(not)movies
-     endfor            ;;--field_types
+     endfor            ;;--field_type
   endif                ;;--phi           
 
 end

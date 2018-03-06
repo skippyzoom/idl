@@ -5,6 +5,7 @@
 pro eppic_xyw_graphics, pdata,xdata,ydata, $
                         w_vals, $
                         info, $
+                        lun=lun, $
                         xrng=xrng, $
                         yrng=yrng, $
                         aspect_ratio=aspect_ratio, $
@@ -28,6 +29,7 @@ pro eppic_xyw_graphics, pdata,xdata,ydata, $
      ny = data_size[2]
 
      ;;==Defaults and guards
+     if n_elements(lun) eq 0 then lun = -1
      if n_elements(rgb_table) eq 0 then rgb_table = 0
      if n_elements(min_value) eq 0 then min_value = !NULL
      if n_elements(max_value) eq 0 then max_value = !NULL
@@ -130,7 +132,7 @@ pro eppic_xyw_graphics, pdata,xdata,ydata, $
                 font_size = 5.0)
 
      ;;==Save image
-     image_save, img,filename=basename+'.pdf'
+     image_save, img,filename=basename+'.pdf',lun=lun
 
      ;;==Restore original data
      pdata = pdata_in
@@ -138,6 +140,6 @@ pro eppic_xyw_graphics, pdata,xdata,ydata, $
      ydata = ydata_in
 
   endif $
-  else print, "[EPPIC_XYW_GRAPHICS] pdata must have dimensions (x,y,w)."
+  else printf, lun,"[EPPIC_XYW_GRAPHICS] pdata must have dimensions (x,y,w)."
 
 end

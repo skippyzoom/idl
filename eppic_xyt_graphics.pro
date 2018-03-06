@@ -4,6 +4,7 @@
 ;-
 pro eppic_xyt_graphics, pdata,xdata,ydata, $
                         info, $
+                        lun=lun, $
                         xrng=xrng, $
                         yrng=yrng, $
                         aspect_ratio=aspect_ratio, $
@@ -32,6 +33,7 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
      ny = data_size[2]
 
      ;;==Defaults and guards
+     if n_elements(lun) eq 0 then lun = -1
      if n_elements(rgb_table) eq 0 then rgb_table = 0
      if n_elements(min_value) eq 0 then min_value = !NULL
      if n_elements(max_value) eq 0 then max_value = !NULL
@@ -70,6 +72,7 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
         ;;==Create movie
         filename = basename+'.mp4'
         data_movie, gdata,xdata,ydata, $
+                    lun = lun, $
                     filename = filename, $
                     title = string_time, $
                     rgb_table = rgb_table, $
@@ -130,7 +133,7 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
                    font_size = 5.0)
 
         ;;==Save image
-        image_save, img[0],filename=basename+'.pdf'
+        image_save, img[0],filename=basename+'.pdf',lun=lun
 
      endelse
 
@@ -140,6 +143,6 @@ pro eppic_xyt_graphics, pdata,xdata,ydata, $
      ydata = ydata_in
 
   endif $
-  else print, "[EPPIC_XYT_GRAPHICS] pdata must have dimensions (x,y,t)."
+  else printf, lun,"[EPPIC_XYT_GRAPHICS] pdata must have dimensions (x,y,t)."
 
 end

@@ -9,8 +9,12 @@
 ;-
 pro mean_field_plots, xdata,ydata,Fx,Fy, $
                       info, $
+                      lun=lun, $
                       rms_=rms_, $
                       basename=basename
+
+  ;;==Defaults and guards
+  if n_elements(lun) eq 0 then lun = -1
 
   ;;==Preserve input
   xdata_in = xdata
@@ -93,7 +97,7 @@ pro mean_field_plots, xdata,ydata,Fx,Fy, $
                 font_size = 5.0)
 
      ;;==Save plot
-     image_save, plt[0],filename=basename+'.pdf',/landscape
+     image_save, plt[0],filename=basename+'.pdf',lun=lun,/landscape
 
      ;;==Restore input data
      xdata = xdata_in
