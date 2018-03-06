@@ -44,7 +44,7 @@ pro eppic_graphics, info
                                  lun = info.wlun, $
                                  /verbose)
            info['image_name'] = rctx.name
-        endif
+        endif else info['image_name'] = ''
         rctx = !NULL
 
         ;;==Check dimensions
@@ -54,6 +54,7 @@ pro eppic_graphics, info
            imgplane = build_imgplane(data,info, $
                                      plane = info.planes[ip], $
                                      context = graphics_context)
+           data = !NULL
 
            ;;==Save string for filenames
            if info.params.ndim_space eq 2 then $
