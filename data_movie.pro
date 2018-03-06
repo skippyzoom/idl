@@ -15,8 +15,8 @@
 ; -- This routine requires that the image dimensions match 
 ;    the dimensions of the initialized video stream. If the 
 ;    user does not pass in the dimensions keyword, this routine 
-;    sets it to [xsize,ysize], where xsize and ysize are derived 
-;    from the input data array.
+;    sets it to [nx,ny], where nx and ny are derived from the 
+;    input data array.
 ;
 ; TO DO
 ; -- Use different image scale factors for movies with 
@@ -25,6 +25,7 @@
 ; -- Improve or remove timestamps option.
 ;-
 pro data_movie, movdata,xdata,ydata, $
+                lun=lun, $
                 filename=filename, $
                 framerate=framerate, $
                 timestamps=timestamps, $
@@ -42,32 +43,27 @@ pro data_movie, movdata,xdata,ydata, $
                 rescale=rescale, $
                 colorbar_title=colorbar_title
 
-  if n_elements(movdata) eq 0 then begin
-     print, "DATA_MOVIE: Please supply image array. No movie produced."
-  endif $
-  else begin
+  ;;==Get data size
+  data_size = size(movdata)
+  n_dims = data_size[0]
 
-     ;;==Get data dimensions
-     movdata = reform(movdata)
-     movsize = size(movdata)
-     if movsize[0] ne 3 then $
-        message, "Movie data must be 3D (two in space, one in time)."
-     xsize = movsize[1]
-     ysize = movsize[2]
-     tsize = movsize[3]
-     if n_elements(xdata) eq 0 then xdata = indgen(xsize)
-     if n_elements(ydata) eq 0 then ydata = indgen(ysize)
+  ;;==Check data size
+  if n_dims eq 3 then begin
+     nt = data_size[n_dims]
+     nx = data_size[1]
+     ny = data_size[2]
 
      ;;==Defaults and guards
+     if n_elements(lun) eq 0 then lun = -1
      if n_elements(filename) eq 0 then filename = 'data_movie.mp4'
      if n_elements(framerate) eq 0 then framerate = 20
      case 1B of
-        (n_elements(title) eq 0): title = make_array(tsize,value = '')
-        (n_elements(title) eq 1): title = make_array(tsize,value = title)
-        (n_elements(title) eq tsize): ;Do nothing
+        (n_elements(title) eq 0): title = make_array(nt,value = '')
+        (n_elements(title) eq 1): title = make_array(nt,value = title)
+        (n_elements(title) eq nt): ;Do nothing
         else: begin
-           print, "DATA_MOVIE: Cannot use title (Incommensurate number of elements)."
-           title = make_array(tsize,value = '')
+           printf, lun,"[DATA_MOVIE] Cannot use title (Incommensurate number of elements)."
+           title = make_array(nt,value = '')
         end
      endcase
      if n_elements(rgb_table) eq 0 then rgb_table = 0
@@ -75,10 +71,12 @@ pro data_movie, movdata,xdata,ydata, $
      if n_elements(max_value) eq 0 then max_value = !NULL
      if n_elements(xtitle) eq 0 then xtitle = ''
      if n_elements(ytitle) eq 0 then ytitle = ''
-     if n_elements(dimensions) eq 0 then dimensions = [xsize,ysize]
+     if n_elements(dimensions) eq 0 then dimensions = [nx,ny]
      if n_elements(expand) eq 0 then expand = 1.0
      if n_elements(rescale) eq 0 then rescale = 1.0
      if n_elements(aspect_ratio) eq 0 then aspect_ratio = 1.0
+     if n_elements(xdata) eq 0 then xdata = indgen(nx)
+     if n_elements(ydata) eq 0 then ydata = indgen(ny)
 
      ;;==Set up graphics parameters
      if keyword_set(xrange) then begin
@@ -89,9 +87,9 @@ pro data_movie, movdata,xdata,ydata, $
      endif else begin
         xmajor = 5
         xminor = 1
-        xsize = n_elements(xdata)
+        nx = n_elements(xdata)
         xtickvalues = xdata[0] + $
-                      (1+xdata[xsize-1]-xdata[1])*indgen(xmajor)/(xmajor-1)
+                      (1+xdata[nx-1]-xdata[1])*indgen(xmajor)/(xmajor-1)
         xtickname = strcompress(fix(xtickvalues),/remove_all)
         xrange = [xtickvalues[0],xtickvalues[xmajor-1]]
      endelse
@@ -104,22 +102,22 @@ pro data_movie, movdata,xdata,ydata, $
      endif else begin
         ymajor = 5
         yminor = 1
-        ysize = n_elements(ydata)
+        ny = n_elements(ydata)
         ytickvalues = ydata[0] + $
-                      (1+ydata[ysize-1]-ydata[1])*indgen(ymajor)/(ymajor-1)
+                      (1+ydata[ny-1]-ydata[1])*indgen(ymajor)/(ymajor-1)
         ytickname = strcompress(fix(ytickvalues),/remove_all)
         yrange = [ytickvalues[0],ytickvalues[ymajor-1]]
      endelse
 
      ;;==Open video stream
-     print, "DATA_MOVIE: Creating ",filename
+     printf, lun,"[DATA_MOVIE] Creating ",filename
      video = idlffvideowrite(filename)
      stream = video.addvideostream(expand*dimensions[0], $
                                    expand*dimensions[1], $
                                    framerate)
 
      ;;==Write data to video stream
-     for it=0,tsize-1 do begin
+     for it=0,nt-1 do begin
         img = image(movdata[*,*,it], $
                     xdata,ydata, $
                     title = title[it], $
@@ -198,8 +196,9 @@ pro data_movie, movdata,xdata,ydata, $
 
      ;;==Close video stream
      video.cleanup
-     print, "DATA_MOVIE: Finished"
+     printf, lun,"[DATA_MOVIE] Finished"
 
-  endelse
+  endif $
+  else printf, lun,"[DATA_MOVIE] movdata must have dimensions (x,y,t)"
 
 end
