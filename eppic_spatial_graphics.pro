@@ -23,9 +23,6 @@ pro eppic_spatial_graphics, imgplane,info
      image_string += '-ift'
   endif
 
-  ;;==Append plane to image string
-  ;; image_string += info.plane_string
-
   ;;==Create graphics of densities
   if strcmp(info.current_name,'den',3) then begin
      n0 = info.params['n0d'+strmid(info.current_name,3)]
@@ -39,7 +36,6 @@ pro eppic_spatial_graphics, imgplane,info
      max_value = +6
      eppic_xyt_graphics, scale*imgplane.f,imgplane.x,imgplane.y, $
                          info, $
-                         lun = info.wlun, $
                          xrng = imgplane.xr, $
                          yrng = imgplane.yr, $
                          rgb_table = 74, $
@@ -60,7 +56,6 @@ pro eppic_spatial_graphics, imgplane,info
            mean_field_plots, imgplane.x,imgplane.y, $
                              scale*imgplane.f,scale*n0*(1+imgplane.f), $
                              info, $
-                             lun = info.wlun, $
                              rms = [0,0,1,1], $
                              basename = basename
         endif       ;;--perp_to_B
@@ -71,7 +66,6 @@ pro eppic_spatial_graphics, imgplane,info
 
      ;;==Create graphics of electrostatic potential
      scale = 1e3
-     ;; image_string = info.plane_string
      ct = get_custom_ct(1)
      basename = info.filepath+path_sep()+ $
                 info.image_name+image_string+info.plane_string
@@ -81,7 +75,6 @@ pro eppic_spatial_graphics, imgplane,info
      ;; max_value = +600
      eppic_xyt_graphics, scale*imgplane.f,imgplane.x,imgplane.y, $
                          info, $
-                         lun = info.wlun, $
                          xrng = imgplane.xr, $
                          yrng = imgplane.yr, $
                          rgb_table = 70, $
@@ -124,20 +117,29 @@ pro eppic_spatial_graphics, imgplane,info
         Et = atan(Ey,Ex)
 
         ;;==Smooth E-field components
-        s_width = 1
-        if s_width gt 1 then begin
-           Ex = smooth(Ex,[s_width,s_width,1],/edge_wrap)
-           Ey = smooth(Ey,[s_width,s_width,1],/edge_wrap)
-           Er = smooth(Er,[s_width,s_width,1],/edge_wrap)
-           Et = smooth(Et,[s_width,s_width,1],/edge_wrap)
-           image_string = info.plane_string+'-sw'+ $
-                          strcompress(s_width,/remove_all)
+        ;; s_width = 3
+        ;; if s_width gt 1 then begin
+        ;;    Ex = smooth(Ex,[s_width,s_width,1],/edge_wrap)
+        ;;    Ey = smooth(Ey,[s_width,s_width,1],/edge_wrap)
+        ;;    Er = smooth(Er,[s_width,s_width,1],/edge_wrap)
+        ;;    Et = smooth(Et,[s_width,s_width,1],/edge_wrap)
+        ;;    image_string = info.plane_string+'-sw'+ $
+        ;;                   strcompress(s_width,/remove_all)
+        ;; endif
+        if info.efield_sw gt 1 then begin
+           str_sw = strcompress(info.efield_sw,/remove_all)
+           printf, info.wlun,"[EPPIC_SPATIAL_GRAPHICS] Smoothing (sw = "+str_sw+")"
+           Ex = smooth(Ex,[info.efield_sw,info.efield_sw,1],/edge_wrap)
+           Ey = smooth(Ey,[info.efield_sw,info.efield_sw,1],/edge_wrap)
+           Er = smooth(Er,[info.efield_sw,info.efield_sw,1],/edge_wrap)
+           Et = smooth(Et,[info.efield_sw,info.efield_sw,1],/edge_wrap)
+           image_string = info.plane_string+'-sw'+str_sw
         endif
 
         ;;==Create graphics of electric field
         scale = 1e3
         basename = info.filepath+path_sep()+ $
-                   'efield'+field_string+'_x'+image_string+info.plane_string
+                   'efield'+field_string+'x'+image_string+info.plane_string
         min_value = -max(abs(scale*Ex[*,*,1:*]))
         max_value = +max(abs(scale*Ex[*,*,1:*]))
         ;; min_value = -24
@@ -146,7 +148,6 @@ pro eppic_spatial_graphics, imgplane,info
                          "$E_x$ [mV/m]" : "$\delta E_x$ [mV/m]"
         eppic_xyt_graphics, scale*Ex,imgplane.x,imgplane.y, $
                             info, $
-                            lun = info.wlun, $
                             xrng = imgplane.xr, $
                             yrng = imgplane.yr, $
                             rgb_table = 70, $
@@ -159,7 +160,7 @@ pro eppic_spatial_graphics, imgplane,info
                             rescale = 0.8, $
                             movie = info.movies
         basename = info.filepath+path_sep()+ $
-                   'efield'+field_string+'_y'+image_string+info.plane_string
+                   'efield'+field_string+'y'+image_string+info.plane_string
         min_value = -max(abs(scale*Ey[*,*,1:*]))
         max_value = +max(abs(scale*Ey[*,*,1:*]))
         ;; min_value = -24
@@ -168,7 +169,6 @@ pro eppic_spatial_graphics, imgplane,info
                          "$E_y$ [mV/m]" : "$\delta E_y$ [mV/m]"
         eppic_xyt_graphics, scale*Ey,imgplane.x,imgplane.y, $
                             info, $
-                            lun = info.wlun, $
                             xrng = imgplane.xr, $
                             yrng = imgplane.yr, $
                             rgb_table = 70, $
@@ -181,7 +181,7 @@ pro eppic_spatial_graphics, imgplane,info
                             rescale = 0.8, $
                             movie = info.movies
         basename = info.filepath+path_sep()+ $
-                   'efield'+field_string+'_r'+image_string+info.plane_string
+                   'efield'+field_string+'r'+image_string+info.plane_string
         min_value = 0
         ;; max_value = max(scale*Er[*,*,1:*])
         max_value = 24
@@ -189,7 +189,6 @@ pro eppic_spatial_graphics, imgplane,info
                          "$|E|$ [mV/m]" : "$|\delta E|$ [mV/m]"
         eppic_xyt_graphics, scale*Er,imgplane.x,imgplane.y, $
                             info, $
-                            lun = info.wlun, $
                             xrng = imgplane.xr, $
                             yrng = imgplane.yr, $
                             rgb_table = 3, $
@@ -202,7 +201,7 @@ pro eppic_spatial_graphics, imgplane,info
                             rescale = 0.8, $
                             movie = info.movies
         basename = info.filepath+path_sep()+ $
-                   'efield'+field_string+'_t'+image_string+info.plane_string
+                   'efield'+field_string+'t'+image_string+info.plane_string
         ct = get_custom_ct(2)
         min_value = -!pi
         max_value = +!pi
@@ -210,7 +209,6 @@ pro eppic_spatial_graphics, imgplane,info
                          "$\tan^{-1}(E)$ [rad]" : "$tan^{-1}(\delta E)$ [rad]"
         eppic_xyt_graphics, Et,imgplane.x,imgplane.y, $
                             info, $
-                            lun = info.wlun, $
                             xrng = imgplane.xr, $
                             yrng = imgplane.yr, $
                             rgb_table = [[ct.r],[ct.g],[ct.b]], $
@@ -232,7 +230,6 @@ pro eppic_spatial_graphics, imgplane,info
               mean_field_plots, imgplane.x,imgplane.y, $
                                 scale*Ex,scale*Ey, $
                                 info, $
-                                lun = info.wlun, $
                                 basename = basename
            endif       ;;--perp_to_B
         endif          ;;--(not)movies

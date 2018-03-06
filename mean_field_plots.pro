@@ -9,12 +9,8 @@
 ;-
 pro mean_field_plots, xdata,ydata,Fx,Fy, $
                       info, $
-                      lun=lun, $
                       rms_=rms_, $
                       basename=basename
-
-  ;;==Defaults and guards
-  if n_elements(lun) eq 0 then lun = -1
 
   ;;==Preserve input
   xdata_in = xdata
@@ -39,8 +35,8 @@ pro mean_field_plots, xdata,ydata,Fx,Fy, $
         1: rms_ = make_array(4,type=1,value=rms_)
         4: rms_ = rms_ gt 0
         else: begin
-           print, "[MEAN_FIELD_PLOTS] Invalid value for rms keyword."
-           print, "                   Calculating means (default) instead."
+           printf, info.wlun,"[MEAN_FIELD_PLOTS] Invalid value for rms keyword."
+           printf, info.wlun,"                   Calculating means (default) instead."
            rms_ = make_array(4,type=1,value=0)
         end
      endcase
@@ -97,12 +93,12 @@ pro mean_field_plots, xdata,ydata,Fx,Fy, $
                 font_size = 5.0)
 
      ;;==Save plot
-     image_save, plt[0],filename=basename+'.pdf',lun=lun,/landscape
+     image_save, plt[0],filename=basename+'.pdf',lun=info.wlun,/landscape
 
      ;;==Restore input data
      xdata = xdata_in
 
   endif $
-  else print, "[MEAN_FIELD_PLOTS] Could not create an image."
+  else printf, info.wlun,"[MEAN_FIELD_PLOTS] Could not create an image."
 
 end

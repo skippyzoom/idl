@@ -170,9 +170,9 @@ pro eppic_spectral_graphics, imgplane,info
                          info, $
                          xrng = imgplane.xr, $
                          yrng = imgplane.yr, $
-                         xrange = [-2*!pi,2*!pi], $
+                         xrange = [-10*!pi,10*!pi], $
                          ;; yrange = [0,2*!pi], $
-                         yrange = [-2*!pi,2*!pi], $
+                         yrange = [-10*!pi,10*!pi], $
                          rgb_table = 39, $
                          min_value = min_value, $
                          max_value = max_value, $
