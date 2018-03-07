@@ -53,7 +53,8 @@ pro eppic_graphics, info
            ;;==Manipulate image data and set up auxiliary data
            imgplane = build_imgplane(data,info, $
                                      plane = info.planes[ip], $
-                                     context = graphics_context)
+                                     ;; context = info.graphics_context)
+                                     context = 'spatial')
            data = !NULL
 
            ;;==Save string for filenames

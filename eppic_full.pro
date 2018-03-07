@@ -102,7 +102,6 @@ pro eppic_full, path=path, $
   ;;==Declare data ranges for spatial data image panels
   ;;  NB: ranges span [x0,xf) rather than [x0,xf-1].
   ranges = {x:[0,grid.nx], $
-            ;; y:[grid.ny/2,grid.ny], $
             y:[0,grid.ny], $
             z:[0,grid.nz]}
   center = {x:grid.nx/2, $
@@ -146,7 +145,7 @@ pro eppic_full, path=path, $
   info['efield_sw'] = 3
 
   ;;==Run graphics routines
-  eppic_graphics, info
+  ;; eppic_graphics, info
 
                                 ;-----------------------------;
                                 ; 2-D images of spectral data ;
@@ -157,10 +156,13 @@ pro eppic_full, path=path, $
 
   ;;==Declare panel positions for spectral data
   position = multi_position(layout[*], $
-                            edges = [0.12,0.10,0.80,0.80], $
-                            buffer = [0.0,0.2])
+                            edges = [0.12,0.20,0.80,0.80], $
+                            buffer = [0.0,0.1])
 
   ;;==Declare data ranges for spectral data
+  ranges = {x:[0,grid.nx], $
+            y:[0,grid.ny], $
+            z:[0,grid.nz]}
   center = {x:0, $
             y:0, $
             z:0}
@@ -177,9 +179,10 @@ pro eppic_full, path=path, $
   info['dc_width'] = 8
   info['missing'] = -1e10
   info['data_context'] = 'spatial'
+  info['axis_style'] = 1
   info['graphics_context'] = 'spectral'
   info['full_transform'] = 0B
-  info['fft_smooth'] = 3
+  info['fft_smooth'] = 5
 
   ;;==Run graphics routines
   eppic_graphics, info

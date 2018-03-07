@@ -11,12 +11,15 @@ pro eppic_spectral_graphics, imgplane,info
 
   ;;==Transform spatial data at each time step
   if strcmp(info.data_context,'spatial') then begin
-     for it=0,nt-1 do begin
-        tmp = imgplane.f
-        tmp[*,*,it] = fft(tmp[*,*,it],/overwrite)
-        imgplane.f = tmp
-        tmp = !NULL
-     endfor              
+     ;; tmp = imgplane.f
+     max_dim = max([nx,ny])
+     min_dim = min([nx,ny])
+     tmp = fltarr(max_dim,max_dim,nt)
+     tmp[0:nx-1,0:ny-1,*] = imgplane.f
+     tmp = shift(tmp,[0,max_dim/2-min_dim/2,0])
+     for it=0,nt-1 do tmp[*,*,it] = fft(tmp[*,*,it],/overwrite)
+     imgplane.f = tmp
+     tmp = !NULL
      info.image_name += '-fft'
   endif
 
@@ -40,8 +43,8 @@ pro eppic_spectral_graphics, imgplane,info
      imgplane.f = real_part(imgplane.f)^2
      ;;--Recenter
      imgplane.f = shift(imgplane.f,nx/2,ny/2,nw/2)
-     imgplane.x -= imgplane.dx*nx/2
-     imgplane.y -= imgplane.dy*ny/2
+     ;; imgplane.x -= imgplane.dx*nx/2
+     ;; imgplane.y -= imgplane.dy*ny/2
      ;;--Zero the near-DC components (crude high-pass filter)
      dc_width = info.dc_width
      tmp = imgplane.f
@@ -138,13 +141,13 @@ pro eppic_spectral_graphics, imgplane,info
      imgplane.f = real_part(imgplane.f)^2
      ;;--Recenter
      imgplane.f = shift(imgplane.f,nx/2,ny/2,0)
-     imgplane.x -= imgplane.dx*nx/2
-     imgplane.y -= imgplane.dy*ny/2
      ;;--Zero the near-DC components (crude high-pass filter)
      dc_width = info.dc_width
      tmp = imgplane.f
-     tmp[nx/2-dc_width:nx/2+dc_width, $
-         ny/2-dc_width:ny/2+dc_width,*] = 0.0
+     ;; tmp[nx/2-dc_width:nx/2+dc_width, $
+     ;;     ny/2-dc_width:ny/2+dc_width,*] = 0.0
+     tmp[nx/2-3:nx/2+3,*,*] = 0.0
+     tmp[*,ny/2,*] = 0.0
      imgplane.f = tmp
      tmp = !NULL
      ;;--Smooth
@@ -160,25 +163,65 @@ pro eppic_spectral_graphics, imgplane,info
      tmp[where(finite(imgplane.f) eq 0)] = info.missing
      imgplane.f = tmp
      tmp = !NULL
+     ;;--Rebin to a square
+     ;; if nx ne ny then begin
+     ;;    max_dim = max([nx,ny])
+     ;;    imgplane.f = rebin(imgplane.f,[max_dim,max_dim,nt])
+     ;;    imgplane.x = rebin(imgplane.x,max_dim)
+     ;;    imgplane.y = rebin(imgplane.y,max_dim)
+     ;; endif
+
+     ;;==Get new dimensions
+     img_size = size(imgplane.f)
+     ny = img_size[2]
+     nx = img_size[1]
 
      ;;==Create images of Fourier-transformed data
      basename = info.filepath+path_sep()+ $
                 info.image_name+'_t'+info.plane_string
      min_value = max(imgplane.f,/nan)-30
      max_value = max(imgplane.f,/nan)
-     eppic_xyt_graphics, imgplane.f,imgplane.x,imgplane.y, $
+     eppic_xyt_graphics, imgplane.f, $
+                         indgen(nx),indgen(ny), $
+                         ;; imgplane.x,imgplane.y, $
                          info, $
-                         xrng = imgplane.xr, $
-                         yrng = imgplane.yr, $
-                         xrange = [-10*!pi,10*!pi], $
-                         ;; yrange = [0,2*!pi], $
-                         yrange = [-10*!pi,10*!pi], $
+                         ;; xrng = imgplane.xr, $
+                         ;; yrng = imgplane.yr, $
+                         ;; ;; xrange = [-2*!pi,2*!pi], $
+                         ;; xrange = [0,2*!pi], $
+                         ;; ;; yrange = [0,2*!pi], $
+                         ;; yrange = [-2*!pi,2*!pi], $
+                         ;; xrange = [nx/2,nx-1], $
+                         ;; yrange = [0,ny-1], $
+                         xrange = [nx/4,3*nx/4], $
+                         yrange = [ny/4,3*ny/4], $
+                         xtickdir = 1, $
+                         ytickdir = 1, $
+                         xmajor = 7, $
+                         xminor = 1, $
+                         ymajor = 7, $
+                         yminor = 1, $
+                         xshowtext = 1, $
+                         yshowtext = 1, $
+                         xticklen = 0.01, $
+                         yticklen = 0.01, $
+                         ;; xtickname = ['$-2\pi$','$-\pi$','0','$+\pi$','$+2\pi$'], $
+                         xtickname = ['$-\pi$','$-\pi/2$','0','$+\pi/2$','$+\pi$'], $
+                         ;; xtickname = ['0','$+\pi$','$+2\pi$'], $
+                         ;; ytickname = ['$-2\pi$','$-\pi$','0','$+\pi$','$+2\pi$'], $
+                         ytickname = ['$-\pi$','$-\pi/2$','0','$+\pi/2$','$+\pi$'], $
+                         ;; xtickvalues = imgplane.dx*[0,nx/4,nx/2,3*nx/4,nx-1], $
+                         xtickvalues = [nx/4,3*nx/8,nx/2,5*nx/8,3*nx/4], $
+                         ;; xtickvalues = imgplane.dx*[nx/2,3*nx/4,nx-1], $
+                         ;; ytickvalues = imgplane.dy*[0,ny/4,ny/2,3*ny/4,ny-1], $
+                         ytickvalues = [ny/4,3*ny/8,ny/2,5*ny/8,3*ny/4], $
+                         ;; aspect_ratio = nx/ny, $
                          rgb_table = 39, $
                          min_value = min_value, $
                          max_value = max_value, $
                          basename = basename, $
-                         dimensions = [nx/2,ny], $
-                         /clip_y_axes, $
+                         dimensions = 0.5*[nx,ny], $
+                         ;; /clip_y_axes, $
                          colorbar_title = "Power [dB]", $
                          expand = 3, $
                          rescale = 0.8, $
