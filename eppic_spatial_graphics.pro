@@ -117,15 +117,6 @@ pro eppic_spatial_graphics, imgplane,info
         Et = atan(Ey,Ex)
 
         ;;==Smooth E-field components
-        ;; s_width = 3
-        ;; if s_width gt 1 then begin
-        ;;    Ex = smooth(Ex,[s_width,s_width,1],/edge_wrap)
-        ;;    Ey = smooth(Ey,[s_width,s_width,1],/edge_wrap)
-        ;;    Er = smooth(Er,[s_width,s_width,1],/edge_wrap)
-        ;;    Et = smooth(Et,[s_width,s_width,1],/edge_wrap)
-        ;;    image_string = info.plane_string+'-sw'+ $
-        ;;                   strcompress(s_width,/remove_all)
-        ;; endif
         if info.efield_sw gt 1 then begin
            str_sw = strcompress(info.efield_sw,/remove_all)
            printf, info.wlun,"[EPPIC_SPATIAL_GRAPHICS] Smoothing (sw = "+str_sw+")"
