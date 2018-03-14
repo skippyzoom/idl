@@ -16,7 +16,8 @@ function set_eppic_params, path=path
   ; Defaults ;
   ;----------;
   if n_elements(params) ne 0 then begin
-     if ~params.haskey('ndim_space') then params.ndim_space = 1+params.haskey('ny')+params.haskey('nz')
+     if ~params.haskey('ndim_space') then $
+        params.ndim_space = 1+params.haskey('ny')+params.haskey('nz')
      if params.ndim_space lt 3 then params.nz = 1
      if params.ndim_space lt 3 then params.dz = 0.0
      if params.ndim_space lt 2 then params.ny = 1
@@ -86,7 +87,8 @@ function set_eppic_params, path=path
                                      'y', -24)          ;yocto
      params.units['bases'] = hash('abs_den', '$m^{-3}$', $ ;Absolute density
                                   'rel_den', 'rel.', $     ;Relative density
-                                  'phi', 'V', $            ;Electrostatic potential
+                                  'phi', 'V', $            ;Electrostatic 
+                                                           ;potential
                                   'E', 'V/m')              ;Electric field
   endif
 

@@ -18,7 +18,8 @@ function read_parameter_file, path, $
      default_names = ['ppic3d.i','eppic.i']
      check_default = where(file_test(path+path_sep()+default_names),count)
      if count ne 0 then begin
-        filename = expand_path(path+path_sep()+default_names[min(check_default)])
+        filename = expand_path(path+path_sep()+ $
+                               default_names[min(check_default)])
         if keyword_set(verbose) then $
            print, "[READ_PARAMETER_FILE] Using parameter file ",filename
      endif else begin
