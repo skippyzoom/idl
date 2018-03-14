@@ -16,7 +16,7 @@ function read_ph5_data, data_name, $
                         ext=ext, $
                         timestep=timestep, $
                         type=type, $
-                        eppic_ft_data=eppic_ft_data, $
+                        data_isft=data_isft, $
                         run_dir=run_dir, $
                         path=path
 
@@ -66,7 +66,7 @@ function read_ph5_data, data_name, $
   nt = n_elements(h5_file)
 
   ;;==Check if the data is EPPIC Fourier-transformed data
-  if keyword_set(eppic_ft_data) then begin
+  if keyword_set(data_isft) then begin
      ;; tmp = get_h5_data(h5_file[0],data_name+'_index')
      tmp = get_h5_data(h5_file_ref,data_name+'_index')
      if n_elements(tmp) ne 0 then begin
@@ -110,7 +110,7 @@ function read_ph5_data, data_name, $
   null_count = 0L
 
   ;;==Check if data is Fourier Transformed output
-  if keyword_set(eppic_ft_data) then begin
+  if keyword_set(data_isft) then begin
 
      for it=0,nt-1 do begin
         ;;==Read data set
