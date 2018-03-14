@@ -141,7 +141,8 @@ function read_ph5_plane, data_name, $
   if n_dim eq 2 || n_dim eq 3 then begin
 
      ;;==Loop over all available time steps
-     if keyword_set(verbose) then printf, lun,"[READ_PH5_PLANE] Reading ",data_name,"..."
+     if keyword_set(verbose) then $
+        printf, lun,"[READ_PH5_PLANE] Reading ",data_name,"..."
 
      ;;==Set counted for missing data
      null_count = 0L
@@ -155,7 +156,8 @@ function read_ph5_plane, data_name, $
            if n_elements(tmp_data) ne 0 then begin
               tmp_size = size(tmp_data)
               tmp_len = (tmp_size[0] eq 1) ? 1 : tmp_size[2]
-              tmp_cplx = complex(tmp_data[0,0:tmp_len-1],tmp_data[1,0:tmp_len-1])
+              tmp_cplx = complex(tmp_data[0,0:tmp_len-1], $
+                                 tmp_data[1,0:tmp_len-1])
               ;;==Read index set
               tmp_ind = get_h5_data(h5_file[it],data_name+'_index')
               ;;==Assign to intermediate struct
@@ -200,7 +202,8 @@ function read_ph5_plane, data_name, $
               full_size = [ndim_space,nx,ny,nz]
               case ndim_space of
                  2: begin
-                    full_array = complexarr(full_size[1],full_size[2])              
+                    full_array = complexarr(full_size[1], $
+                                            full_size[2])
                     full_array[0:ft_size[1]-1,0:ft_size[2]-1] = ft_array
                     ft_array = !NULL              
                     full_array = shift(full_array,[1,1])
@@ -208,8 +211,10 @@ function read_ph5_plane, data_name, $
                     data[*,*,it] = full_array
                  end
                  3: begin
-                    full_array = complexarr(full_size[1],full_size[2],full_size[3])
-                    full_array[0:ft_size[1]-1,0:ft_size[2]-1,0:ft_size[3]-1] = ft_array
+                    full_array = complexarr(full_size[1], $
+                                            full_size[2],full_size[3])
+                    full_array[0:ft_size[1]-1, $
+                               0:ft_size[2]-1,0:ft_size[3]-1] = ft_array
                     ft_array = !NULL                 
                     full_array = shift(full_array,[1,1,0])
                     full_array = conj(full_array)
@@ -264,7 +269,8 @@ function read_ph5_plane, data_name, $
   endif $                       ;n_dims eq 2 or 3
   else if n_dim eq 0 then $
      printf, lun,"[READ_PH5_PLANE] Could not read ",data_name $
-  else $
-     printf, lun,"[READ_PH5_PLANE] Only works for input data with 2 or 3 spatial dimensions."
+  else begin
+     printf, lun,"[READ_PH5_PLANE] Only works for input data"
+     printf, lun,"                 with 2 or 3 spatial dimensions."
 
 end
