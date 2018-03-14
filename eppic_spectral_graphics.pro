@@ -11,12 +11,11 @@ pro eppic_spectral_graphics, imgplane,info
 
   ;;==Transform spatial data at each time step
   if strcmp(info.data_context,'spatial') then begin
-     ;; tmp = imgplane.f
      max_dim = max([nx,ny])
      min_dim = min([nx,ny])
      tmp = fltarr(max_dim,max_dim,nt)
      tmp[0:nx-1,0:ny-1,*] = imgplane.f
-     tmp = shift(tmp,[0,max_dim/2-min_dim/2,0])
+     ;; tmp = shift(tmp,[0,max_dim/2-min_dim/2,0])
      for it=0,nt-1 do tmp[*,*,it] = fft(tmp[*,*,it],/overwrite)
      imgplane.f = tmp
      tmp = !NULL
@@ -29,11 +28,14 @@ pro eppic_spectral_graphics, imgplane,info
      imgsize = size(imgplane.f)
      ny = imgsize[2]
      nx = imgsize[1]
-
+;; STOP
      ;;==Transform the time dimension
      nw = next_power2(nt)
      tmp = make_array(nx,ny,nw,type=6,value=0.0)
+     h_size = nw/2
+     h_win = hanning(h_size,alpha=0.5)
      tmp[*,*,0:nt-1] = imgplane.f
+     for iw=0,h_size-1 do tmp[*,*,iw] *= h_win[iw]
      tmp = fft(tmp,dim=3)
      imgplane.f = tmp
      tmp = !NULL
@@ -43,13 +45,13 @@ pro eppic_spectral_graphics, imgplane,info
      imgplane.f = real_part(imgplane.f)^2
      ;;--Recenter
      imgplane.f = shift(imgplane.f,nx/2,ny/2,nw/2)
-     ;; imgplane.x -= imgplane.dx*nx/2
-     ;; imgplane.y -= imgplane.dy*ny/2
      ;;--Zero the near-DC components (crude high-pass filter)
      dc_width = info.dc_width
      tmp = imgplane.f
-     tmp[nx/2-dc_width:nx/2+dc_width, $
-         ny/2-dc_width:ny/2+dc_width,*] = 0.0
+     ;; tmp[nx/2-dc_width:nx/2+dc_width, $
+     ;;     ny/2-dc_width:ny/2+dc_width,*] = 0.0
+     tmp[nx/2-3:nx/2+3,*,*] = 0.0
+     tmp[*,ny/2,*] = 0.0
      imgplane.f = tmp
      tmp = !NULL
      ;;--Smooth
@@ -65,9 +67,19 @@ pro eppic_spectral_graphics, imgplane,info
      tmp[where(finite(imgplane.f) eq 0)] = info.missing
      imgplane.f = tmp
      tmp = !NULL
-
+;; STOP
+     ;; ;;-->DEV
+     ;; help, imgplane.f
+     ;; imgplane.f = imgplane.f[*,ny/2:*,*]
+     ;; help, imgplane.f
+     ;; ;;==Get new dimensions
+     ;; imgsize = size(imgplane.f)
+     ;; ny = imgsize[2]
+     ;; nx = imgsize[1]
+     ;; ;;<--
+;; STOP
      ;;==Interpolate
-     theta_range = [0,360]
+     theta_range = [0,90]
      rtp = xyz_rtp(imgplane.f[*,*,0],dx=imgplane.dx,dy=imgplane.dy, $
                    theta_range = theta_range)
      nk = n_elements(rtp.r_vals)
@@ -78,7 +90,7 @@ pro eppic_spectral_graphics, imgplane,info
                       theta_range = theta_range)
         ktw[*,*,iw] = rtp.data
      endfor
-
+STOP
      ;;==Build vector of frequencies
      w_max = 2*!pi/(info.params.dt*info.params.nout)
      w_vals = w_max*(dindgen(nw)/nw-0.5)
@@ -163,13 +175,6 @@ pro eppic_spectral_graphics, imgplane,info
      tmp[where(finite(imgplane.f) eq 0)] = info.missing
      imgplane.f = tmp
      tmp = !NULL
-     ;;--Rebin to a square
-     ;; if nx ne ny then begin
-     ;;    max_dim = max([nx,ny])
-     ;;    imgplane.f = rebin(imgplane.f,[max_dim,max_dim,nt])
-     ;;    imgplane.x = rebin(imgplane.x,max_dim)
-     ;;    imgplane.y = rebin(imgplane.y,max_dim)
-     ;; endif
 
      ;;==Get new dimensions
      img_size = size(imgplane.f)

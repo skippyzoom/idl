@@ -57,10 +57,11 @@ pro eppic_full, path=path, $
   ;;==Choose time steps for images
   ;; nt = 9
   ;; timestep = params.nout*(nt_max/(nt-1))*lindgen(nt)
+  timestep = params.nout*lindgen(nt_max)
   ;; layout = [3,3]
   ;; timestep = params.nout*[1,nt_max/4,nt_max/2,3*nt_max/4,nt_max-1]
   ;; timestep = params.nout*[nt_max/2,nt_max-1]
-  timestep = params.nout*[0,nt_max/2,nt_max-1]
+  ;; timestep = params.nout*[0,nt_max/2,nt_max-1]
   nt = n_elements(timestep)
   layout = [1,nt]
   string_time = string(1e3*params.dt*timestep,format='(f8.2)')
@@ -142,10 +143,10 @@ pro eppic_full, path=path, $
   info['data_context'] = 'spatial'
   info['graphics_context'] = 'spatial'
   info['movies'] = 0B
-  info['efield_sw'] = 3
+  info['efield_sw'] = 1
 
   ;;==Run graphics routines
-  ;; eppic_graphics, info
+  eppic_graphics, info
 
                                 ;-----------------------------;
                                 ; 2-D images of spectral data ;
@@ -178,14 +179,14 @@ pro eppic_full, path=path, $
   info['data_names'] = data_names
   info['dc_width'] = 8
   info['missing'] = -1e10
-  info['data_context'] = 'spatial'
   info['axis_style'] = 1
+  info['data_context'] = 'spatial'
   info['graphics_context'] = 'spectral'
-  info['full_transform'] = 0B
+  info['full_transform'] = 1B
   info['fft_smooth'] = 5
 
   ;;==Run graphics routines
-  eppic_graphics, info
+  ;; eppic_graphics, info
 
   ;;==Print closing message
   printf, wlun,"[EPPIC_FULL] Finished"

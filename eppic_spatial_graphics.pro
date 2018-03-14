@@ -52,7 +52,7 @@ pro eppic_spatial_graphics, imgplane,info
         if strcmp(info.current_plane,info.perp_to_B) then begin
            image_string = info.plane_string
            basename = info.filepath+path_sep()+ $
-                      info.image_name+image_string+'_rms'+info.plane_string
+                      info.image_name+'_rms'+image_string+info.plane_string
            mean_field_plots, imgplane.x,imgplane.y, $
                              scale*imgplane.f,scale*n0*(1+imgplane.f), $
                              info, $
@@ -124,7 +124,7 @@ pro eppic_spatial_graphics, imgplane,info
            Ey = smooth(Ey,[info.efield_sw,info.efield_sw,1],/edge_wrap)
            Er = smooth(Er,[info.efield_sw,info.efield_sw,1],/edge_wrap)
            Et = smooth(Et,[info.efield_sw,info.efield_sw,1],/edge_wrap)
-           image_string = info.plane_string+'-sw'+str_sw
+           image_string += '-sw'+str_sw
         endif
 
         ;;==Create graphics of electric field
@@ -217,10 +217,17 @@ pro eppic_spatial_graphics, imgplane,info
            if strcmp(info.current_plane,info.perp_to_B) then begin
               image_string = info.plane_string
               basename = info.filepath+path_sep()+ $
-                         'efield'+image_string+'_mean'+info.plane_string
+                         'efield'+field_string+'_mean_xy'+image_string+info.plane_string
               mean_field_plots, imgplane.x,imgplane.y, $
                                 scale*Ex,scale*Ey, $
                                 info, $
+                                basename = basename
+              basename = info.filepath+path_sep()+ $
+                         'efield'+field_string+'_mean_rt'+image_string+info.plane_string
+              mean_field_plots, imgplane.x,imgplane.y, $
+                                scale*Er,Et, $
+                                info, $
+                                /rms, $
                                 basename = basename
            endif       ;;--perp_to_B
         endif          ;;--(not)movies

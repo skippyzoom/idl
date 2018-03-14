@@ -3,7 +3,6 @@
 ; been interpolated from Cartesian to polar in k-space.
 ;-
 pro eppic_ktw_graphics, ktw,rtp,info, $
-                        lun=lun, $
                         lambda=lambda, $
                         yrange=yrange, $
                         xrange=xrange, $
@@ -20,7 +19,6 @@ pro eppic_ktw_graphics, ktw,rtp,info, $
   if n_dims eq 3 then begin
 
      ;;==Defaults and guards
-     if n_elements(lun) eq 0 then lun = -1
      if n_elements(xrange) eq 0 then xrange = !NULL
      if n_elements(yrange) eq 0 then yrange = !NULL
      if n_elements(aspect_ratio) eq 0 then aspect_ratio = 1.0
@@ -80,10 +78,10 @@ pro eppic_ktw_graphics, ktw,rtp,info, $
         string_lambda = string(lambda[il],format='(f5.2)')
         string_lambda = strcompress(string_lambda,/remove_all)
         image_save, img[0],filename=basename+ $
-                    '_lambda'+string_lambda+'.pdf',lun=lun
+                    '_lambda'+string_lambda+'.pdf',lun=info.wlun
 
      endfor
   endif $
-  else printf, lun,"[EPPIC_KTW_GRAPHICS] Incorrect dimensions. Could not produce graphics."
+  else printf, info.wlun,"[EPPIC_KTW_GRAPHICS] Incorrect dimensions. Could not produce graphics."
 
 end
