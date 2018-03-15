@@ -26,6 +26,14 @@
 ;     Boolean keyword indicating that this routine should
 ;     swap the x and y axis by exchanging xdata and ydata,
 ;     and rotating fdata by 270 degrees.
+; CALC_FFT (default: unset)
+;     Boolean keyword or integer indicating whether to 
+;     calculate the FFT of the data before creating images.
+;     If the user sets /calc_fft, this routine will 
+;     calculate the forward transform. The user can also 
+;     pass an integer to indicate the transform direction
+;     (e.g., calc_fft = -1 will calculate the inverse 
+;     transform).
 ; INFO_PATH (default: './')
 ;     Fully qualified path to the simulation parameter
 ;     file (ppic3d.i or eppic.i).
@@ -42,6 +50,7 @@ pro eppic_movie, data_name, $
                  data_type=data_type, $
                  data_isft=data_isft, $
                  swap_xy=swap_xy, $
+                 calc_fft=calc_fft, $
                  info_path=info_path, $
                  data_path=data_path, $
                  save_path=save_path, $
@@ -104,6 +113,20 @@ pro eppic_movie, data_name, $
      fsize = size(fdata)
      nx = fsize[1]
      ny = fsize[2]
+
+     ;;==Calculate FFT, if requested
+     if keyword_set(calc_fft) then begin
+        for it=0,nt-1 do begin
+           fdata[*,*,it] = fft(fdata[*,*,it],calc_fft)
+           if calc_fft gt 0 then begin
+              fdata[*,*,it] = real_part(fdata[*,*,it])
+              fdata[*,*,it] = shift(fdata[*,*,it],[nx/2,ny/2])
+              fdata[nx/2-3:nx/2+3,ny/2-3:ny/2+3,*] = min(fdata[*,*,it])
+              fdata /= max(fdata[*,*,it])
+              fdata[*,*,it] = 10*alog10(fdata[*,*,it]^2)
+           endif
+        endfor
+     endif
 
      ;;==Set up an array of times for the title
      str_time = strcompress(string(1e3*params.dt*timestep, $
