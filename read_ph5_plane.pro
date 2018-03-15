@@ -272,5 +272,5 @@ function read_ph5_plane, data_name, $
   else begin
      printf, lun,"[READ_PH5_PLANE] Only works for input data"
      printf, lun,"                 with 2 or 3 spatial dimensions."
-
+  endelse
 end
