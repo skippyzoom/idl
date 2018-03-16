@@ -59,6 +59,12 @@ function set_eppic_params, path=path
      if ~params.haskey('vzthd1') then params.vzthd1 = 0.0
   endif
 
+  ;-----------;
+  ; Additions ;
+  ;-----------;
+  params.sizepertime = long64(params.nx*params.nsubdomains)* $
+                       long64(params.ny)*long64(params.nz)
+
   ;-------;
   ; Units ;
   ;-------;
