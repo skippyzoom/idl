@@ -85,7 +85,11 @@ pro eppic_movie, data_name, $
   ydata = grid.dy*indgen(grid.ny)
 
   ;;==Read a single (2+1)-D plane of data
-  fdata = read_ph5_plane(data_name, $
+  if strcmp(data_name,'e',1,/fold_case) then $
+     read_name = 'phi' $
+  else $
+     read_name = data_name
+  fdata = read_ph5_plane(read_name, $
                          ext = '.h5', $
                          timestep = timestep, $
                          plane = plane, $
@@ -126,8 +130,77 @@ pro eppic_movie, data_name, $
               fdata[*,*,it] = 10*alog10(fdata[*,*,it]^2)
            endif
         endfor
+        if calc_fft lt 1 then begin
+           xtitle = '$k_{Zon}$ [m$^{-1}$]'
+           ytitle = '$k_{Ver}$ [m$^{-1}$]'
+        endif $
+        else begin
+           xtitle = 'Zonal [m]'
+           ytitle = 'Vertical [m]'
+        endelse
      endif
 
+     ;;==Calculate E, if necessary
+     if strcmp(data_name,'e',1,/fold_case) then begin
+        Ex = fltarr(size(fdata,/dim))
+        Ey = fltarr(size(fdata,/dim))
+        for it=0,nt-1 do begin
+           gradf = gradient(fdata[*,*,it], $
+                            dx = params.dx*params.nout_avg, $
+                            dy = params.dy*params.nout_avg)
+           Ex[*,*,it] = -1.0*gradf.x
+           Ey[*,*,it] = -1.0*gradf.y
+        endfor
+     endif
+
+     ;;==Set graphics preferences
+     if strcmp(data_name,'den',3) then begin
+        min_value = -max(abs(fdata[*,*,1:*]))
+        max_value = +max(abs(fdata[*,*,1:*]))
+        rgb_table = 5
+     endif
+     if strcmp(data_name,'phi') then begin
+        min_value = -max(abs(fdata[*,*,1:*]))
+        max_value = +max(abs(fdata[*,*,1:*]))
+        ct = get_custom_ct(2)
+        rgb_table = [[ct.r],[ct.g],[ct.b]]
+     endif
+     if strcmp(data_name,'Ex') || $
+        strcmp(data_name,'efield_x') then begin
+        fdata = Ex
+        min_value = -max(abs(fdata[*,*,1:*]))
+        max_value = +max(abs(fdata[*,*,1:*]))
+        rgb_table = 5
+     endif
+     if strcmp(data_name,'Ey') || $
+        strcmp(data_name,'efield_y') then begin
+        fdata = Ey
+        min_value = -max(abs(fdata[*,*,1:*]))
+        max_value = +max(abs(fdata[*,*,1:*]))
+        rgb_table = 5
+     endif
+     if strcmp(data_name,'Er') || $
+        strcmp(data_name,'efield_r') || $
+        strcmp(data_name,'efield') then begin
+        fdata = sqrt(Ex^2 + Ey^2)
+        min_value = 0
+        max_value = max(fdata[*,*,1:*])
+        rgb_table = 3
+     endif
+     if strcmp(data_name,'Et') || $
+        strcmp(data_name,'efield_t') then begin
+        fdata = atan(Ey,Ex)
+        min_value = -!pi
+        max_value = +!pi
+        ct = get_custom_ct(2)
+        rgb_table = [[ct.r],[ct.g],[ct.b]]
+     endif
+     if keyword_set(calc_fft) then begin
+        min_value = -30
+        max_value = 0
+        rgb_table = 39
+     endif
+STOP
      ;;==Set up an array of times for the title
      str_time = strcompress(string(1e3*params.dt*timestep, $
                                    format='(f6.2)'),/remove_all)
@@ -137,15 +210,13 @@ pro eppic_movie, data_name, $
      filename = expand_path(save_path+path_sep()+save_name)
      data_movie, fdata,xdata,ydata, $
                  filename = filename, $
-                 min_value = -max(abs(fdata)), $
-                 max_value = +max(abs(fdata)), $
-                 rgb_table = 5, $
+                 min_value = min_value, $
+                 max_value = max_value, $
+                 rgb_table = rgb_table, $
                  axis_style = 1, $
                  title = title, $
                  xstyle = 1, $
                  ystyle = 1, $
-                 xtitle = 'Zonal [m]', $
-                 ytitle = 'Vertical [m]', $
                  xmajor = 5, $
                  xminor = 1, $
                  ymajor = 5, $
