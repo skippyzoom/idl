@@ -7,7 +7,7 @@
 ;
 ; Created 14Mar2018 by Matt Young.
 ;------------------------------------------------------------------------------
-;                             **PARAMETERS**
+;                                 **PARAMETERS**
 ; DATA_NAME
 ;     The name of the data quantity to read. If the data
 ;     does not exist, read_ph5_plane.pro will return 0
