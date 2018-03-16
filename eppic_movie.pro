@@ -22,10 +22,11 @@
 ; DATA_ISFT (default: 0)
 ;     Boolean that represents whether the EPPIC data 
 ;     quantity is Fourier-transformed or not.
-; SWAP_XY (default: unset)
-;     Boolean keyword indicating that this routine should
-;     swap the x and y axis by exchanging xdata and ydata,
-;     and rotating fdata by 270 degrees.
+; ROTATE (default: 0)
+;     Integer indcating whether, and in which direction,
+;     to rotate the data array and axes before creating a
+;     movie. This parameter corresponds to the 'direction'
+;     parameter in IDL's rotate.pro.
 ; FFT_DIRECTION (default: 0)
 ;     Integer indicating whether, and in which direction,
 ;     to calculate the FFT of the data before creating a
@@ -45,7 +46,7 @@ pro eppic_movie, data_name, $
                  plane=plane, $
                  data_type=data_type, $
                  data_isft=data_isft, $
-                 swap_xy=swap_xy, $
+                 rotate=rotate, $
                  fft_direction=fft_direction, $
                  info_path=info_path, $
                  data_path=data_path, $
@@ -56,6 +57,7 @@ pro eppic_movie, data_name, $
   if n_elements(plane) eq 0 then plane = 'xy'
   if n_elements(data_type) eq 0 then data_type = 4
   if n_elements(data_isft) eq 0 then data_isft = 0B
+  if n_elements(rotate) eq 0 then rotate = 0
   if n_elements(fft_direction) eq 0 then fft_direction = 0
   if n_elements(info_path) eq 0 then info_path = './'
   if n_elements(data_path) eq 0 then data_path = './'
@@ -99,15 +101,20 @@ pro eppic_movie, data_name, $
   fsize = size(fdata)
   if fsize[0] eq 3 then begin
 
-     ;;==Swap x and y axes, if requested
-     if keyword_set(swap_xy) then begin
-        tmp = ydata
-        ydata = xdata
-        xdata = tmp
-        fsize = size(fdata)
-        tmp = fdata
-        fdata = make_array(fsize[2],fsize[1],nt,type=fsize[4],/nozero)
-        for it=0,nt-1 do fdata[*,*,it] = rotate(tmp[*,*,it],3)
+     ;;==Rotate data, if requested
+     if rotate gt 0 then begin
+        if rotate mod 2 then begin
+           tmp = ydata
+           ydata = xdata
+           xdata = tmp
+           fsize = size(fdata)
+           tmp = fdata
+           fdata = make_array(fsize[2],fsize[1],nt,type=fsize[4],/nozero)
+           for it=0,nt-1 do fdata[*,*,it] = rotate(tmp[*,*,it],rotate)
+        endif $
+        else begin
+           for it=0,nt-1 do fdata[*,*,it] = rotate(fdata[*,*,it],rotate)
+        endelse
      endif
 
      ;;==Get dimensions of data array
@@ -210,6 +217,8 @@ pro eppic_movie, data_name, $
                  rgb_table = rgb_table, $
                  axis_style = 1, $
                  title = title, $
+                 xtitle = xtitle, $
+                 ytitle = ytitle, $
                  xstyle = 1, $
                  ystyle = 1, $
                  xmajor = 5, $
