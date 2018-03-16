@@ -26,14 +26,10 @@
 ;     Boolean keyword indicating that this routine should
 ;     swap the x and y axis by exchanging xdata and ydata,
 ;     and rotating fdata by 270 degrees.
-; CALC_FFT (default: unset)
-;     Boolean keyword or integer indicating whether to 
-;     calculate the FFT of the data before creating images.
-;     If the user sets /calc_fft, this routine will 
-;     calculate the forward transform. The user can also 
-;     pass an integer to indicate the transform direction
-;     (e.g., calc_fft = -1 will calculate the inverse 
-;     transform).
+; FFT_DIRECTION (default: 0)
+;     Integer indicating whether, and in which direction,
+;     to calculate the FFT of the data before creating a
+;     movie. Setting fft_direction = 0 results in no FFT.
 ; INFO_PATH (default: './')
 ;     Fully qualified path to the simulation parameter
 ;     file (ppic3d.i or eppic.i).
@@ -50,7 +46,7 @@ pro eppic_movie, data_name, $
                  data_type=data_type, $
                  data_isft=data_isft, $
                  swap_xy=swap_xy, $
-                 calc_fft=calc_fft, $
+                 fft_direction=fft_direction, $
                  info_path=info_path, $
                  data_path=data_path, $
                  save_path=save_path, $
@@ -60,6 +56,7 @@ pro eppic_movie, data_name, $
   if n_elements(plane) eq 0 then plane = 'xy'
   if n_elements(data_type) eq 0 then data_type = 4
   if n_elements(data_isft) eq 0 then data_isft = 0B
+  if n_elements(fft_direction) eq 0 then fft_direction = 0
   if n_elements(info_path) eq 0 then info_path = './'
   if n_elements(data_path) eq 0 then data_path = './'
   if n_elements(save_path) eq 0 then save_path = './'
@@ -119,18 +116,16 @@ pro eppic_movie, data_name, $
      ny = fsize[2]
 
      ;;==Calculate FFT, if requested
-     if keyword_set(calc_fft) then begin
-        for it=0,nt-1 do begin
-           fdata[*,*,it] = fft(fdata[*,*,it],calc_fft)
-           if calc_fft gt 0 then begin
-              fdata[*,*,it] = real_part(fdata[*,*,it])
-              fdata[*,*,it] = shift(fdata[*,*,it],[nx/2,ny/2])
-              fdata[nx/2-3:nx/2+3,ny/2-3:ny/2+3,*] = min(fdata[*,*,it])
-              fdata /= max(fdata[*,*,it])
-              fdata[*,*,it] = 10*alog10(fdata[*,*,it]^2)
-           endif
-        endfor
-        if calc_fft lt 1 then begin
+     if fft_direction ne 0 then begin
+        for it=0,nt-1 do $
+           fdata[*,*,it] = real_part(fft(fdata[*,*,it],fft_direction))
+        if fft_direction lt 0 then begin
+           fdata = shift(fdata,[nx/2,ny/2,0])
+           fdata[nx/2-3:nx/2+3,ny/2-3:ny/2+3,*] = min(fdata)
+           fdata /= max(fdata)
+           fdata = 10*alog10(fdata^2)
+        endif
+        if fft_direction lt 1 then begin
            xtitle = '$k_{Zon}$ [m$^{-1}$]'
            ytitle = '$k_{Ver}$ [m$^{-1}$]'
         endif $
@@ -195,12 +190,12 @@ pro eppic_movie, data_name, $
         ct = get_custom_ct(2)
         rgb_table = [[ct.r],[ct.g],[ct.b]]
      endif
-     if keyword_set(calc_fft) then begin
+     if fft_direction ne 0 then begin
         min_value = -30
         max_value = 0
         rgb_table = 39
      endif
-STOP
+
      ;;==Set up an array of times for the title
      str_time = strcompress(string(1e3*params.dt*timestep, $
                                    format='(f6.2)'),/remove_all)
