@@ -8,20 +8,7 @@
 ; Created on 11Dec2017 (may)
 ;-
 pro eppic_basic, path=path, $
-                 directory=directory, $
-                 moments=moments, $
-                 phi=phi, $
-                 dens=dens, $
-                 denft=denft, $
-                 all=all
-
-  ;;==Defaults and guards
-  if keyword_set(all) then begin
-     moments = 1B
-     phi = 1B
-     dens = 1B
-     denft = 1B
-  endif
+                 directory=directory
 
   ;;==Navigate to working directory
   if n_elements(path) eq 0 then path = './'
@@ -41,8 +28,7 @@ pro eppic_basic, path=path, $
 
   ;;==Read in simulation parameters
   params = set_eppic_params(path=path)
-  grid = set_grid(path=path)
-  nt_max = calc_timesteps(path=path,grid=grid)
+  nt_max = calc_timesteps(path=path)
 
 
                                 ;-------------------------------;
