@@ -11,7 +11,15 @@
 ; in May 2006. This version analyzes either pure PIC or hybrid
 ; runs, based on the value of efield_algorithm.
 ;
-; NOTES
+; Created by Matt Young.
+;------------------------------------------------------------------------------
+;                                 **PARAMETERS**
+; PATH (default: './')
+;    Path in which to search for moments*.out files.
+; LUN (default: -1)
+;    Logical unit number for printing runtime messages.
+;------------------------------------------------------------------------------
+;                                   **NOTES**
 ; -- This function assumes that distribution 0 is magnetized
 ;    and distribution 1 is unmagnetized when it calculates
 ;    collision frequencies.
@@ -28,10 +36,12 @@
 ;    corresponding to physical axes y & -x)
 ;-
 
-function analyze_moments, path=path
+function analyze_moments, path=path, $
+                          lun=lun
 
-  ;;==Set default path
+  ;;==Defaults and guards
   if n_elements(path) eq 0 then path = './'
+  if n_elements(lun) eq 0 then lun = -1
 
   ;;==Read sim parameters and moment files
   params = set_eppic_params(path=path)
@@ -72,7 +82,8 @@ function analyze_moments, path=path
      vxthd1 = float(params.vxthd1)
      vythd1 = float(params.vythd1)
      vzthd1 = float(params.vzthd1)
-     if (n_elements(kb) eq 0) then if (md0 lt 1e-8) then kb = 1.38e-23 else kb = 1
+     if (n_elements(kb) eq 0) then if (md0 lt 1e-8) then $
+        kb = 1.38e-23 else kb = 1
      if (efield_algorithm eq 1) || (efield_algorithm eq 2) then hybrid_run = 1B
 
      ;;==Create constant electron moments for QN, inertialess electrons
@@ -180,19 +191,27 @@ function analyze_moments, path=path
      ;;==Collision frequencies and Psi
      ;; if (efield_algorithm eq 1) || (efield_algorithm eq 2) then $
      if keyword_set(hybrid_run) then $
-        nu0 = moments1[5,*]*0.0 + coll_rate0 $                    ;From input value
+        ;;--From input value
+        nu0 = moments1[5,*]*0.0 + coll_rate0 $
      else begin
-        if keyword_set(E0_par) then nu0 = (Ezp/vzpd0)*(qd0/md0) $ ;From parallel drift
-        else nu0 = wc0*vypd0/vxpd0                                ;From Hall drift
+        ;;--From parallel or Hall drift
+        if keyword_set(E0_par) then nu0 = (Ezp/vzpd0)*(qd0/md0) $
+        else nu0 = wc0*vypd0/vxpd0
      endelse
-     ;; nu1 = (Eyp/vypd1)*(qd1/md1)                               ;From Ped drift
-     nu1 = (qd1/md1)*(Exp*vxpd1 + Eyp*vypd1)/(vxpd1^2 + vypd1^2)  ;From perp drift
+     ;;--From Ped drift
+     ;; nu1 = (Eyp/vypd1)*(qd1/md1)
+     ;;--From perp drift
+     nu1 = (qd1/md1)*(Exp*vxpd1 + Eyp*vypd1)/(vxpd1^2 + vypd1^2)
      if 0 then begin
         ;;-->Can I get a more general expression from the drift equation?
-        nu0 = 0.5*qd0*Eyp/(md0*vypd0)*(1 + sqrt(1-(2*md0*vypd0*wc0/(qd0*Eyp))^2))
-        nu1 = 0.5*qd1*Eyp/(md1*vypd1)*(1 + sqrt(1-(2*md1*vypd1*wc1/(qd1*Eyp))^2))
-        nu0 = 0.5*qd0*Eyp/(md0*vypd0)*(1 - sqrt(1-(2*md0*vypd0*wc0/(qd0*Eyp))^2))
-        nu1 = 0.5*qd1*Eyp/(md1*vypd1)*(1 - sqrt(1-(2*md1*vypd1*wc1/(qd1*Eyp))^2))
+        nu0 = 0.5*qd0*Eyp/(md0*vypd0)* $
+              (1 + sqrt(1-(2*md0*vypd0*wc0/(qd0*Eyp))^2))
+        nu1 = 0.5*qd1*Eyp/(md1*vypd1)* $
+              (1 + sqrt(1-(2*md1*vypd1*wc1/(qd1*Eyp))^2))
+        nu0 = 0.5*qd0*Eyp/(md0*vypd0)* $
+              (1 - sqrt(1-(2*md0*vypd0*wc0/(qd0*Eyp))^2))
+        nu1 = 0.5*qd1*Eyp/(md1*vypd1)* $
+              (1 - sqrt(1-(2*md1*vypd1*wc1/(qd1*Eyp))^2))
      endif
      Psi = abs(nu0*nu1/(wc0*wc1))
      driver = (Eyp/B0)/(1+Psi)
@@ -309,7 +328,7 @@ function analyze_moments, path=path
      return, moment_struct
   endif $
   else begin
-     print, "[ANALYZE_MOMENTS] Could not read parameter file"
+     printf, lun,"[ANALYZE_MOMENTS] Could not read parameter file"
      return, !NULL
   endelse
 end
