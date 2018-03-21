@@ -42,9 +42,9 @@ pro eppic_basic, path=path, $
      moments = analyze_moments(path=path)
 
      ;;==Create plots
-     plot_moments, moments,params=params, $
-                   path=filepath, $
-                   font_name=font_name,font_size=font_size
+     plot_moments, moments, $
+                   params=params, $
+                   path=filepath
 
   endif
 
