@@ -10,7 +10,8 @@
 ;    if it does not find an extension.
 ;-
 function strip_extension, name
-  pos = strpos(name,'.',/reverse_search)
-  if pos ge 0 then name = strmid(name,0,pos)
-  return, name
+  name_in = name
+  pos = strpos(name_in,'.',/reverse_search)
+  if pos ge 0 then name_in = strmid(name_in,0,pos)
+  return, name_in
 end
