@@ -1,5 +1,5 @@
 ;+
-; Read EPPIC data and return a time-stepped array
+; Read EPPIC parallel HDF data and return a time-stepped array
 ;
 ; Created by Matt Young.
 ; The FT portion of this code is based on code written by
@@ -8,8 +8,8 @@
 ;                                 **PARAMETERS**
 ; DATA_NAME
 ;    The name of the data quantity to read. If the data
-;    does not exist, read_ph5.pro will return 0
-;    and this routine will exit gracefully.
+;    does not exist, read_ph5.pro this function will exit 
+;    gracefully.
 ; EXT (default: 'h5')
 ;    File extension of data to read.
 ; TIMESTEP (default: 0)
@@ -71,33 +71,6 @@ function read_ph5, data_name, $
 
   ;;==Check ranges
   ranges = set_ranges(ranges,params=params,path=path)
-  ;; ;; if n_elements(ranges) eq 0 then $
-  ;; ;;    ranges = dictionary('x0',0,'xf',nx,'y0',0,'yf',ny,'z0',0,'zf',nz)
-  ;; if n_elements(ranges) eq 0 then ranges = [0,nx,0,ny,0,nz]
-  ;; if isa(ranges,/float,/array) then ranges = long(ranges)
-  ;; if isa(ranges,/int,/array) then begin
-  ;;    if n_elements(ranges) eq 4 then $
-  ;;       ranges = [ranges,0,nz]
-  ;;    ranges = dictionary('x0',ranges[0],'xf',ranges[1], $
-  ;;                        'y0',ranges[2],'yf',ranges[3], $
-  ;;                        'z0',ranges[4],'zf',ranges[5])
-  ;; endif $
-  ;; else if isa(ranges,'dictionary') then begin
-  ;;    if n_elements(ranges) eq 4 then begin
-  ;;       ranges['z0'] = 0
-  ;;       ranges['zf'] = nz
-  ;;    endif
-  ;; endif
-  ;; if ndim_space eq 2 then ranges.zf = ranges.z0 + 1
-  ;; if ranges.xf lt ranges.x0 then $
-  ;;    message, "Must have ranges.x0 ("+string(ranges.xf)+ $
-  ;;             ") =< ranges.xf ("+string(ranges.x0)+")"
-  ;; if ranges.yf lt ranges.y0 then $
-  ;;    message, "Must have ranges.y0 ("+string(ranges.y0)+ $
-  ;;             ") =< ranges.yf ("+string(ranges.yf)+")"
-  ;; if ranges.zf lt ranges.z0 then $
-  ;;    message, "Must have ranges.z0 ("+string(ranges.z0)+ $
-  ;;             ") =< ranges.zf ("+string(ranges.zf)+")"
 
   ;;==Trim the dot from file extension pattern
   if strcmp(strmid(ext,0,1),'.') then $
