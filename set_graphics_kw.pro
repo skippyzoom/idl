@@ -46,11 +46,6 @@ function set_graphics_kw, data_name, $
      ytitle = 'Vertical [m]'
   endelse
 
-  ;;==Convert time steps to strings
-  str_time = strcompress(string(1e3*params.dt*timestep, $
-                                format='(f6.2)'),/remove_all)
-  time_stamps = "t = "+str_time+" ms"
-
   ;;==Set graphics preferences
   img_pos = [0.10,0.10,0.80,0.80]
   clr_pos = [0.82,0.10,0.84,0.80]
