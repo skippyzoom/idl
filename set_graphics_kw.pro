@@ -2,12 +2,10 @@ function set_graphics_kw, data_name, $
                           fdata, $
                           params, $
                           timestep, $
-                          fft_direction=fft_direction, $
-                          data_isft=data_isft
+                          context = context
 
   ;;==Defaults and guards
-  if n_elements(fft_direction) eq 0 then fft_direction = 0
-  if n_elements(data_isft) eq 0 then data_isft = 0
+  if n_elements(context) eq 0 then context = 'spatial'
 
   ;;==Get data array dimensions
   fsize = size(fdata)
@@ -25,7 +23,7 @@ function set_graphics_kw, data_name, $
   ;; ytickvalues = ny*indgen(ymajor)/(ymajor-1)
 
   ;;==Set x and y titles
-  if fft_direction lt 0 or data_isft then begin
+  if strcmp(context,'spectral') then begin
      xtitle = '$k_{Zon}$ [m$^{-1}$]'
      ytitle = '$k_{Ver}$ [m$^{-1}$]'
      ;; xtickname = strarr(xmajor)
@@ -138,7 +136,7 @@ function set_graphics_kw, data_name, $
      image_kw['rgb_table'] = [[ct.r],[ct.g],[ct.b]]
      colorbar_kw['title'] = '$tan^{-1}(\delta E_y,\delta E_x)$ [rad.]'
   endif
-  if fft_direction ne 0 then begin
+  if strcmp(context,'spectral') then begin
      image_kw['min_value'] = -30
      image_kw['max_value'] = 0
      image_kw['rgb_table'] = 39
