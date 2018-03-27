@@ -14,19 +14,11 @@
 ;    File extension of data to read.
 ; TIMESTEP (default: 0)
 ;    Simulation time steps at which to read data.
-; AXES (default: 'xy')
-;    Simulation axes to extract from HDF data. If the
-;    simulation is 2 D, read_ph5.pro will ignore
-;    this parameter.
-; CENTER (default: 0)
-;    The point at which to subscript the axis perpendicular
-;    to the requested plane.
-; RANGES (default: [0,nx,0,ny])
-;    A four-element array specifying logical x and y ranges
-;    to return. The elements are [x0,xf,y0,yf], where 
-;    x0 and xf are the bounds of the first dimension specified
-;    by 'axes' and y0 and yf are the bounds of the second
-;    dimension.
+; RANGES (default: [0,nx,0,ny,0,nz])
+;    A four- or six-element array or dictionary specifying the
+;    x, y, and z ranges to return. The elements are 
+;    (x0,xf,y0,yf,z0,zf), where [x0,xf) is the range of x 
+;    values, and similarly for y and z.
 ; DATA_TYPE (default: 4)
 ;    IDL numerical data type of simulation output, 
 ;    typically either 4 (float) for spatial data
@@ -70,7 +62,7 @@ function read_ph5, data_name, $
   ;;==Read in run parameters
   params = set_eppic_params(path=info_path)
 
-  ;;==Extract global dimensions from parameters
+  ;;==Extract dimensional quantities from parameters
   nx = params.nx*params.nsubdomains
   ny = params.ny
   nz = params.nz
@@ -78,32 +70,34 @@ function read_ph5, data_name, $
   ndim_space = params.ndim_space
 
   ;;==Check ranges
-  if n_elements(ranges) eq 0 then $
-     ranges = dictionary('x0',0,'xf',nx,'y0',0,'yf',ny,'z0',0,'zf',nz)
-  if isa(ranges,/float,/array) then ranges = long(ranges)
-  if isa(ranges,/int,/array) then begin
-     if n_elements(ranges) eq 4 then $
-        ranges = [ranges,0,nz]
-     ranges = dictionary('x0',ranges[0],'xf',ranges[1], $
-                         'y0',ranges[2],'yf',ranges[3], $
-                         'z0',ranges[4],'zf',ranges[5])
-  endif $
-  else if isa(ranges,'dictionary') then begin
-     if n_elements(ranges) eq 4 then begin
-        ranges['z0'] = 0
-        ranges['zf'] = nz
-     endif
-  endif
-  if ndim_space eq 2 then ranges.zf = ranges.z0 + 1
-  if ranges.xf lt ranges.x0 then $
-     message, "Must have ranges.x0 ("+string(ranges.xf)+ $
-              ") =< ranges.xf ("+string(ranges.x0)+")"
-  if ranges.yf lt ranges.y0 then $
-     message, "Must have ranges.y0 ("+string(ranges.y0)+ $
-              ") =< ranges.yf ("+string(ranges.yf)+")"
-  if ranges.zf lt ranges.z0 then $
-     message, "Must have ranges.z0 ("+string(ranges.z0)+ $
-              ") =< ranges.zf ("+string(ranges.zf)+")"
+  ranges = set_ranges(ranges,params=params,path=path)
+  ;; ;; if n_elements(ranges) eq 0 then $
+  ;; ;;    ranges = dictionary('x0',0,'xf',nx,'y0',0,'yf',ny,'z0',0,'zf',nz)
+  ;; if n_elements(ranges) eq 0 then ranges = [0,nx,0,ny,0,nz]
+  ;; if isa(ranges,/float,/array) then ranges = long(ranges)
+  ;; if isa(ranges,/int,/array) then begin
+  ;;    if n_elements(ranges) eq 4 then $
+  ;;       ranges = [ranges,0,nz]
+  ;;    ranges = dictionary('x0',ranges[0],'xf',ranges[1], $
+  ;;                        'y0',ranges[2],'yf',ranges[3], $
+  ;;                        'z0',ranges[4],'zf',ranges[5])
+  ;; endif $
+  ;; else if isa(ranges,'dictionary') then begin
+  ;;    if n_elements(ranges) eq 4 then begin
+  ;;       ranges['z0'] = 0
+  ;;       ranges['zf'] = nz
+  ;;    endif
+  ;; endif
+  ;; if ndim_space eq 2 then ranges.zf = ranges.z0 + 1
+  ;; if ranges.xf lt ranges.x0 then $
+  ;;    message, "Must have ranges.x0 ("+string(ranges.xf)+ $
+  ;;             ") =< ranges.xf ("+string(ranges.x0)+")"
+  ;; if ranges.yf lt ranges.y0 then $
+  ;;    message, "Must have ranges.y0 ("+string(ranges.y0)+ $
+  ;;             ") =< ranges.yf ("+string(ranges.yf)+")"
+  ;; if ranges.zf lt ranges.z0 then $
+  ;;    message, "Must have ranges.z0 ("+string(ranges.z0)+ $
+  ;;             ") =< ranges.zf ("+string(ranges.zf)+")"
 
   ;;==Trim the dot from file extension pattern
   if strcmp(strmid(ext,0,1),'.') then $
@@ -148,7 +142,6 @@ function read_ph5, data_name, $
      else $
         ft_template = {ikx:0, iky:0, ikz:0, val:complex(0)}
   endif
-
   if dims_eq then begin
      n_dim = ndim_space 
      x0 = ranges.x0
@@ -164,9 +157,11 @@ function read_ph5, data_name, $
   endif $
   else n_dim = 0
 
+  ;;==Retain singular time dimension
   if nt eq 1 then data = reform(data,[size(data,/dim),1])
   ndim_data = size(data,/n_dim)-1
 
+  ;;==If data is 2- or 3-D, proceed
   if n_dim eq 2 || n_dim eq 3 then begin
 
      ;;==Loop over all available time steps
