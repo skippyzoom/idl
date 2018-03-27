@@ -1,3 +1,87 @@
+;+
+; Routine for producing images of EPPIC data from a (2+1)-D array.
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
+;                                 **PARAMETERS**
+; IMGDATA (required)
+;    A (2+1)-D array from which to make a image.
+; XDATA (optional)
+; YDATA (optional)
+; LUN (default: -1)
+;    Logical unit number for printing runtime messages.
+; LOG (default: unset)
+;    Take the logarithm of each frame before creating an image.
+;    The value of alog_base sets the logarithmic base.
+; ALOG_BASE (default: 10)
+;    String or number indicating the logarithmic base to use when 
+;    /log is true. The use can pass the following values:
+;    10 or '10' for base-10 (alog10); 2 or '2' for base-2 (alog2);
+;    any string starting with 'e', any string whose first 3 letters
+;    are 'nat', or the value exp(1) for base-e (alog). Setting this
+;    parameter will set log = 1B
+; FILENAME (default: 'data_image.pdf')
+;    Name of resultant image file, including extension. This routine
+;    will pass filename to image_save.pro, where IDL will use the 
+;    extension to determine the file type. See the IDL help pages
+;    for image.pro and save_method for more information on supported
+;    file types. This routine will attemp to make the number of 
+;    elements in filename consistent with the value of multi_page.
+; MULTI_PAGE (default: unset)
+;    Boolean keyword to toggle saving images as multiple pages in
+;    a single document. Only allowed (per IDL) for .pdf and .gif
+;    formats
+; RESIZE (default: [1.0, 1.0])
+;    Normalized factor by which to resize the graphics window.
+;    This parameter can be a scalar, in which case this routine
+;    will apply the same value to both axes, or it can be a vector
+;    with one value for each axis. 
+; IMAGE_KW (default: none)
+;    Dictionary of keyword properties accepted by IDL's image.pro.
+;    Unlike image.pro, the 'title' parameter may consist of one
+;    element for each time step. In that case, this routine will
+;    iterate through 'title', passing one value to the image()
+;    call for each frame. See also the IDL help page for image.pro.
+; ADD_COLORBAR (default: unset)
+;    Toggle a colorbar with minimal keyword properties. This keyword
+;    allows the user to have a reference before passing more keyword
+;    properties via colorbar_kw. If the user sets this keyword as a
+;    boolean value (typically, /add_colorbar) then this routine will 
+;    create a horizontal colorbar. The user may also set this keyword
+;    to 'horizontal' or 'vertical', including abbreviations (e.g., 'h'
+;    or 'vert'), to create a colorbar with the corresponding orientation.
+;    This routine will ignore this keyword if the user passes a 
+;    dictionary for colorbar_kw.
+; COLORBAR_KW (default: none)
+;    Dictionary of keyword properties accepted by IDL's colorbar.pro,
+;    with the exception that this routine will automatically set 
+;    target = img. See also the IDL help page for colorbar.pro.
+; TEXT_POS (default: [0.0, 0.0, 0.0])
+;    An array containing the x, y, and z positions for text.pro.
+;    See also the IDL help page for text.pro.
+; TEXT_STRING (default: none)
+;    The string or string array to print with text.pro. The 
+;    presence or absence of this string determines whether or 
+;    not this routine calls text(). This routine currently only
+;    supports a single string, which it will use at each time 
+;    step, or an array of strings with length equal to the number
+;    of time steps. See also the IDL help page for text.pro.
+; TEXT_FORMAT (default: 'k')
+;    A string that sets the text color using short tokens. See
+;    also the IDL help page for text.pro.
+; TEXT_KW (default: none)
+;   Dictionary of keyword properties accepted by IDL's text.pro. 
+;   See also the IDL help page for text.pro.
+;------------------------------------------------------------------------------
+;                                   **NOTES**
+; -- This routine assumes the final dimension of data 
+;    is the time-step dimension. 
+; -- This routine automatically sets the buffer keyword 
+;    to 1B to ensure that the current frame goes to a 
+;    buffer instead of printing to the screen. The latter 
+;    would slow the process considerably and clutter the 
+;    screen. 
+;-
 pro data_image, imgdata,xdata,ydata, $
                 lun=lun, $
                 log=log, $
@@ -32,11 +116,15 @@ pro data_image, imgdata,xdata,ydata, $
         log = 1B
      if n_elements(alog_base) eq 0 then alog_base = '10'
      if n_elements(filename) eq 0 then filename = 'data_image.pdf'
-     if n_elements(filename) eq 1 then begin
+     if n_elements(filename) eq 1 && ~keyword_set(multi_page) then begin
         str_ind = strcompress(sindgen(nt),/remove_all)
-        fbase = strip_extension(filename)
-        fext = get_extension(filename)
-        filename = fbase + str_ind + fext
+        filename = strip_extension(filename) + str_ind + $
+                   '.'+get_extension(filename)
+     endif
+     if n_elements(filename) gt 1 && keyword_set(multi_page) then begin
+        printf, lun,"[DATA_IMAGE] Warning: Using "+filename[0]
+        printf, lun,"             for all multi-page image."
+        filename = filename[0]
      endif
      if n_elements(framerate) eq 0 then framerate = 20
      if n_elements(xdata) eq 0 then xdata = indgen(nx)
@@ -123,12 +211,24 @@ pro data_image, imgdata,xdata,ydata, $
                       text_format, $
                       _EXTRA = text_kw.tostruct())
         endif
+        if ~keyword_set(multi_page) then $
+           image_save, img, $
+                       filename = filename[it], $
+                       lun = lun
+     endfor
+     if keyword_set(multi_page) then $
         image_save, img, $
-                    filename = filename[it], $
+                    filename = filename, $
+                    lun = lun $
+     else begin
+        printf, lun,"[DATA_IMAGE] keyword 'multi_page' not set."
+        printf, lun,"             Only saving img[0]."
+        image_save, img[0], $
+                    filename = filename, $
                     lun = lun
-     endfor 
+     endelse
 
-  endif $
+  endif  $
   else printf, lun,"[DATA_IMAGE] image data must have dimensions (x,y,t)"
 
 end

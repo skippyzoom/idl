@@ -1,3 +1,11 @@
+;+
+; Script for creating EPPIC movies with data_movie.pro.
+; Intended as a subscript to eppic_analysis.pro.
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
+;-
+
 ;;==Declare the movie file path and name
 ;; save_path = path+path_sep()+'images'
 save_path = '~/idl'
