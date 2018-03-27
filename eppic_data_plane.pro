@@ -29,10 +29,6 @@
 ;    to rotate the data array and axes before creating a
 ;    movie. This parameter corresponds to the 'direction'
 ;    parameter in IDL's rotate.pro.
-; FFT_DIRECTION (default: 0)
-;    Integer indicating whether, and in which direction,
-;    to calculate the FFT of the data before creating a
-;    movie. Setting fft_direction = 0 results in no FFT.
 ; INFO_PATH (default: './')
 ;    Fully qualified path to the simulation parameter
 ;    file (ppic3d.i or eppic.i).
@@ -48,7 +44,6 @@ function eppic_data_plane, data_name, $
                            data_type=data_type, $
                            data_isft=data_isft, $
                            rotate=rotate, $
-                           fft_direction=fft_direction, $
                            info_path=info_path, $
                            data_path=data_path, $
                            lun=lun
@@ -62,7 +57,6 @@ function eppic_data_plane, data_name, $
   if n_elements(data_type) eq 0 then data_type = 4
   if n_elements(data_isft) eq 0 then data_isft = 0B
   if n_elements(rotate) eq 0 then rotate = 0
-  if n_elements(fft_direction) eq 0 then fft_direction = 0
   if n_elements(info_path) eq 0 then info_path = './'
   if n_elements(data_path) eq 0 then data_path = './'
   if n_elements(lun) eq 0 then lun = -1
@@ -120,5 +114,9 @@ function eppic_data_plane, data_name, $
      return, plane
 
   endif $
-  else print, "[EPPIC_IMAGE] Could not create image of "+data_name+"."
+  else begin
+     printf, lun,"[EPPIC_IMAGE] Could not build plane for:"
+     printf, lun,"              data_name = "+data_name
+     printf, lun,"              axes = "+axes
+  endelse
 end
