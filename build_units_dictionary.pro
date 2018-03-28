@@ -1,7 +1,7 @@
 ;+
 ; Create a dictionary of units for graphics labels.
 ;-
-function build_units_dictionary, path=path
+function build_units_dictionary
   units = dictionary()
   units['prefixes'] = hash('Y', 24, $            ;yotta
                            'Z', 21, $            ;zetta
