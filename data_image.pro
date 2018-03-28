@@ -219,14 +219,7 @@ pro data_image, imgdata,xdata,ydata, $
      if keyword_set(multi_page) then $
         image_save, img, $
                     filename = filename, $
-                    lun = lun $
-     else begin
-        printf, lun,"[DATA_IMAGE] keyword 'multi_page' not set."
-        printf, lun,"             Only saving img[0]."
-        image_save, img[0], $
-                    filename = filename, $
                     lun = lun
-     endelse
 
   endif  $
   else printf, lun,"[DATA_IMAGE] image data must have dimensions (x,y,t)"
