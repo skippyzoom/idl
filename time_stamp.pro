@@ -1,5 +1,16 @@
 ;+
 ; Create a time stamp from systime() for use in file names
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
+;                                 **PARAMETERS**
+; MODE (default: 'full')
+;    String selecting the time of time stamp to output
+;    'full': A version of the full output from systime,
+;            modified for use in filenames.
+;    'date': The date in DDMMYYYY format.
+; LUN (default: -1)
+;    Logical unit number for printing runtime messages.
 ;-
 function time_stamp, mode=mode,lun=lun
 
