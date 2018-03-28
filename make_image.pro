@@ -21,13 +21,13 @@ str_fmt = '(i0'+strcompress(nt_oom+1,/remove_all)+')'
 str_ind = strcompress(string(timestep,format=str_fmt),/remove_all)
 
 ;;==Declare an array of filenames
-;; filename = expand_path(save_path)+path_sep()+ $
-;;                        save_name+'-'+str_ind+save_ext
-filename = save_name+save_ext
+filename = expand_path(save_path)+path_sep()+ $
+                       save_name+'-'+str_ind+save_ext
+;; filename = save_name+save_ext
 
 ;;==Set up graphics preferences
 kw = set_graphics_kw(data_name,fdata,params,timestep, $
-                     context = 'spatial')
+                     context = 'spectral')
 text_pos = [0.05,0.85]
 text_string = time_stamps
 text_format = 'k'
