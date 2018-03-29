@@ -39,3 +39,5 @@ pro make_movie, fdata,xdata,ydata, $
               text_string = text_string, $
               text_format = text_format, $
               text_kw = kw.text
+
+end
