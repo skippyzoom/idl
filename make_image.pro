@@ -19,7 +19,7 @@ pro make_image, fdata,xdata,ydata, $
 
   ;;==Declare an array of filenames
   filename = expand_path(file.path)+path_sep()+ $
-             file.name+file.info+'-'+time.index+file.ext
+             file.name+file.info+'-'+time.index+file.type
 
   ;;==Set up graphics preferences
   kw = set_graphics_kw(data_name,fdata,params, $
