@@ -4,20 +4,22 @@
 ; Created by Matt Young.
 ;------------------------------------------------------------------------------
 ;-
-
 pro make_image, fdata,xdata,ydata, $
                 data_name,time, $
-                save_info=save_info, $
+                file=file, $
                 context=context
 
   ;;==Defaults and guards
-  if ~isa(save_info,'dictionary') then save_info = dictionary(save_info)
-  if ~save_info.haskey('path') then save_info['path'] = './'
+  if ~isa(file,'dictionary') then file = dictionary(file)
+  if ~file.haskey('path') then file['path'] = './'
+  if ~file.haskey('name') then file['name'] = 'data_image'
+  if ~file.haskey('type') then file['type'] = '.pdf'
+  if ~file.haskey('info') then file['info'] = ''
   if n_elements(context) eq 0 then context = 'spatial'
 
   ;;==Declare an array of filenames
-  filename = expand_path(save_info.path)+path_sep()+ $
-             save_info.name+'-'+time.index+save_info.ext
+  filename = expand_path(file.path)+path_sep()+ $
+             file.name+file.info+'-'+time.index+file.ext
 
   ;;==Set up graphics preferences
   kw = set_graphics_kw(data_name,fdata,params, $

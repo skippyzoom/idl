@@ -1,30 +1,41 @@
 ;+
-; Script for creating EPPIC movies with data_movie.pro.
-; Intended as a subscript to eppic_analysis.pro.
+; Make movies from EPPIC data with data_movie.pro.
 ;
 ; Created by Matt Young.
 ;------------------------------------------------------------------------------
 ;-
 
-;;==Declare the movie file path and name
-;; save_path = path+path_sep()+'images'
-save_path = '~/idl'
-save_name = 'eppic_analysis-test.mp4'
-filename = expand_path(save_path+path_sep()+save_name)
+pro make_movie, fdata,xdata,ydata, $
+                data_name,time, $
+                file=file, $
+                context=context
 
-;;==Set up graphics preferences
-kw = set_graphics_kw(data_name,fdata,params,timestep, $
-                     context = 'spatial')
-text_pos = [0.05,0.85]
-text_string = time_stamps
-text_format = 'k'
+  ;;==Defaults and guards
+  if ~isa(file,'dictionary') then file = dictionary(file)
+  if ~file.haskey('path') then file['path'] = './'
+  if ~file.haskey('name') then file['name'] = 'data_movie'
+  if ~file.haskey('type') then file['type'] = '.mp4'
+  if ~file.haskey('info') then file['info'] = ''
+  if n_elements(context) eq 0 then context = 'spatial'
 
-;;==Create and save a movie
-data_movie, fdata,xdata,ydata, $
-            filename = filename, $
-            image_kw = kw.image, $
-            colorbar_kw = kw.colorbar, $
-            text_pos = text_pos, $
-            text_string = text_string, $
-            text_format = text_format, $
-            text_kw = kw.text
+  ;;==Declare the movie file path and name
+  filename = expand_path(file.path)+path_sep()+ $
+             file.name+file.info+file.type
+
+  ;;==Set up graphics preferences
+  kw = set_graphics_kw(data_name,fdata,params, $
+                       fix(time.index), $
+                       context = context)
+  text_pos = [0.05,0.85]
+  text_string = time.stamp
+  text_format = 'k'
+
+  ;;==Create and save a movie
+  data_movie, fdata,xdata,ydata, $
+              filename = filename, $
+              image_kw = kw.image, $
+              colorbar_kw = kw.colorbar, $
+              text_pos = text_pos, $
+              text_string = text_string, $
+              text_format = text_format, $
+              text_kw = kw.text
