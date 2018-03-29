@@ -1,9 +1,22 @@
 ;+
-; Save an image, given the reference returned by image().
-; This function accepts any extension accepted by the IDL
-; save method (https://www.harrisgeospatial.com/docs/save_method.html)
-; If this function doesn't recognize the file extension,
-; it will issue a warning and use '.png' as the extension.
+; Save an image based on file extension.
+;
+; This function saves an image, given the object reference 
+; returned by image(). This function accepts any extension 
+; accepted by the IDL save method. See the IDL help page 
+; for save_method for more information. If this function 
+; doesn't recognize the file extension, it will issue a 
+; warning and use '.png' as the extension.
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
+;                                 **PARAMETERS**
+; IMAGE (required)
+;    The object reference returned by a call to image().
+; FILENAME (default: 'new_image.png')
+;    The name that the resultant image file will have.
+; LUN (default: -1)
+;    Logical unit number for printing runtime messages.
 ;-
 pro image_save, image,filename=filename,lun=lun,_EXTRA=ex
 
@@ -24,19 +37,27 @@ pro image_save, image,filename=filename,lun=lun,_EXTRA=ex
 
   ;;==Defaults and guards
   if n_elements(lun) eq 0 then lun = -1
-  if n_elements(filename) eq 0 then filename = "new_image.png"
+  if n_elements(filename) eq 0 then filename = 'new_image.png'
+
+  ;;==Make sure target directory exists
+  if ~file_test(file_dirname(filename),/directory) then $
+     spawn, 'mkdir -p '+file_dirname(filename)
 
   ;;==Get file extension from filename
   ext = get_extension(filename)
   supported = string_exists(types,ext,/fold_case)
   if ~supported then begin
-     printf, lun,"[IMAGE_SAVE] File type not recognized or not supported. Using PNG."
+     printf, lun,"[IMAGE_SAVE] File type not recognized or not supported." 
+     printf, lun,"             Using PNG."
      filename = strip_extension(filename)+'.png'
   endif
 
   ;;==Save image
   case n_elements(image) of
-     0: printf, lun,"[IMAGE_SAVE] Invalid image hangle. Did not save ",filename,"."
+     0: begin
+        printf, lun,"[IMAGE_SAVE] Invalid image hangle."
+        printf, lun,"             Did not save ",filename,"."
+     end
      1: begin
         printf, lun,"[IMAGE_SAVE] Saving ",filename,"..."
         image.save, filename,_EXTRA=ex
