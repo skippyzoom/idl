@@ -1,16 +1,15 @@
-function set_graphics_kw, data_name, $
-                          fdata, $
-                          params, $
-                          timestep, $
-                          context = context
+function set_graphics_kw, data_name,data, $
+                          path=path, $
+                          context=context
 
   ;;==Defaults and guards
+  if n_elements(path) eq 0 then path = './'
   if n_elements(context) eq 0 then context = 'spatial'
 
   ;;==Get data array dimensions
-  fsize = size(fdata)
-  nx = fsize[1]
-  ny = fsize[2]
+  dsize = size(data)
+  nx = dsize[1]
+  ny = dsize[2]
 
   ;;==Set number of x and y ticks
   xmajor = 5
@@ -85,46 +84,49 @@ function set_graphics_kw, data_name, $
                        'fill_background', 1B, $
                        'fill_color', 'powder blue')
   if strcmp(data_name,'den',3) then begin
-     image_kw['min_value'] = -max(abs(fdata[*,*,1:*]))
-     image_kw['max_value'] = +max(abs(fdata[*,*,1:*]))
+     image_kw['min_value'] = -max(abs(data[*,*,1:*]))
+     image_kw['max_value'] = +max(abs(data[*,*,1:*]))
      image_kw['rgb_table'] = 5
      colorbar_kw['title'] = '$\delta n/n_0$'
   endif
   if strcmp(data_name,'phi') then begin
-     image_kw['min_value'] = -max(abs(fdata[*,*,1:*]))
-     image_kw['max_value'] = +max(abs(fdata[*,*,1:*]))
+     image_kw['min_value'] = -max(abs(data[*,*,1:*]))
+     image_kw['max_value'] = +max(abs(data[*,*,1:*]))
      ct = get_custom_ct(1)
      image_kw['rgb_table'] = [[ct.r],[ct.g],[ct.b]]
      colorbar_kw['title'] = '$\phi$ [V]'
   endif
   if strcmp(data_name,'Ex') || $
      strcmp(data_name,'efield_x') then begin
-     fdata = Ex
-     image_kw['min_value'] = -max(abs(fdata[*,*,1:*]))
-     image_kw['max_value'] = +max(abs(fdata[*,*,1:*]))
+     image_kw['min_value'] = -max(abs(data[*,*,1:*]))
+     image_kw['max_value'] = +max(abs(data[*,*,1:*]))
      image_kw['rgb_table'] = 5
      colorbar_kw['title'] = '$\delta E_x$ [V/m]'
   endif
   if strcmp(data_name,'Ey') || $
      strcmp(data_name,'efield_y') then begin
-     fdata = Ey
-     image_kw['min_value'] = -max(abs(fdata[*,*,1:*]))
-     image_kw['max_value'] = +max(abs(fdata[*,*,1:*]))
+     image_kw['min_value'] = -max(abs(data[*,*,1:*]))
+     image_kw['max_value'] = +max(abs(data[*,*,1:*]))
      image_kw['rgb_table'] = 5
      colorbar_kw['title'] = '$\delta E_y$ [V/m]'
   endif
+  if strcmp(data_name,'Ez') || $
+     strcmp(data_name,'efield_z') then begin
+     image_kw['min_value'] = -max(abs(data[*,*,1:*]))
+     image_kw['max_value'] = +max(abs(data[*,*,1:*]))
+     image_kw['rgb_table'] = 5
+     colorbar_kw['title'] = '$\delta E_z$ [V/m]'
+  endif
   if strcmp(data_name,'Er') || $
-     strcmp(data_name,'efield_r') || $
+     strcmp(data_name,'efield_r',strlen('efield_r')) || $
      strcmp(data_name,'efield') then begin
-     fdata = sqrt(Ex^2 + Ey^2)
      image_kw['min_value'] = 0
-     image_kw['max_value'] = max(fdata[*,*,1:*])
+     image_kw['max_value'] = max(data[*,*,1:*])
      image_kw['rgb_table'] = 3
      colorbar_kw['title'] = '$|\delta E|$ [V/m]'
   endif
   if strcmp(data_name,'Et') || $
-     strcmp(data_name,'efield_t') then begin
-     fdata = atan(Ey,Ex)
+     strcmp(data_name,'efield_t',strlen('efield_t')) then begin
      image_kw['min_value'] = -!pi
      image_kw['max_value'] = +!pi
      ct = get_custom_ct(2)
