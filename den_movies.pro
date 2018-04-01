@@ -1,6 +1,5 @@
 ;;==Extract a plane of density data
 if n_elements(axes) eq 0 then axes = 'xy'
-;; if n_elements(den1) eq 0 then $
    plane = eppic_data_plane('den1', $
                             timestep = fix(time.index), $
                             axes = axes, $
