@@ -1,5 +1,5 @@
 ;;==Declare the simulation run path
-run = 'run007'
+run = 'run009'
 project = 'parametric_wave'
 path = get_base_dir()+path_sep()+project+path_sep()+run
 
@@ -11,6 +11,11 @@ nt_max = calc_timesteps(path=path)
 
 ;;==Read moments files
 moments = analyze_moments(path=path)
+
+;;==Plot moments data
+plot_moments, moments, $
+              params = params, $
+              path = path+path_sep()+'frames'
 
 ;;==Declare rotation
 rotate = 3
@@ -27,14 +32,16 @@ time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
 @den_images
 @phi_images
 @efield_images
+
+;;==Clear arrays
 delvar, den1,phi
 
-;;==Create the time-step array
-timestep = params.nout*lindgen(nt_max)
+;; ;;==Create the time-step array
+;; timestep = params.nout*lindgen(nt_max)
 
-;;==Convert time steps to strings
-time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
+;; ;;==Convert time steps to strings
+;; time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
 
-@den_movies
-@phi_movies
-@efield_movies
+;; @den_movies
+;; @phi_movies
+;; @efield_movies
