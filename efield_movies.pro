@@ -1,65 +1,69 @@
-;+
-; Movies of electric field
-;-
-pro efield_movies, pdata,xdata,ydata,xrng,yrng,dx,dy,Ex0,Ey0,nt,info,image_string=image_string
+;;==Extract a plane of potential data
+if n_elements(axes) eq 0 then axes = 'xy'
+if n_elements(phi) eq 0 then $
+   plane = eppic_data_plane('phi', $
+                            timestep = fix(time.index), $
+                            axes = axes, $
+                            data_type = 4, $
+                            data_isft = 0B, $
+                            ranges = ranges, $
+                            rotate = rotate, $
+                            info_path = path, $
+                            data_path = path+path_sep()+'parallel')
 
-  ;;==Defaults and guards
-  if n_elements(image_string) eq 0 then image_string = ''
-  pdata_in = pdata
-  xdata_in = xdata
-  ydata_in = ydata
+;;==Calculate E from phi
+if n_elements(phi) eq 0 then $
+   phi = plane.remove('f')
+if n_elements(phi) eq 0 then $
+   xdata = plane.remove('x')
+if n_elements(phi) eq 0 then $
+   ydata = plane.remove('y')
 
-  ;;==Smooth 2-D plane
-  ;; pdata = smooth(pdata,[0.5/dx,0.5/dy,1],/edge_wrap)
+efield = calc_grad_xyzt(phi, $
+                        dx = plane.dx, dy = plane.dy, $
+                        scale = -1.0)
+Ex = efield.x
+Ey = efield.y
+efield = !NULL
 
-  ;;==Calculate E-field components
-  Ex = fltarr(size(pdata,/dim))
-  Ey = fltarr(size(pdata,/dim))
-  Er = fltarr(size(pdata,/dim))
-  Et = fltarr(size(pdata,/dim))
-  for it=0,nt-1 do begin
-     gradf = gradient(pdata[*,*,it],dx=dx*info.params.nout_avg,dy=dy*info.params.nout_avg)
-     Ex[*,*,it] = -1.0*gradf.x + Ex0
-     Ey[*,*,it] = -1.0*gradf.y + Ey0
-     Er[*,*,it] = sqrt(Ex[*,*,it]^2 + Ey[*,*,it]^2)
-     Et[*,*,it] = atan(Ey[*,*,it],Ex[*,*,it])
-  endfor
+;;==Make movie of Ex
+data_graphics, Ex,xdata,ydata, $
+               'efield_'+strmid(axes,0,1), $
+               time = time, $
+               movie_path = path+path_sep()+'movies', $
+               movie_name = 'efield_'+strmid(axes,0,1), $
+               movie_type = '.mp4', $
+               context = 'spatial'
 
-  ;;==Extract axis subsets
-  xdata = xdata[xrng[0]:xrng[1]]
-  ydata = ydata[yrng[0]:yrng[1]]
+;;==Make movie of Ey
+data_graphics, Ey,xdata,ydata, $
+               'efield_'+strmid(axes,1,1), $
+               time = time, $
+               movie_path = path+path_sep()+'movies', $
+               movie_name = 'efield_'+strmid(axes,1,1), $
+               movie_type = '.mp4', $
+               context = 'spatial'
 
-  ;;==Extract |E| subimage
-  gdata = Er[xrng[0]:xrng[1],yrng[0]:yrng[1],*]
+;;==Calculate magnitude
+Er = sqrt(Ex*Ex + Ey*Ey)
 
-  ;;==Set up graphics parameters
-  rgb_table = 3
-  min_value = 0
-  max_value = max(gdata[*,*,1:*])
+;;==Make movie of Er
+data_graphics, Er,xdata,ydata, $
+               'efield_r'+axes, $
+               time = time, $
+               movie_path = path+path_sep()+'movies', $
+               movie_name = 'efield_r'+axes, $
+               movie_type = '.mp4', $
+               context = 'spatial'
 
-  ;;==Create string array of times
-  dsize = size(gdata)
-  nt = dsize[dsize[0]]
-  string_time = string(info.params.dt*info.params.nout* $
-                       1e3* $
-                       lindgen(nt), format='(f8.2)')
-  string_time = "t = "+strcompress(string_time,/remove_all)+" ms"
+;;==Calculate angle
+Et = atan(Ey,Ex)
 
-  ;;==Create movie
-  filename = info.filepath+path_sep()+ $
-             'emag'+image_string+'.mp4'
-  data_movie, gdata,xdata,ydata, $
-              filename = filename, $
-              title = string_time, $
-              rgb_table = rgb_table, $
-              min_value = min_value, $
-              max_value = max_value, $
-              expand = 3, $
-              rescale = 0.8
-
-  ;;==Restore original data
-  pdata = pdata_in
-  xdata = xdata_in
-  ydata = ydata_in
-
-end
+;;==Make movie of Er
+data_graphics, Et,xdata,ydata, $
+               'efield_t'+axes, $
+               time = time, $
+               movie_path = path+path_sep()+'movies', $
+               movie_name = 'efield_t'+axes, $
+               movie_type = '.mp4', $
+               context = 'spatial'
