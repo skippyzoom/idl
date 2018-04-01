@@ -45,6 +45,9 @@ function set_graphics_kw, data_name,data, $
      ytitle = 'Vertical [m]'
   endelse
 
+  ;;==Set colorbar tickmarks
+  ;;-->Use plusminus_labels.pro
+
   ;;==Set graphics preferences
   img_pos = [0.10,0.10,0.80,0.80]
   clr_pos = [0.82,0.10,0.84,0.80]
@@ -74,6 +77,8 @@ function set_graphics_kw, data_name,data, $
                         'font_name', "Times")
   colorbar_kw = dictionary('orientation', 1, $
                            'textpos', 1, $
+                           'font_size', 24.0, $
+                           'font_name', "Times", $
                            'position', clr_pos)
   text_kw = dictionary('font_name', 'Times', $
                        'font_size', 24, $
