@@ -1,16 +1,23 @@
 ;+
-; Intended to be a way to prevent '+0.0' when
-; using a 'f+...' format specifier.
+; Create an array of labels with appropriate +/- symbols
 ;
-; FORMAT: Optional user-specified FORTRAN-style
-;   format code. See 
-;   https://harrisgeospatial.com/docs/format_codes_fortran.html
-;   for details. If the user passes a string with 
-;   leading or training parentheses, this function
-;   will strip them to access the code and width.
-;   This function will also add 1 to the width to 
-;   account for the +/- symbol, so that the printed
-;   numbers have the user-specified width.
+; This function returns an array of numerical labels with '+'
+; prefix for positive values and a '-' prefix for negative values,
+; using the 'f+...' format specifier with special treatment of '0'.
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
+;                                 **PARAMETERS**
+; VALUES (requires)
+;    An array of numerical values for which to make string labels.
+; FORMAT (default: 'f8.3')
+;    Optional user-specified FORTRAN-style format code. See 
+;    https://harrisgeospatial.com/docs/format_codes_fortran.html
+;    for details. If the user passes a string with leading or 
+;    training parentheses, this function will strip them to access 
+;    the code and width. This function will also add 1 to the width 
+;    to account for the +/- symbol, so that the printed numbers have 
+;    the user-specified width.
 ;-
 function plusminus_labels, values,format=format
 
