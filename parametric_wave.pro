@@ -1,5 +1,5 @@
 ;;==Declare the simulation run path
-run = 'test085'
+run = 'run007'
 ;; project = 'parametric_wave'
 ;; path = get_base_dir()+path_sep()+project+path_sep()+run
 
@@ -41,18 +41,26 @@ timestep = params.nout*[0,params.nt_max/2,params.nt_max-1]
 ;;==Convert time steps to strings
 time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
 
+den_images, time,ranges,path,rotate,data_out=fdata
 ;; @den_images
+;; fdata = den
+;; data_name = 'den1'
+;; @fft_images
+phi_images, time,ranges,path,rotate,data_out=fdata
 ;; @phi_images
+;; fdata = phi
+;; data_name = 'phi'
+;; @fft_images
 ;; @efield_images
 
 ;;==Clear arrays
-delvar, den1,phi
+delvar, den,phi
 
-;;==Create the time-step array
-timestep = params.nout*lindgen(params.nt_max)
+;; ;;==Create the time-step array
+;; timestep = params.nout*lindgen(params.nt_max)
 
-;;==Convert time steps to strings
-time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
+;; ;;==Convert time steps to strings
+;; time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
 
 ;; @den_movies
 ;; @phi_movies
