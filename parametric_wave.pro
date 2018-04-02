@@ -1,7 +1,11 @@
-;; ;;==Declare the simulation run path
-;; run = 'test084'
+;;==Declare the simulation run path
+run = 'test085'
 ;; project = 'parametric_wave'
 ;; path = get_base_dir()+path_sep()+project+path_sep()+run
+
+;; ;;==Prompt for run and read
+;; if n_elements(run) eq 0 then run = ''
+;; if strcmp(run,'') then read, run,prompt='Enter run name: '
 
 ;; ;;==Read simulation parameters
 ;; params = set_eppic_params(path=path)
@@ -17,13 +21,9 @@
 ;;               params = params, $
 ;;               path = path+path_sep()+'frames'
 
-;;==Prompt for run and read
-run = ''
-if n_elements(run) eq 0 then read, run,prompt='Enter run name: '
-
 ;;==Declare project name and perform initial analysis
 project = 'parametric_wave'
-init = initialize_run(project+run)
+init = initialize_run(project+path_sep()+run)
 
 ;;==Extract initialized variables
 path = init.path
