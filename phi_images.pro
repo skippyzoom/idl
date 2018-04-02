@@ -1,4 +1,4 @@
-pro phi_images, time,ranges,path,rotate,data_out=data_out
+pro phi_images, time,ranges,path,axes,rotate,data_out=data_out
 
   ;;==Extract a plane of potential data
   if n_elements(axes) eq 0 then axes = 'xy'
@@ -12,27 +12,22 @@ pro phi_images, time,ranges,path,rotate,data_out=data_out
                            info_path = path, $
                            data_path = path+path_sep()+'parallel')
 
-  ;;==Extract arrays
-  fdata = plane.remove('f')
-  xdata = plane.remove('x')
-  ydata = plane.remove('y')
+  ;;==Make data available to calling routine
+  data_out = plane
 
   ;;==Get dimensions of data plane
-  fsize = size(fdata)
+  fsize = size(plane.f)
   nx = fsize[1]
   ny = fsize[2]
   nt = fsize[3]
 
   ;;==Make frame(s)
-  data_graphics, fdata,xdata,ydata, $
+  data_graphics, plane.f,plane.x,plane.y, $
                  'phi', $
                  time = time, $
                  frame_path = path+path_sep()+'frames', $
                  frame_name = 'phi', $
                  frame_type = '.pdf', $
                  context = 'spatial'
-
-  ;;==Make data available to calling routine
-  data_out = fdata
 
 end
