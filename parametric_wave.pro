@@ -1,5 +1,5 @@
 ;;==Declare the simulation run path
-run = 'test083'
+run = 'test084'
 project = 'parametric_wave'
 path = get_base_dir()+path_sep()+project+path_sep()+run
 
@@ -24,7 +24,7 @@ rotate = 3
 ranges = [0.0,1.0,0.0,1.0]
 
 ;;==Create the time-step array
-timestep = params.nout*[0,1,5,nt_max/2,nt_max-1]
+timestep = params.nout*[0,nt_max/2,nt_max-1]
 
 ;;==Convert time steps to strings
 time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
