@@ -88,4 +88,4 @@ for it=0,nt-1 do $
               color = color[it], $
               /buffer, $
               overplot = (it gt 0))
-image_save, plt,filename = filename
+frame_save, plt,filename = filename
