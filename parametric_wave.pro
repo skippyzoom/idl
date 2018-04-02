@@ -1,5 +1,5 @@
 ;;==Declare the simulation run path
-run = 'run009'
+run = 'test083'
 project = 'parametric_wave'
 path = get_base_dir()+path_sep()+project+path_sep()+run
 
@@ -36,11 +36,11 @@ time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
 ;;==Clear arrays
 delvar, den1,phi
 
-;; ;;==Create the time-step array
-;; timestep = params.nout*lindgen(nt_max)
+;;==Create the time-step array
+timestep = params.nout*lindgen(nt_max)
 
-;; ;;==Convert time steps to strings
-;; time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
+;;==Convert time steps to strings
+time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
 
 ;; @den_movies
 ;; @phi_movies
