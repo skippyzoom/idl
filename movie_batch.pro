@@ -7,25 +7,26 @@ eppic_movie, data_name, $
              axes = 'xy', $
              data_type = 4, $
              data_isft = 0B, $
-             ;; ranges = [0.0,1.0,0.25,0.75], $
              rotate = 3, $
-             fft_direction = -1, $
              info_path = path, $
              data_path = path+path_sep()+'parallel', $
-             save_path = './', $
-             save_name = 'data_movie-plane_test.mp4'
+             save_path = path+path_sep()+'movies', $
+             save_name = data_name+'.mp4'
 
-;; data_name = 'den1'
-;; eppic_movie, data_name, $
-;;              axes = 'xy', $
-;;              data_type = 4, $
-;;              data_isft = 0B, $
-;;              ranges = [0.0,1.0,0.25,0.75], $
-;;              rotate = 3, $
-;;              info_path = path, $
-;;              data_path = path+path_sep()+'parallel', $
-;;              save_path = path+path_sep()+'movies', $
-;;              save_name = data_name+'.mp4'
+run = 'run009'
+project = 'parametric_wave'
+path = get_base_dir()+path_sep()+project+path_sep()+run
+
+data_name = 'den1'
+eppic_movie, data_name, $
+             axes = 'xy', $
+             data_type = 4, $
+             data_isft = 0B, $
+             rotate = 3, $
+             info_path = path, $
+             data_path = path+path_sep()+'parallel', $
+             save_path = path+path_sep()+'movies', $
+             save_name = data_name+'.mp4'
 
 ;; data_name = 'den1'
 ;; eppic_movie, data_name, $
