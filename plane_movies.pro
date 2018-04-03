@@ -44,7 +44,7 @@ pro plane_movies, name, $
                  time = time, $
                  movie_path = path+path_sep()+'movies', $
                  movie_name = name, $
-                 movie_type = '.pdf', $
+                 movie_type = '.mp4', $
                  context = 'spatial'
 
 end

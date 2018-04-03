@@ -57,7 +57,7 @@ pro efield_movies, phi,xdata,ydata, $
                  time = time, $
                  movie_path = path+path_sep()+'movies', $
                  movie_name = 'efield_'+strmid(axes,0,1), $
-                 movie_type = '.pdf', $
+                 movie_type = '.mp4', $
                  context = 'spatial'
 
   ;;==Make movie(s) of Ey
@@ -66,7 +66,7 @@ pro efield_movies, phi,xdata,ydata, $
                  time = time, $
                  movie_path = path+path_sep()+'movies', $
                  movie_name = 'efield_'+strmid(axes,1,1), $
-                 movie_type = '.pdf', $
+                 movie_type = '.mp4', $
                  context = 'spatial'
 
   ;;==Calculate magnitude
@@ -78,7 +78,7 @@ pro efield_movies, phi,xdata,ydata, $
                  time = time, $
                  movie_path = path+path_sep()+'movies', $
                  movie_name = 'efield_r'+axes, $
-                 movie_type = '.pdf', $
+                 movie_type = '.mp4', $
                  context = 'spatial'
 
   ;;==Calculate angle
@@ -90,7 +90,7 @@ pro efield_movies, phi,xdata,ydata, $
                  time = time, $
                  movie_path = path+path_sep()+'movies', $
                  movie_name = 'efield_t'+axes, $
-                 movie_type = '.pdf', $
+                 movie_type = '.mp4', $
                  context = 'spatial'
 
 end
