@@ -1,4 +1,4 @@
-pro fft_images, fdata,name, $
+pro fft_movies, fdata,name, $
                 time=time, $
                 path=path, $
                 nkx=nkx, $
@@ -52,7 +52,7 @@ pro fft_images, fdata,name, $
                  time = time, $
                  movie_path = path+path_sep()+'movies', $
                  movie_name = name+'_fft', $
-                 movie_type = '.pdf', $
+                 movie_type = '.mp4', $
                  context = 'spectral'
 
 end
