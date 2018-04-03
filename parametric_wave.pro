@@ -55,35 +55,51 @@ time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
 ;;             nky = n_elements(plane.y), $
 ;;             dx = plane.dx, $
 ;;             dy = plane.dy
-plane_images, 'phi', $
+;; plane_images, 'phi', $
+;;               axes = 'xy', $
+;;               time = time, $
+;;               ranges = ranges, $
+;;               rotate = rotate, $
+;;               path = path, $
+;;               data_out = plane
+;; fft_images, plane.f,plane.name, $
+;;             time = time, $
+;;             path = path, $
+;;             nkx = n_elements(plane.x), $
+;;             nky = n_elements(plane.y), $
+;;             dx = plane.dx, $
+;;             dy = plane.dy
+;; efield_images, plane.f,plane.x,plane.y, $
+;;                time = time, $
+;;                ranges = ranges, $
+;;                path = path, $
+;;                axes = axes, $
+;;                rotate = rotate, $
+;;                dx = plane.dx, $
+;;                dy = plane.dy
+
+;;==Create the time-step array
+timestep = params.nout*lindgen(params.nt_max)
+
+;;==Convert time steps to strings
+time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
+
+
+;; @den_movies
+;; @phi_movies
+;; @efield_movies
+
+plane_movies, 'den1', $
               axes = 'xy', $
               time = time, $
               ranges = ranges, $
               rotate = rotate, $
               path = path, $
               data_out = plane
-fft_images, plane.f,plane.name, $
+fft_movies, plane.f,plane.name, $
             time = time, $
             path = path, $
             nkx = n_elements(plane.x), $
             nky = n_elements(plane.y), $
             dx = plane.dx, $
             dy = plane.dy
-efield_images, plane.f,plane.x,plane.y, $
-               time = time, $
-               ranges = ranges, $
-               path = path, $
-               axes = axes, $
-               rotate = rotate, $
-               dx = plane.dx, $
-               dy = plane.dy
-
-;; ;;==Create the time-step array
-;; timestep = params.nout*lindgen(params.nt_max)
-
-;; ;;==Convert time steps to strings
-;; time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
-
-;; @den_movies
-;; @phi_movies
-;; @efield_movies
