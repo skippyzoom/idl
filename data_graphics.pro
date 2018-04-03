@@ -14,7 +14,46 @@
 ;    a (1+1)-D array from which to make plots, or a 1-D
 ;    array of x-axis points for making plots.
 ; XDATA (optional)
+;    Either a 1-D array of x-axis points for making images
+;    or a (1+1)-D array from which to make plots when arg1
+;    is a 1-D array of x-axis points.
 ; YDATA (optional)
+;    A 1-D array of y-axis points for making images.
+; DATA_NAME ()
+; TIME (default: see below)
+;    The struct or dictionary containing time-step information
+;    (e.g., time indices). Typically, the top-level routine or
+;    script generates this data structure. If the user does not
+;    pass an appropriate data structure, this routine will create
+;    a dictionary with the single member 'index' containing the
+;    data indgen(nt), where nt is the number of time steps in
+;    fdata.
+; FRAME_NAME (optional)
+;    The base name of plot or image frames to produced. This 
+;    routine will prefix FRAME_PATH and affix FRAME_INFO, the 
+;    array of time indices, and FRAME_TYPE to create the full
+;    file path.
+; FRAME_PATH (default: './')
+;    The base path in which to save image or plot frames.
+; FRAME_TYPE (default: '.pdf')
+;    The format in which to save image or plot frames.
+; FRAME_INFO (default: '')
+;    Any additional text to affix to the file name (e.g., 'test',
+;    'zoom-in').
+; MOVIE_NAME (optional)
+;    The base name of plot or image movies to produced. This 
+;    routine will prefix MOVIE_PATH and affix MOVIE_INFO, the 
+;    array of time indices, and MOVIE_TYPE to create the full
+;    file path.
+; MOVIE_PATH (default: './')
+;    The base path in which to save image or plot movies.
+; MOVIE_TYPE (default: '.mp4')
+;    The format in which to save image or plot movies.
+; MOVIE_INFO (default: '')
+;    Any additional text to affix to the file name (e.g., 'test',
+;    'zoom-in').
+; CONTEXT (default: 'spatial')
+;    The graphics context to pass to set_graphics_kw.pro
 ;-
 pro data_graphics, fdata,xdata,ydata, $
                    data_name, $
@@ -64,7 +103,7 @@ pro data_graphics, fdata,xdata,ydata, $
         text_format = 'k'
      endif
 
-     ;;==Create and save a movie
+     ;;==Create and save an image
      data_frame, fdata,xdata,ydata, $
                  filename = filename, $
                  multi_page = 0B, $
