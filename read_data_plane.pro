@@ -41,16 +41,16 @@
 ; LUN (default: -1)
 ;    Logical unit number for printing runtime messages.
 ;-
-function eppic_data_plane, data_name, $
-                           timestep=timestep, $
-                           axes=axes, $
-                           ranges=ranges, $
-                           data_type=data_type, $
-                           data_isft=data_isft, $
-                           rotate=rotate, $
-                           info_path=info_path, $
-                           data_path=data_path, $
-                           lun=lun
+function read_data_plane, data_name, $
+                          timestep=timestep, $
+                          axes=axes, $
+                          ranges=ranges, $
+                          data_type=data_type, $
+                          data_isft=data_isft, $
+                          rotate=rotate, $
+                          info_path=info_path, $
+                          data_path=data_path, $
+                          lun=lun
 
   ;;==Defaults and guards
   if n_elements(timestep) eq 0 then timestep = 0

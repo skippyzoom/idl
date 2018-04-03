@@ -16,15 +16,15 @@ pro plane_movies, name, $
   if n_elements(path) eq 0 then path = './'
 
   ;;==Extract a plane of data
-  plane = eppic_data_plane(name, $
-                           timestep = fix(time.index), $
-                           axes = axes, $
-                           data_type = 4, $
-                           data_isft = 0B, $
-                           ranges = ranges, $
-                           rotate = rotate, $
-                           info_path = path, $
-                           data_path = path+path_sep()+'parallel')
+  plane = read_data_plane(name, $
+                          timestep = fix(time.index), $
+                          axes = axes, $
+                          data_type = 4, $
+                          data_isft = 0B, $
+                          ranges = ranges, $
+                          rotate = rotate, $
+                          info_path = path, $
+                          data_path = path+path_sep()+'parallel')
 
   ;;==Add name to plane
   plane['name'] = name

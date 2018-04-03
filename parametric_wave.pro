@@ -43,20 +43,20 @@ pro parametric_wave, run
   ;;==Convert time steps to strings
   time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
 
-  ;; plane_images, 'den1', $
-  ;;               axes = 'xy', $
-  ;;               time = time, $
-  ;;               ranges = ranges, $
-  ;;               rotate = rotate, $
-  ;;               path = path, $
-  ;;               data_out = plane
-  ;; fft_images, plane.f,plane.name, $
-  ;;             time = time, $
-  ;;             path = path, $
-  ;;             nkx = n_elements(plane.x), $
-  ;;             nky = n_elements(plane.y), $
-  ;;             dx = plane.dx, $
-  ;;             dy = plane.dy
+  plane_images, 'den1', $
+                axes = 'xy', $
+                time = time, $
+                ranges = ranges, $
+                rotate = rotate, $
+                path = path, $
+                data_out = plane
+  fft_images, plane.f,plane.name, $
+              time = time, $
+              path = path, $
+              nkx = n_elements(plane.x), $
+              nky = n_elements(plane.y), $
+              dx = plane.dx, $
+              dy = plane.dy
   ;; plane_images, 'phi', $
   ;;               axes = 'xy', $
   ;;               time = time, $
@@ -100,5 +100,25 @@ pro parametric_wave, run
   ;;             nky = n_elements(plane.y), $
   ;;             dx = plane.dx, $
   ;;             dy = plane.dy
+
+  ;;==Extract a plane of data
+  name = 'den1'
+  plane = read_data_plane(name, $
+                          timestep = fix(time.index), $
+                          axes = axes, $
+                          data_type = 4, $
+                          data_isft = 0B, $
+                          ranges = ranges, $
+                          rotate = rotate, $
+                          info_path = path, $
+                          data_path = path+path_sep()+'parallel')
+
+  fft_interp, plane.f,name, $
+              time = time, $
+              path = path, $
+              nkx = n_elements(plane.x), $
+              nky = n_elements(plane.y), $
+              dx = plane.dx, $
+              dy = plane.dy
 
 end
