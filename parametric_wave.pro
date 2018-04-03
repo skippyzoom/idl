@@ -41,23 +41,42 @@ timestep = params.nout*[0,params.nt_max/2,params.nt_max-1]
 ;;==Convert time steps to strings
 time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
 
-den_images, time,ranges,path,axes,rotate,data_out=plane
-fsize = size(plane.f)
-nx = fsize[1]
-ny = fsize[2]
-fft_images, plane.f,'den1',time,path,nx,ny,params.dx,params.dy
-;; phi_images, time,ranges,path,axes,rotate,data_out=plane
-;; fsize = size(plane.fdata)
-;; nx = fsize[1]
-;; ny = fsize[2]
-;; fft_images, plane.fdata,'phi',path,nx,ny,params.dx,params.dy
-;; ;; @fft_images
-;; efield_images, plane.fdata,plane.xdata,plane.ydata, $
-;;                time,ranges,path,axes,rotate,params.dx,params.dy
-;; ;; @efield_images
-
-;; ;;==Clear arrays
-;; delvar, den,phi
+;; plane_images, 'den1', $
+;;               axes = 'xy', $
+;;               time = time, $
+;;               ranges = ranges, $
+;;               rotate = rotate, $
+;;               path = path, $
+;;               data_out = plane
+;; fft_images, plane.f,plane.name, $
+;;             time = time, $
+;;             path = path, $
+;;             nkx = n_elements(plane.x), $
+;;             nky = n_elements(plane.y), $
+;;             dx = plane.dx, $
+;;             dy = plane.dy
+plane_images, 'phi', $
+              axes = 'xy', $
+              time = time, $
+              ranges = ranges, $
+              rotate = rotate, $
+              path = path, $
+              data_out = plane
+fft_images, plane.f,plane.name, $
+            time = time, $
+            path = path, $
+            nkx = n_elements(plane.x), $
+            nky = n_elements(plane.y), $
+            dx = plane.dx, $
+            dy = plane.dy
+efield_images, plane.f,plane.x,plane.y, $
+               time = time, $
+               ranges = ranges, $
+               path = path, $
+               axes = axes, $
+               rotate = rotate, $
+               dx = plane.dx, $
+               dy = plane.dy
 
 ;; ;;==Create the time-step array
 ;; timestep = params.nout*lindgen(params.nt_max)

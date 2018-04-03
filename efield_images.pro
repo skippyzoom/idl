@@ -1,5 +1,23 @@
-pro efield_images, phi,xdata,ydata,time,ranges,path,axes,rotate,dx,dy, $
+pro efield_images, phi,xdata,ydata, $
+                   axes=axes, $
+                   time=time, $
+                   ranges=ranges, $
+                   rotate=rotate, $
+                   path=path, $
+                   dx=dx, $
+                   dy=dy, $
                    data_out=data_out
+
+  ;;==Defaults and guards
+  if n_elements(axes) eq 0 then axes = 'xy'
+  if n_elements(time) eq 0 then time = dictionary()
+  if ~isa(time,'dictionary') then time = dictionary(time)
+  if ~time.haskey('index') then time['index'] = 0
+  if n_elements(ranges) eq 0 then ranges = [0,1,0,1,0,1]
+  if n_elements(rotate) eq 0 then rotate = 0
+  if n_elements(path) eq 0 then path = './'
+  if n_elements(dx) eq 0 then dx = 1.0
+  if n_elements(dy) eq 0 then dy = 1.0
 
   ;;==Extract a plane of potential data
   if n_elements(axes) eq 0 then axes = 'xy'
@@ -13,6 +31,7 @@ pro efield_images, phi,xdata,ydata,time,ranges,path,axes,rotate,dx,dy, $
                               rotate = rotate, $
                               info_path = path, $
                               data_path = path+path_sep()+'parallel')
+
      phi = plane.remove('f')
      xdata = plane.remove('x')
      ydata = plane.remove('y')
@@ -25,9 +44,6 @@ pro efield_images, phi,xdata,ydata,time,ranges,path,axes,rotate,dx,dy, $
   nt = fsize[3]
   if n_elements(xdata) eq 0 then xdata = dx*indgen(nx)
   if n_elements(xdata) eq 0 then ydata = dy*indgen(ny)
-
-  ;;==Make data available to calling routine
-  data_out = plane
 
   ;;==Calculate E from phi
   efield = calc_grad_xyzt(phi,dx=dx,dy=dy,scale=-1.0)
