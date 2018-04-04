@@ -43,20 +43,20 @@ pro parametric_wave, run
   ;;==Convert time steps to strings
   time = time_strings(timestep,dt=params.dt,scale=1e3,precision=2)
 
-  plane_images, 'den1', $
-                axes = 'xy', $
-                time = time, $
-                ranges = ranges, $
-                rotate = rotate, $
-                path = path, $
-                data_out = plane
-  fft_images, plane.f,plane.name, $
-              time = time, $
-              path = path, $
-              nkx = n_elements(plane.x), $
-              nky = n_elements(plane.y), $
-              dx = plane.dx, $
-              dy = plane.dy
+  ;; plane_images, 'den1', $
+  ;;               axes = 'xy', $
+  ;;               time = time, $
+  ;;               ranges = ranges, $
+  ;;               rotate = rotate, $
+  ;;               path = path, $
+  ;;               data_out = plane
+  ;; fft_images, plane.f,plane.name, $
+  ;;             time = time, $
+  ;;             path = path, $
+  ;;             nkx = n_elements(plane.x), $
+  ;;             nky = n_elements(plane.y), $
+  ;;             dx = plane.dx, $
+  ;;             dy = plane.dy
   ;; plane_images, 'phi', $
   ;;               axes = 'xy', $
   ;;               time = time, $
@@ -113,12 +113,25 @@ pro parametric_wave, run
                           info_path = path, $
                           data_path = path+path_sep()+'parallel')
 
-  fft_interp, plane.f,name, $
-              time = time, $
-              path = path, $
-              nkx = n_elements(plane.x), $
-              nky = n_elements(plane.y), $
-              dx = plane.dx, $
-              dy = plane.dy
+  ;; f_interp = fft_interp(plane.f, $
+  ;;                       /full, $
+  ;;                       time = time, $
+  ;;                       path = path, $
+  ;;                       lambda = 4.0, $
+  ;;                       nkx = n_elements(plane.x), $
+  ;;                       nky = n_elements(plane.y), $
+  ;;                       dx = plane.dx*params.nout_avg, $
+  ;;                       dy = plane.dy*params.nout_avg, $
+  ;;                       dt = params.dt*params.nout)
+  fft_interp_images, plane.f, $
+                     /full, $
+                     time = time, $
+                     path = path+path_sep()+'frames', $
+                     lambda = 4.0, $
+                     nkx = n_elements(plane.x), $
+                     nky = n_elements(plane.y), $
+                     dx = plane.dx*params.nout_avg, $
+                     dy = plane.dy*params.nout_avg, $
+                     dt = params.dt*params.nout
 
 end
