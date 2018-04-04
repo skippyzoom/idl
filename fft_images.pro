@@ -23,16 +23,10 @@ pro fft_images, fdata,name, $
   if n_elements(dy) eq 0 then dy = 1.0
 
   ;;==Set up spectral array
-  ;; tmp = fdata
-  ;; fdata = make_array(nkx,nky,nt,type=6,value=0)
-  ;; fdata[0:nx-1,0:ny-1,*] = tmp
-  ;; tmp = !NULL
   fftarr = make_array(nkx,nky,nt,type=6,value=0)
   fftarr[0:nx-1,0:ny-1,*] = fdata
 
   ;;==Calculate spatial FFT of density
-  ;; for it=0,nt-1 do $
-  ;;    fdata[*,*,it] = fft(fdata[*,*,it],/overwrite,/center)
   for it=0,nt-1 do $
      fftarr[*,*,it] = fft(fftarr[*,*,it],/overwrite,/center)
 
