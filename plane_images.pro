@@ -45,6 +45,6 @@ pro plane_images, name, $
                  frame_path = path+path_sep()+'frames', $
                  frame_name = name, $
                  frame_type = '.pdf', $
-                 context = 'spatial'
+                 context = name
 
 end
