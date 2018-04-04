@@ -95,7 +95,7 @@ pro efield_images, phi,xdata,ydata, $
 
   ;;==Make plots of mean E-field components
   Ex_ymean = mean(Ex,dim=2)
-  file_path = path+path_sep()+'test_frames'
+  file_path = path+path_sep()+'frames'
   file_name = 'Ex_ymean'
   file_type = '.pdf'
   filename = expand_path(file_path)+path_sep()+ $
