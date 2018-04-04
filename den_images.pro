@@ -1,33 +1,39 @@
-pro den_images, time,ranges,path,axes,rotate,data_out=data_out
+;+
+; Script for creating images of density in the working directory
+;-
 
-  ;;==Extract a plane of density data
-  if n_elements(axes) eq 0 then axes = 'xy'
-  plane = eppic_data_plane('den1', $
-                           timestep = fix(time.index), $
-                           axes = axes, $
-                           data_type = 4, $
-                           data_isft = 0B, $
-                           ranges = ranges, $
-                           rotate = rotate, $
-                           info_path = path, $
-                           data_path = path+path_sep()+'parallel')
+;;==Declare the distribution
+den = 'den1'
 
-  ;;==Make data available to calling routine
-  data_out = plane
+;;==Set the path to here
+path = './'
 
-  ;;==Get dimensions of data plane
-  fsize = size(plane.f)
-  nx = fsize[1]
-  ny = fsize[2]
-  nt = fsize[3]
+;;==Read simulation parameters
+params = set_eppic_params(path=path)
 
-  ;;==Make frame(s)
-  data_graphics, plane.f,plane.x,plane.y, $
-                 'den1', $
-                 time = time, $
-                 frame_path = path+path_sep()+'frames', $
-                 frame_name = 'den1', $
-                 frame_type = '.pdf', $
-                 context = 'spatial'
+;;==Calculate max number of time steps
+nt_max = calc_timesteps(path=path)
 
-end
+;;==Set up time-step info
+time = time_strings(params.nout*[0,nt_max-1], $
+                    dt=params.dt,scale=1e3,precision=2)
+
+;;==Extract a plane of density data
+plane = eppic_data_plane(den, $
+                         timestep = fix(time.index), $
+                         axes = 'xy', $
+                         data_type = 4, $
+                         data_isft = 0B, $
+                         ranges = [0,1,0,1], $
+                         rotate = 3, $
+                         info_path = path, $
+                         data_path = path+path_sep()+'parallel')
+
+;;==Make frame(s)
+data_graphics, plane.f,plane.x,plane.y, $
+               den, $
+               time = time, $
+               frame_path = path+path_sep()+'frames', $
+               frame_name = den, $
+               frame_type = '.pdf', $
+               context = den
