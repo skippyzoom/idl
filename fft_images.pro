@@ -1,10 +1,39 @@
-pro fft_images, fdata,name, $
+pro fft_images, name, $
+                data=data, $
+                full=full, $
+                axes=axes, $
                 time=time, $
+                ranges=ranges, $
+                rotate=rotate, $
                 path=path, $
                 nkx=nkx, $
                 nky=nky, $
                 dx=dx, $
                 dy=dy
+
+  ;;==Check for input data
+  if n_elements(data) eq 0 then begin
+     if n_elements(axes) eq 0 then axes = 'xy'
+     if n_elements(time) eq 0 then time = dictionary()
+     if ~isa(time,'dictionary') then time = dictionary(time)
+     if ~time.haskey('index') then time['index'] = 0
+     if n_elements(ranges) eq 0 then ranges = [0,1,0,1,0,1]
+     if n_elements(rotate) eq 0 then rotate = 0
+     if n_elements(path) eq 0 then path = './'     
+     plane = read_data_plane(name, $
+                             timestep = fix(time.index), $
+                             axes = axes, $
+                             data_type = 4, $
+                             data_isft = 0B, $
+                             ranges = ranges, $
+                             rotate = rotate, $
+                             info_path = path, $
+                             data_path = path+path_sep()+'parallel')
+     fdata = plane.remove('f')
+     dx = plane.remove('dx')
+     dy = plane.remove('dy')
+     plane = !NULL
+  endif
 
   ;;==Get dimensions of input array
   fsize = size(fdata)
@@ -38,7 +67,7 @@ pro fft_images, fdata,name, $
   fdata /= max(fdata)
   fdata = 10*alog10(fdata^2)
 
-  ;;==Set up spectral x- and y-axis vectors
+  ;;==Set up kx and ky vectors
   xdata = 2*!pi*fftfreq(nkx,dx)
   xdata = shift(xdata,nkx/2)
   ydata = 2*!pi*fftfreq(nky,dy)
