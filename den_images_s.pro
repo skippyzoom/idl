@@ -19,15 +19,15 @@ time = time_strings(params.nout*[0,nt_max-1], $
                     dt=params.dt,scale=1e3,precision=2)
 
 ;;==Extract a plane of density data
-plane = eppic_data_plane(den, $
-                         timestep = fix(time.index), $
-                         axes = 'xy', $
-                         data_type = 4, $
-                         data_isft = 0B, $
-                         ranges = [0,1,0,1], $
-                         rotate = 3, $
-                         info_path = path, $
-                         data_path = path+path_sep()+'parallel')
+plane = read_data_plane(den, $
+                        timestep = fix(time.index), $
+                        axes = 'xy', $
+                        data_type = 4, $
+                        data_isft = 0B, $
+                        ranges = [0,1,0,1], $
+                        rotate = 3, $
+                        info_path = path, $
+                        data_path = path+path_sep()+'parallel')
 
 ;;==Make frame(s)
 data_graphics, plane.f,plane.x,plane.y, $
