@@ -64,7 +64,7 @@ ydata = shift(ydata,nky/2)
 wdata = 2*!pi*fftfreq(nw,dt)
 wdata = shift(wdata,nw/2)
 
-;;==Make frames(s)
+;;==Make frame(s)
 kw = set_graphics_kw(data = fdata, $
                      context = name+'_fft')
 img = image(fdata[*,nky/2,*],xdata,wdata, $
