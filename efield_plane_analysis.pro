@@ -3,7 +3,7 @@
 ;-
 
 ;;==Read a plane of phi data
-@phi_read_plane.scr
+@phi_read_plane
 
 ;;==Calculate the gradient
 efield = calc_grad_xyzt(phi,dx=dx,dy=dy,scale=-1)
@@ -13,46 +13,25 @@ Ex = efield.x
 Ey = efield.y
 efield = !NULL
 
-;;==Make images of x component
-@Ex_kw.scr
-filename = pd.path+path_sep()+'frames'+ $
-           path_sep()+'efield_x-'+time.index+'.pdf'
-data_graphics, Ex,xdata,ydata, $
-               /make_frame, $
-               filename = filename, $
-               image_kw = image_kw, $
-               colorbar_kw = colorbar_kw
+;; ;;==Make images of x component
+;; @Ex_images
 
-;;==Make images of y component
-@Ey_kw.scr
+;;==Make plots of average x component
+Ex_mean = mean(Ex,dim=1)
 filename = pd.path+path_sep()+'frames'+ $
-           path_sep()+'efield_y-'+time.index+'.pdf'
-data_graphics, Ey,xdata,ydata, $
+           path_sep()+'efield_x-x_mean-'+time.index+'.pdf'
+data_graphics, ydata,Ex_mean, $
                /make_frame, $
-               filename = filename, $
-               image_kw = image_kw, $
-               colorbar_kw = colorbar_kw
+               filename = filename
 
-;;==Calculate magnitude and angle
-Er = sqrt(Ex*Ex + Ey*Ey)
-Et = atan(Ey,Ex)
 
-;;==Make images of magnitude
-@Er_kw.scr
-filename = pd.path+path_sep()+'frames'+ $
-           path_sep()+'efield_r-'+time.index+'.pdf'
-data_graphics, Er,xdata,ydata, $
-               /make_frame, $
-               filename = filename, $
-               image_kw = image_kw, $
-               colorbar_kw = colorbar_kw
+;; ;;==Make images of y component
+;; @Ey_images
 
-;;==Make images of angle
-@Et_kw.scr
-filename = pd.path+path_sep()+'frames'+ $
-           path_sep()+'efield_t-'+time.index+'.pdf'
-data_graphics, Et,xdata,ydata, $
-               /make_frame, $
-               filename = filename, $
-               image_kw = image_kw, $
-               colorbar_kw = colorbar_kw
+;; ;;==Make images of magnitude
+;; Er = sqrt(Ex*Ex + Ey*Ey)
+;; @Er_images
+
+;; ;;==Make images of angle
+;; Et = atan(Ey,Ex)
+;; @Et_images

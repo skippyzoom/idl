@@ -3,10 +3,10 @@
 ;-
 
 ;;==Read a plane of den1 data
-@den1_read_plane.scr
+@den1_read_plane
 
 ;;==Load graphics keywords for den1 images
-@den1_kw.scr
+@den1_kw
 
 ;;==Create frames of den1 data
 filename = pd.path+path_sep()+'frames'+ $
@@ -19,10 +19,10 @@ data_graphics, den1,xdata,ydata, $
 
 ;;==Calculate the spatial FFT of the den1 plane
 fdata = den1
-@fft_2D_time.scr
+@fft_2D_time
 
 ;;==Load graphics keywords for FFT images
-@fft_kw.scr
+@fft_kw
 
 ;;==Create frames of den1 spatial FFT
 filename = pd.path+path_sep()+'frames'+ $
