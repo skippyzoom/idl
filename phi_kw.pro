@@ -1,8 +1,11 @@
 ;+
 ; Script to set graphics keyword preferences for phi
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
 ;-
 
-@default_kw.scr
+@default_kw
 
 dsize = size(phi)
 nx = dsize[1]

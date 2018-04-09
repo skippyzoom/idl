@@ -1,8 +1,11 @@
 ;+
 ; Script to set graphics keyword preferences for den1
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
 ;-
 
-@default_kw.scr
+@default_kw
 
 dsize = size(den1)
 nx = dsize[1]
