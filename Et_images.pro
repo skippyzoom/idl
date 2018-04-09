@@ -1,9 +1,17 @@
 ;+
-; Script for making image frames of E-field angle
+; Script for making image frames of E-field plane angle. 
+;
+; Note that the two components are the logical 'x' and 'y' components
+; in the given plane, as set by the AXES variable. See notes in 
+; Ex_images.pro and Ey_images.pro.
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
 ;-
 @Et_kw
 filename = pd.path+path_sep()+'frames'+ $
-           path_sep()+'efield_t-'+time.index+'.pdf'
+           path_sep()+'efield_t'+axes+ $
+           time.index+'.pdf'
 data_graphics, Et,xdata,ydata, $
                /make_frame, $
                filename = filename, $
