@@ -1,5 +1,8 @@
 ;+
 ; Script to set graphics keyword preferences for E-field magnitude
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
 ;-
 
 @default_kw.scr

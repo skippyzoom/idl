@@ -1,5 +1,8 @@
 ;+
 ; Script to set graphics keyword preferences for E-field angle
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
 ;-
 
 @default_kw.scr
