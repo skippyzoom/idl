@@ -12,7 +12,7 @@
 @den1_kw
 
 ;;==Create frames of den1 data
-filename = pd.path+path_sep()+'frames'+ $
+filename = path+path_sep()+'frames'+ $
            path_sep()+'den1-'+time.index+'.pdf'
 data_graphics, den1,xdata,ydata, $
                /make_frame, $
@@ -28,7 +28,7 @@ fdata = den1
 @fft_kw
 
 ;;==Create frames of den1 spatial FFT
-filename = pd.path+path_sep()+'frames'+ $
+filename = path+path_sep()+'frames'+ $
            path_sep()+'den1_fft-'+time.index+'.pdf'
 data_graphics, fdata,xdata,ydata, $
                /make_frame, $

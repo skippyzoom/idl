@@ -12,7 +12,7 @@
 @phi_kw
 
 ;;==Create frames of phi data
-filename = pd.path+path_sep()+'frames'+ $
+filename = path+path_sep()+'frames'+ $
            path_sep()+'phi-'+time.index+'.pdf'
 data_graphics, phi,xdata,ydata, $
                /make_frame, $
@@ -28,7 +28,7 @@ fdata = phi
 @fft_kw
 
 ;;==Create frames of phi spatial FFT
-filename = pd.path+path_sep()+'frames'+ $
+filename = path+path_sep()+'frames'+ $
            path_sep()+'phi_fft-'+time.index+'.pdf'
 data_graphics, fdata,xdata,ydata, $
                /make_frame, $

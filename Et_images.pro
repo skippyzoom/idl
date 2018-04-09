@@ -9,7 +9,7 @@
 ;------------------------------------------------------------------------------
 ;-
 @Et_kw
-filename = pd.path+path_sep()+'frames'+ $
+filename = path+path_sep()+'frames'+ $
            path_sep()+'efield_t'+axes+ $
            time.index+'.pdf'
 data_graphics, Et,xdata,ydata, $

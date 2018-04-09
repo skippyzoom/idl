@@ -10,7 +10,7 @@
 ;------------------------------------------------------------------------------
 ;-
 @Ex_kw
-filename = pd.path+path_sep()+'frames'+ $
+filename = path+path_sep()+'frames'+ $
            path_sep()+'efield_'+strmid(axes,0,1)+ $
            '-'+time.index+'.pdf'
 data_graphics, Ex,xdata,ydata, $
