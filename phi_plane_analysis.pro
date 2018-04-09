@@ -1,5 +1,8 @@
 ;+
 ; Script for analyzing a plane of EPPIC phi data.
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
 ;-
 
 ;;==Read a plane of phi data

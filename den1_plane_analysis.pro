@@ -1,5 +1,8 @@
 ;+
 ; Script for analyzing a plane of EPPIC den1 data.
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
 ;-
 
 ;;==Read a plane of den1 data

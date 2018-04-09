@@ -1,5 +1,8 @@
 ;+
 ; Script for analyzing E fields from a plane of EPPIC phi data.
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
 ;-
 
 ;;==Read a plane of phi data
