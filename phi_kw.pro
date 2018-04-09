@@ -20,4 +20,4 @@ image_kw['xtitle'] = 'Zonal [m]'
 image_kw['ytitle'] = 'Vertical [m]'
 image_kw['xticklen'] = 0.02
 image_kw['yticklen'] = 0.02*data_aspect
-colorbar_kw['title'] = '$\delta n/n_0$'
+colorbar_kw['title'] = '$\phi$ [V]'
