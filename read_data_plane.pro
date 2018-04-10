@@ -120,8 +120,8 @@ function read_data_plane, data_name, $
 
   endif $
   else begin
-     printf, lun,"[EPPIC_IMAGE] Could not build plane for:"
-     printf, lun,"              data_name = "+data_name
-     printf, lun,"              axes = "+axes
+     printf, lun,"[READ_DATA_PLANE] Could not build plane for:"
+     printf, lun,"                  data_name = "+data_name
+     printf, lun,"                  axes = "+axes
   endelse
 end
