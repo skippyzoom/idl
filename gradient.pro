@@ -2,16 +2,23 @@
 ; Returns a dictionary representing the gradient of a function, f.
 ; Each member field contains one component of Grad[f].
 ;
-; DX, DY, DZ: The user may supply a single value for each differential
-; or may supply dx as a vector of differentials. If f has more than
-; 3 dimensions, dx must be a vector. This approach provides consistency
-; with other gradient functions, which only allow the user to supply 
-; scalar differential values, while providing an interface that can
-; handle arrays as large as the maximum allowed by IDL. If the user
-; supplies separate values for each, this function will return a 
-; dictionary with keys (x,y[,z]); if the user supplies a vector of
-; differentials, this function will return a dictionary with keys
-; [x1,x2,...,xN].
+; Created by Matt Young.
+;------------------------------------------------------------------------------
+;                                 **PARAMETERS**
+; F (required)
+;    The function whose gradient to calculate
+; DX[,DY,DZ] (default: 1.0 for all)
+;    Differential values for computing point-wise centered finite
+;    differences. The user may supply a single value for each
+;    differential or may supply dx as a vector of differentials. If f
+;    has more than 3 dimensions, dx must be a vector. This approach
+;    provides consistency with other gradient functions, which only
+;    allow the user to supply scalar differential values, while
+;    providing an interface that can handle arrays as large as the
+;    maximum allowed by IDL. If the user supplies separate values for
+;    each, this function will return a dictionary with keys (x[,y,z]);
+;    if the user supplies a vector of differentials, this function
+;    will return a dictionary with keys [x1,x2,...,xN].
 ;-
 function gradient, f, $
                    dx=dx,dy=dy,dz=dz, $
