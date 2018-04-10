@@ -16,9 +16,8 @@
 ;   See analyze_moments.pro for more information on which
 ;   quantities it calculates and how it does so.
 ;-
-if n_elements(path) eq 0 then path = '.'
+if n_elements(path) eq 0 then path = './'
 cd, path
 params = set_eppic_params(path=path)
-grid = set_grid(path=path)
-nt_max = calc_timesteps(path=path,grid=grid)
+nt_max = calc_timesteps(path=path)
 moment_vars = analyze_moments(path=path)
