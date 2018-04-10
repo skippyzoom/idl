@@ -1,13 +1,19 @@
 ;+
-; Remove the extension from a file name
-; without knowing the extension a priori.
-; This function assumes that all characters
-; following the final '.' comprise the
-; extension.
+; Remove the extension from a file name.
 ;
-; NOTES
-; -- This function will return name unmodified
-;    if it does not find an extension.
+; This function removes the extension from a file name without knowing
+; the extension a priori. It assumes that all characters following the
+; final '.' comprise the extension.
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
+;                                 **PARAMETERS**
+; NAME (required)
+;    String file name from which to strip extension.
+;------------------------------------------------------------------------------
+;                                   **NOTES**
+; -- This function will return NAME unmodified if it does not find an
+;    extension.
 ;-
 function strip_extension, name
   name_in = name
