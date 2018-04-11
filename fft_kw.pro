@@ -2,7 +2,7 @@
 ; Script to set graphics keyword preferences for FFTs
 ;-
 
-@default_kw.scr
+@default_kw
 
 dsize = size(fdata)
 nx = dsize[1]
