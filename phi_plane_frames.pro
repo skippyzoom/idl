@@ -1,35 +1,35 @@
 ;+
-; Script for analyzing a plane of EPPIC den1 data.
+; Script for making frames from a plane of EPPIC phi data.
 ;
 ; Created by Matt Young.
 ;------------------------------------------------------------------------------
 ;-
 
-;;==Read a plane of den1 data
-@den1_read_plane
+;;==Read a plane of phi data
+@phi_read_plane
 
-;;==Load graphics keywords for den1 images
-@den1_kw
+;;==Load graphics keywords for phi
+@phi_kw
 
-;;==Create frames of den1 data
+;;==Create image frames of phi data
 filename = path+path_sep()+'frames'+ $
-           path_sep()+'den1-'+time.index+'.pdf'
-data_graphics, den1,xdata,ydata, $
+           path_sep()+'phi-'+time.index+'.pdf'
+data_graphics, phi,xdata,ydata, $
                /make_frame, $
                filename = filename, $
                image_kw = image_kw, $
                colorbar_kw = colorbar_kw
 
-;;==Calculate the spatial FFT of the den1 plane
-fdata = den1
+;;==Calculate the spatial FFT of the phi plane
+fdata = phi
 @fft_2D_time
 
 ;;==Load graphics keywords for FFT images
 @fft_kw
 
-;;==Create frames of den1 spatial FFT
+;;==Create image frames of phi spatial FFT
 filename = path+path_sep()+'frames'+ $
-           path_sep()+'den1_fft-'+time.index+'.pdf'
+           path_sep()+'phi_fft-'+time.index+'.pdf'
 data_graphics, fdata,xdata,ydata, $
                /make_frame, $
                filename = filename, $
