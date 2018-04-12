@@ -1,5 +1,5 @@
 ;+
-; Script for analyzing E fields from a plane of EPPIC phi data.
+; Script for making movies of E from a plane of EPPIC phi data.
 ;
 ; Created by Matt Young.
 ;------------------------------------------------------------------------------
