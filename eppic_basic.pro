@@ -39,7 +39,7 @@ pro eppic_basic, path=path, $
   if keyword_set(moments) then begin
 
      ;;==Read in data
-     moments = analyze_moments(path=path)
+     moments = read_moments(path=path)
 
      ;;==Create plots
      plot_moments, moments, $

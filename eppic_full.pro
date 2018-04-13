@@ -42,7 +42,7 @@ pro eppic_full, path=path, $
                                 ; 1-D plots of velocity moments ;
                                 ;-------------------------------;
   ;;==Read in data
-  moments = analyze_moments(path=path)
+  moments = read_moments(path=path)
 
   ;;==Create plots
   plot_moments, moments,params=params, $

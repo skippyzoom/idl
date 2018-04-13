@@ -28,7 +28,7 @@ function project_setup, path=path,project=project
   nt_max = calc_timesteps(path=path)
   params['nt_max'] = nt_max
   pd['params'] = params
-  moments = analyze_moments(path=path)
+  moments = read_moments(path=path)
   pd['moments'] = moments
   pd['ranges'] = [0,1,0,1,0,1]
   pd['rotate'] = 0

@@ -40,7 +40,7 @@ pro basic_multi_image, data_name, $
   params = set_eppic_params(path=path)
   grid = set_grid(path=path)
   nt_max = calc_timesteps(path=path,grid=grid)
-  moments = analyze_moments(path=path)
+  moments = read_moments(path=path)
 
   ;;==Construct title strings
   title = string(1e3*params.dt*timestep,format='(f7.2)')

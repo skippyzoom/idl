@@ -30,7 +30,7 @@ function initialize_run, run
   params['nt_max'] = nt_max
 
   ;;==Read moments files
-  moments = analyze_moments(path=path)
+  moments = read_moments(path=path)
 
   ;;==Plot moments data
   plot_moments, moments, $

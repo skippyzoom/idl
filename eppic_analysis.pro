@@ -13,7 +13,7 @@ data_name = 'den1'
 params = set_eppic_params(path=path)
 
 ;;==Analyze moments files
-moments = analyze_moments(path=path)
+moments = read_moments(path=path)
 
 ;;==Create plots of moments data
 plot_moments, moments,params=params,path=path+path_sep()+'test_images'
