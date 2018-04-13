@@ -10,8 +10,7 @@
 ;-
 @Er_kw
 filename = path+path_sep()+'movies'+ $
-           path_sep()+'efield_r'+axes+ $
-           time.index+'.mp4'
+           path_sep()+'efield_r'+axes+'.mp4'
 data_graphics, Er,xdata,ydata, $
                /make_movie, $
                filename = filename, $

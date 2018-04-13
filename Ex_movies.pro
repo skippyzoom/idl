@@ -11,8 +11,7 @@
 ;-
 @Ex_kw
 filename = path+path_sep()+'movies'+ $
-           path_sep()+'efield_'+strmid(axes,0,1)+ $
-           '-'+time.index+'.mp4'
+           path_sep()+'efield_'+strmid(axes,0,1)+'.mp4'
 data_graphics, Ex,xdata,ydata, $
                /make_movie, $
                filename = filename, $

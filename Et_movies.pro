@@ -10,8 +10,7 @@
 ;-
 @Et_kw
 filename = path+path_sep()+'movies'+ $
-           path_sep()+'efield_t'+axes+ $
-           time.index+'.mp4'
+           path_sep()+'efield_t'+axes+'.mp4'
 data_graphics, Et,xdata,ydata, $
                /make_movie, $
                filename = filename, $
