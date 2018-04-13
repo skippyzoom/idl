@@ -13,7 +13,7 @@
 
 ;;==Create image movies of phi data
 filename = path+path_sep()+'movies'+ $
-           path_sep()+'phi-'+time.index+'.pdf'
+           path_sep()+'phi.mp4'
 data_graphics, phi,xdata,ydata, $
                /make_movie, $
                filename = filename, $
@@ -29,7 +29,7 @@ fdata = phi
 
 ;;==Create image movies of phi spatial FFT
 filename = path+path_sep()+'movies'+ $
-           path_sep()+'phi_fft-'+time.index+'.pdf'
+           path_sep()+'phi_fft.mp4'
 data_graphics, fdata,xdata,ydata, $
                /make_movie, $
                filename = filename, $

@@ -13,7 +13,7 @@
 
 ;;==Create image movies of den1 data
 filename = path+path_sep()+'movies'+ $
-           path_sep()+'den1-'+time.index+'.mp4'
+           path_sep()+'den1.mp4'
 data_graphics, den1,xdata,ydata, $
                /make_movie, $
                filename = filename, $
@@ -29,7 +29,7 @@ fdata = den1
 
 ;;==Create image movies of den1 spatial FFT
 filename = path+path_sep()+'movies'+ $
-           path_sep()+'den1_fft-'+time.index+'.mp4'
+           path_sep()+'den1_fft.mp4'
 data_graphics, fdata,xdata,ydata, $
                /make_movie, $
                filename = filename, $
