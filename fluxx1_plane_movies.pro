@@ -1,24 +1,24 @@
 ;+
-; Script for making image movies of E-field plane magnitude. 
-;
-; Note that the two components are the logical 'x' and 'y' components
-; in the given plane, as set by the AXES variable. See notes in 
-; Ex_images.pro and Ey_images.pro.
+; Script for making frames from a plane of EPPIC fluxx1 data.
 ;
 ; Created by Matt Young.
 ;------------------------------------------------------------------------------
 ;-
-@Er_kw
+
+;;==Load graphics keywords for fluxx1
+@fluxx1_kw
+
+;;==Create image movies of fluxx1 data
 filename = path+path_sep()+'movies'+ $
-           path_sep()+'efield_r'+axes+'.mp4'
-data_graphics, Er,xdata,ydata, $
+           path_sep()+'fluxx1.mp4'
+data_graphics, fluxx1,xdata,ydata, $
                /make_movie, $
                filename = filename, $
                image_kw = image_kw, $
                colorbar_kw = colorbar_kw
 filename = path+path_sep()+'movies'+ $
-           path_sep()+'efield_r'+axes+'.mp4'
-data_graphics, Er[1024-256:1024+255,*,*], $
+           path_sep()+'fluxx1_zoom.mp4'
+data_graphics, fluxx1[1024-256:1024+255,*,*], $
                xdata[1024-256:1024+255],ydata, $
                /make_movie, $
                filename = filename, $

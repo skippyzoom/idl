@@ -5,8 +5,8 @@
 ;------------------------------------------------------------------------------
 ;-
 
-;;==Read a plane of phi data
-@phi_read_plane
+;; ;;==Read a plane of phi data
+;; @phi_read_plane
 
 ;;==Load graphics keywords for phi
 @phi_kw
@@ -15,6 +15,14 @@
 filename = path+path_sep()+'movies'+ $
            path_sep()+'phi.mp4'
 data_graphics, phi,xdata,ydata, $
+               /make_movie, $
+               filename = filename, $
+               image_kw = image_kw, $
+               colorbar_kw = colorbar_kw
+filename = path+path_sep()+'movies'+ $
+           path_sep()+'phi.mp4'
+data_graphics, phi[1024-256:1024+255,*,*], $
+               xdata[1024-256:1024+255],ydata, $
                /make_movie, $
                filename = filename, $
                image_kw = image_kw, $

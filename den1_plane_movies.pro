@@ -5,20 +5,28 @@
 ;------------------------------------------------------------------------------
 ;-
 
-;;==Read a plane of den1 data
-@den1_read_plane
+;; ;;==Read a plane of den1 data
+;; @den1_read_plane
 
 ;;==Load graphics keywords for den1
 @den1_kw
 
-;;==Create image movies of den1 data
-filename = path+path_sep()+'movies'+ $
-           path_sep()+'den1.mp4'
-data_graphics, den1,xdata,ydata, $
-               /make_movie, $
-               filename = filename, $
-               image_kw = image_kw, $
-               colorbar_kw = colorbar_kw
+;; ;;==Create image movies of den1 data
+;; filename = path+path_sep()+'movies'+ $
+;;            path_sep()+'den1.mp4'
+;; data_graphics, den1,xdata,ydata, $
+;;                /make_movie, $
+;;                filename = filename, $
+;;                image_kw = image_kw, $
+;;                colorbar_kw = colorbar_kw
+;; filename = path+path_sep()+'movies'+ $
+;;            path_sep()+'den1_zoom.mp4'
+;; data_graphics, den1[1024-256:1024+255,*,*], $
+;;                xdata[1024-256:1024+255],ydata, $
+;;                /make_movie, $
+;;                filename = filename, $
+;;                image_kw = image_kw, $
+;;                colorbar_kw = colorbar_kw
 
 ;;==Calculate the spatial FFT of the den1 plane
 fdata = den1

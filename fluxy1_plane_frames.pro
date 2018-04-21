@@ -1,26 +1,24 @@
 ;+
-; Script for making image frames of E-field plane angle. 
-;
-; Note that the two components are the logical 'x' and 'y' components
-; in the given plane, as set by the AXES variable. See notes in 
-; Ex_images.pro and Ey_images.pro.
+; Script for making frames from a plane of EPPIC fluxy1 data.
 ;
 ; Created by Matt Young.
 ;------------------------------------------------------------------------------
 ;-
-@Et_kw
+
+;;==Load graphics keywords for fluxy1
+@fluxy1_kw
+
+;;==Create image frames of fluxy1 data
 filename = path+path_sep()+'frames'+ $
-           path_sep()+'efield_t'+axes+ $
-           time.index+'.pdf'
-data_graphics, Et,xdata,ydata, $
+           path_sep()+'fluxy1-'+time.index+'.pdf'
+data_graphics, fluxy1,xdata,ydata, $
                /make_frame, $
                filename = filename, $
                image_kw = image_kw, $
                colorbar_kw = colorbar_kw
 filename = path+path_sep()+'frames'+ $
-           path_sep()+'efield_t'+axes+ $
-           time.index+'_zoom.pdf'
-data_graphics, Et[1024-256:1024+255,*,*], $
+           path_sep()+'fluxy1-'+time.index+'_zoom.pdf'
+data_graphics, fluxy1[1024-256:1024+255,*,*], $
                xdata[1024-256:1024+255],ydata, $
                /make_frame, $
                filename = filename, $

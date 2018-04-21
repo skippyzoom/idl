@@ -13,11 +13,11 @@ plot_kw = dictionary()
 plot_kw['xstyle'] = 1
 plot_kw['overplot'] = 1
 plot_kw['color'] = ['black', $
-                    ;; 'midnight blue', $
+                    'midnight blue', $
                     'dark blue', $
                     'medium blue', $
-                    ;; 'blue', $
-                    ;; 'dodger blue',$
+                    'blue', $
+                    'dodger blue',$
                     'deep sky blue']
 plot_kw['font_name'] = 'Times'
 

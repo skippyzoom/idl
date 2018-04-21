@@ -5,8 +5,8 @@
 ;------------------------------------------------------------------------------
 ;-
 
-;;==Read a plane of phi data
-@phi_read_plane
+;; ;;==Read a plane of phi data
+;; @phi_read_plane
 
 ;;==Calculate the gradient
 efield = calc_grad_xyzt(phi,dx=dx,dy=dy,scale=-1)

@@ -17,3 +17,11 @@ data_graphics, Ex,xdata,ydata, $
                filename = filename, $
                image_kw = image_kw, $
                colorbar_kw = colorbar_kw
+filename = path+path_sep()+'movies'+ $
+           path_sep()+'efield_'+strmid(axes,0,1)+'_zoom.mp4'
+data_graphics, Ex[1024-256:1024+255,*,*], $
+               xdata[1024-256:1024+255],ydata, $
+               /make_movie, $
+               filename = filename, $
+               image_kw = image_kw, $
+               colorbar_kw = colorbar_kw
