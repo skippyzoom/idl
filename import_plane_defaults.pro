@@ -5,9 +5,6 @@
 ;------------------------------------------------------------------------------
 ;-
 if n_elements(axes) eq 0 then axes = 'xy'
-;; if n_elements(ranges) eq 0 then $
-;;    ranges = [0,params.nx*params.nsubdomains, $
-;;              0,params.ny]/params.nout_avg
 if n_elements(rotate) eq 0 then rotate = 0
 if n_elements(data_type) eq 0 then data_type = 4
 if n_elements(data_isft) eq 0 then data_isft = 0B
