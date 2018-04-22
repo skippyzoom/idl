@@ -5,14 +5,6 @@
 ;------------------------------------------------------------------------------
 ;-
 
-;;==Calculate the gradient
-efield = calc_grad_xyzt(phi,dx=dx,dy=dy,scale=-1)
-
-;;==Extract components
-Ex = efield.x
-Ey = efield.y
-efield = !NULL
-
 ;;==Make images of x component
 @Ex_images
 
@@ -26,9 +18,7 @@ efield = !NULL
 @Ey_mean_plots
 
 ;;==Make images of magnitude
-Er = sqrt(Ex*Ex + Ey*Ey)
 @Er_images
 
 ;;==Make images of angle
-Et = atan(Ey,Ex)
 @Et_images
