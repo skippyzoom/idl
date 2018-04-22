@@ -19,7 +19,8 @@ fdata = den1
 filename = path+path_sep()+'frames'+ $
            path_sep()+'den1_fft-'+time.index+ $
            name_info+'.pdf'
-data_graphics, fdata,xdata,ydata, $
+data_graphics, fdata, $
+               ;; xdata,ydata, $
                /make_frame, $
                filename = filename, $
                image_kw = image_kw, $
