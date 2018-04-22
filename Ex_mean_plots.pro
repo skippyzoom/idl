@@ -11,7 +11,9 @@
 ;-
 plot_kw = dictionary()
 plot_kw['xstyle'] = 1
-plot_kw['overplot'] = 1
+tmp = make_array(n_elements(time.index),value=1)
+tmp[0] = 0B
+plot_kw['overplot'] = tmp
 plot_kw['color'] = ['black', $
                     'midnight blue', $
                     'dark blue', $
