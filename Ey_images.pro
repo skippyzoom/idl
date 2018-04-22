@@ -18,12 +18,3 @@ data_graphics, Ey,xdata,ydata, $
                filename = filename, $
                image_kw = image_kw, $
                colorbar_kw = colorbar_kw
-filename = path+path_sep()+'frames'+ $
-           path_sep()+'efield_'+strmid(axes,1,1)+ $
-           '-'+time.index+'_zoom.pdf'
-data_graphics, Ey[1024-256:1024+255,*,*], $
-               xdata[1024-256:1024+255],ydata, $
-               /make_frame, $
-               filename = filename, $
-               image_kw = image_kw, $
-               colorbar_kw = colorbar_kw

@@ -12,16 +12,8 @@
 filename = path+path_sep()+'frames'+ $
            path_sep()+'efield_t'+axes+ $
            time.index+'.pdf'
-data_graphics, Et,xdata,ydata, $
-               /make_frame, $
-               filename = filename, $
-               image_kw = image_kw, $
-               colorbar_kw = colorbar_kw
-filename = path+path_sep()+'frames'+ $
-           path_sep()+'efield_t'+axes+ $
-           time.index+'_zoom.pdf'
-data_graphics, Et[1024-256:1024+255,*,*], $
-               xdata[1024-256:1024+255],ydata, $
+data_graphics, smooth(Et,[7,7,1],/edge_wrap), $
+               xdata,ydata, $
                /make_frame, $
                filename = filename, $
                image_kw = image_kw, $
