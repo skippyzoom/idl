@@ -1,3 +1,10 @@
+;+
+; Script for making frames from a plane of EPPIC phi data.
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
+;-
+
 ;;==Calculate the spatial FFT of the phi plane
 fdata = phi
 @fft_2D_time

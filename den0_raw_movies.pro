@@ -1,4 +1,21 @@
+;+
+; Script for making movies from a plane of EPPIC den0 data.
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
+;-
+
+;;==Set defaults
+if n_elements(x0) eq 0 then x0 = 0
+if n_elements(xf) eq 0 then xf = nx-1
+if n_elements(y0) eq 0 then y0 = 0
+if n_elements(yf) eq 0 then yf = ny-1
+if n_elements(name_info) eq 0 then name_info = ''
+
+;;==Load graphics keywords for den0
 @den0_kw
+
+;;==Create image movie of den0 data
 filename = path+path_sep()+'movies'+ $
            path_sep()+'den0.mp4'
 data_graphics, den0,xdata,ydata, $

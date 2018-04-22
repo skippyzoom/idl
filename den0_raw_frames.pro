@@ -1,3 +1,10 @@
+;+
+; Script for making frames from a plane of EPPIC den0 data.
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
+;-
+
 ;;==Set defaults
 if n_elements(x0) eq 0 then x0 = 0
 if n_elements(xf) eq 0 then xf = nx-1
