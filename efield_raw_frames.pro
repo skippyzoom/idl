@@ -6,19 +6,19 @@
 ;-
 
 ;;==Make images of x component
-@Ex_images
+@Ex_raw_images
 
 ;;==Make plots of average x component
 @Ex_mean_plots
 
 ;;==Make images of y component
-@Ey_images
+@Ey_raw_images
 
 ;;==Make plots of average x component
 @Ey_mean_plots
 
 ;;==Make images of magnitude
-@Er_images
+@Er_raw_images
 
 ;;==Make images of angle
-@Et_images
+@Et_raw_images
