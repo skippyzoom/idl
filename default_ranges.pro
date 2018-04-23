@@ -11,7 +11,7 @@
 ; <return>
 ;    Array of data ranges.
 ;-
-function default_ranges, axes,path=path,params=params
+function default_ranges, axes,path=path,params=params,data_isft=data_isft
 
   ;;==Defaults
   if n_elements(path) eq 0 then path = './'
@@ -19,15 +19,18 @@ function default_ranges, axes,path=path,params=params
 
   ;;==Select ranges based on axes
   case 1B of 
-     strcmp(axes,'xy') || strcmp(axes,'yx'): $
-        ranges = [0,params.nx*params.nsubdomains, $
-                  0,params.ny]/params.nout_avg
-     strcmp(axes,'xz') || strcmp(axes,'zx'): $
-        ranges = [0,params.nx, $
-                  0,params.nz]/params.nout_avg
-     strcmp(axes,'yz') || strcmp(axes,'zy'): $
-        ranges = [0,params.ny, $
-                  0,params.nz]/params.nout_avg
+     strcmp(axes,'xy') || strcmp(axes,'yx'): begin
+        ranges = [0,params.nx*params.nsubdomains,0,params.ny]
+        if ~keyword_set(data_isft) then ranges /= params.nout_avg
+     end
+     strcmp(axes,'xz') || strcmp(axes,'zx'): begin
+        ranges = [0,params.nx,0,params.nz]
+        if ~keyword_set(data_isft) then ranges /= params.nout_avg
+     end
+     strcmp(axes,'yz') || strcmp(axes,'zy'): begin
+        ranges = [0,params.ny,0,params.nz]
+        if ~keyword_set(data_isft) then ranges /= params.nout_avg
+     end
   endcase
 
   ;;==Return ranges array
