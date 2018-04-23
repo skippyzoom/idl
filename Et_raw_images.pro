@@ -12,7 +12,7 @@
 filename = path+path_sep()+'frames'+ $
            path_sep()+'efield_t'+axes+ $
            time.index+'.pdf'
-data_graphics, smooth(Et,[7,7,1],/edge_wrap), $
+data_graphics, Et, $
                xdata,ydata, $
                /make_frame, $
                filename = filename, $
