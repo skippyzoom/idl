@@ -2,6 +2,7 @@
 ; Import a logically (2+1)-D plane of data from an EPPIC run.
 ;-
 pro import_data_plane, data_name, $
+                       lun=lun, $
                        timestep=timestep, $
                        axes=axes, $
                        ranges=ranges, $
@@ -61,10 +62,6 @@ pro import_data_plane, data_name, $
   endcase
 
   ;;==Read data at each time step
-  if strcmp(data_name,'e',1,/fold_case) then $
-     read_name = 'phi' $
-  else $
-     read_name = data_name
   f_out = read_ph5(data_name, $
                    timestep = timestep, $
                    ranges = [x0,xf,y0,yf,z0,zf], $
