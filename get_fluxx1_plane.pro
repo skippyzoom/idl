@@ -13,10 +13,12 @@ import_data_plane, 'fluxx1', $
                    timestep = long(time.index), $
                    axes = axes, $
                    ranges = ranges, $
+                   zero_point = zero_point, $
                    rotate = rotate, $
                    info_path = info_path, $
                    data_path = data_path, $
-                   data_type = data_type, $
+                   data_type = 4, $
+                   data_isft = 0B, $
                    f_out = fluxx1, $
                    x_out = xdata, $
                    y_out = ydata, $

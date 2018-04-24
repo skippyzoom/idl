@@ -13,10 +13,12 @@ import_data_plane, 'den0', $
                    timestep = long(time.index), $
                    axes = axes, $
                    ranges = ranges, $
+                   zero_point = zero_point, $
                    rotate = rotate, $
                    info_path = info_path, $
                    data_path = data_path, $
-                   data_type = data_type, $
+                   data_type = 4, $
+                   data_isft = 0B, $
                    f_out = den0, $
                    x_out = xdata, $
                    y_out = ydata, $

@@ -5,8 +5,6 @@
 ;------------------------------------------------------------------------------
 ;-
 
-data_isft = 1B
-
 ;;==Set default values
 @import_plane_defaults
 
@@ -15,11 +13,12 @@ import_data_plane, 'denft1', $
                    timestep = long(time.index), $
                    axes = axes, $
                    ranges = ranges, $
+                   zero_point = zero_point, $
                    rotate = rotate, $
                    info_path = info_path, $
                    data_path = data_path, $
                    data_type = 6, $
-                   /data_isft, $
+                   data_isft = 1B, $
                    f_out = denft1, $
                    x_out = xdata, $
                    y_out = ydata, $
