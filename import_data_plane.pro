@@ -56,7 +56,7 @@ pro import_data_plane, data_name, $
   y_out = dy_out*(ranges[2] + indgen(ny_out))
 
   ;;==Rotate data, if requested
-  if keyword_set(data_isft) then begin
+  if ~keyword_set(data_isft) then begin
      if rotate gt 0 then begin
         if rotate mod 2 then begin
            tmp = y_out
