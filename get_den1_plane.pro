@@ -5,7 +5,7 @@
 ;------------------------------------------------------------------------------
 ;-
 
-;;==Set default values
+;;==Load defaults
 @import_plane_defaults
 
 ;;==Extract a plane of data
