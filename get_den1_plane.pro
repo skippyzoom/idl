@@ -4,7 +4,6 @@
 ; Created by Matt Young.
 ;------------------------------------------------------------------------------
 ;-
-
 ;;==Load defaults
 @import_plane_defaults
 

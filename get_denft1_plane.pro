@@ -6,7 +6,6 @@
 ;-
 
 ;;==Load default values
-;; data_isft = 1B
 @import_plane_defaults
 
 ;;==Extract a plane of data
