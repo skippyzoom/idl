@@ -1,7 +1,6 @@
 ;+
 ; Script for converting denft1 to den1
 ;-
-
 ftsize = size(denft1)
 if ftsize[0] eq 3 then $
    den1 = fltarr(ftsize[1],ftsize[2],ftsize[3]) $
