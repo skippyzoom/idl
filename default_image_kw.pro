@@ -1,8 +1,12 @@
 ;+
-; Set default keywords for EPPIC graphics. The purpose of this script
-; is to save time when setting up data-specific keywords and to
-; ensure uniformity for certain keywords that don't need to
-; change between data quantities.
+; Script for setting default keywords for EPPIC image. 
+;
+; The purpose of this script is to save time when setting up graphics
+; keywords in a new script and to ensure uniformity for certain
+; keywords that don't need to change between data quantities.
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
 ;-
 img_pos = [0.10,0.10,0.80,0.80]
 clr_pos = [0.82,0.10,0.84,0.80]
@@ -19,14 +23,10 @@ image_kw = dictionary('axis_style', 1, $
                       'ysubticklen', 0.5, $
                       'xtickdir', 1, $
                       'ytickdir', 1, $
-                      'xtickfont_size', 20.0, $
-                      'ytickfont_size', 20.0, $
-                      'font_size', 24.0, $
-                      'font_name', "Times")
+                      'font_name', 'Times')
 colorbar_kw = dictionary('orientation', 1, $
                          'textpos', 1, $
-                         'font_size', 24.0, $
-                         'font_name', "Times", $
+                         'font_name', 'Times', $
                          'position', clr_pos)
 text_kw = dictionary('font_name', 'Times', $
                      'font_size', 24, $
