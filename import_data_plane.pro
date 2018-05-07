@@ -38,18 +38,22 @@ pro import_data_plane, data_name, $
   fsize = size(f_out)
   case 1B of
      strcmp(axes,'xy') || strcmp(axes,'yx'): begin
-        dx_out = params.dx*params.nout_avg
-        dy_out = params.dy*params.nout_avg
+        dx_out = params.dx
+        dy_out = params.dy
      end
      strcmp(axes,'xz') || strcmp(axes,'zx'): begin
-        dx_out = params.dx*params.nout_avg
-        dy_out = params.dz*params.nout_avg
+        dx_out = params.dx
+        dy_out = params.dz
      end
      strcmp(axes,'yz') || strcmp(axes,'zy'): begin
-        dx_out = params.dy*params.nout_avg
-        dy_out = params.dz*params.nout_avg
+        dx_out = params.dy
+        dy_out = params.dz
      end
   endcase
+  if ~keyword_set(data_isft) then begin
+     dx_out *= params.nout_avg
+     dy_out *= params.nout_avg
+  endif
   nx_out = fsize[1]
   ny_out = fsize[2]
   x_out = dx_out*(ranges[0] + indgen(nx_out))
