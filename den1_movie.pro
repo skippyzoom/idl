@@ -21,12 +21,10 @@ yf = ny
 
 ;;==Load graphics keywords for den1
 @default_image_kw
-
 dsize = size(den1)
 nx = dsize[1]
 ny = dsize[2]
 data_aspect = float(ny)/nx
-
 image_kw['min_value'] = -max(abs(den1[x0:xf-1,y0:yf-1,1:*]))
 image_kw['max_value'] = +max(abs(den1[x0:xf-1,y0:yf-1,1:*]))
 image_kw['rgb_table'] = 5
@@ -49,8 +47,8 @@ colorbar_kw['major'] = 5
 ;;==Create image movie of den1 data
 if n_elements(file_description) eq 0 then $
    file_description = ''
-filename = expand_path(path+path_sep()+'movies'+ $
-           path_sep()+'den1')+ $
+filename = expand_path(path+path_sep()+'movies')+ $
+           path_sep()+'den1'+ $
            '-'+file_description+ $
            '.'+get_extension(movie_type)
 data_graphics, den1[x0:xf-1,y0:yf-1,*], $
