@@ -5,14 +5,14 @@
 ;------------------------------------------------------------------------------
 ;-
 
-;;==Make movies of x component
-@Ex_raw_movies
+;;==Make movie of x component
+@Ex_movie
 
-;;==Make movies of y component
-@Ey_raw_movies
+;;==Make movie of y component
+@Ey_movie
 
-;;==Make movies of magnitude
-@Er_raw_movies
+;;==Make movie of magnitude
+@Er_movie
 
-;;==Make movies of angle
-@Et_raw_movies
+;;==Make movie of angle
+@Et_movie
