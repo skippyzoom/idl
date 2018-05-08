@@ -1,13 +1,13 @@
 ;+
 ; Import a logically (2+1)-D plane of data from an EPPIC run.
 ;-
-pro import_data_plane, data_name, $
+pro import_plane_data, data_name, $
                        lun=lun, $
+                       path=path, $
                        axes=axes, $
                        rotate=rotate, $
                        ranges=ranges, $
                        data_isft=data_isft, $
-                       info_path=info_path, $
                        f_out=f_out, $
                        x_out=x_out, $
                        y_out=y_out, $
@@ -18,13 +18,13 @@ pro import_data_plane, data_name, $
                        _EXTRA=ex
 
   ;;==Defaults and guards
+  if n_elements(lun) eq 0 then lun = -1
+  if n_elements(path) eq 0 then path = './'
   if n_elements(axes) eq 0 then axes = 'xy'
   if n_elements(rotate) eq 0 then rotate = 0
-  if n_elements(info_path) eq 0 then info_path = './'
-  if n_elements(lun) eq 0 then lun = -1
 
   ;;==Read simulation parameters
-  params = set_eppic_params(path=info_path)
+  params = set_eppic_params(path=path)
 
   ;;==Read data at each time step
   f_out = read_ph5_plane(data_name, $
@@ -32,10 +32,13 @@ pro import_data_plane, data_name, $
                          axes = axes, $
                          ranges = ranges, $
                          data_isft = data_isft, $
-                         info_path = info_path, $
+                         info_path = path, $
                          _EXTRA = ex)
 
+  ;;==Get size of data plane
   fsize = size(f_out)
+
+  ;;==Set plane-appropriate parameters
   case 1B of
      strcmp(axes,'xy') || strcmp(axes,'yx'): begin
         dx_out = params.dx
