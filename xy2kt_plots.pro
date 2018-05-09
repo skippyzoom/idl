@@ -8,7 +8,7 @@ pro xy2kt_plots, xy2kt, $
                  lun=lun, $
                  data_isdB=data_isdB, $
                  lambda=lambda, $
-                 plot_kw = plot_kw, $
+                 plot_kw=plot_kw, $
                  filebase=filebase, $
                  filetype=filetype
 

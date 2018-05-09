@@ -14,7 +14,7 @@ pro xy2kt_movie, xy2kt, $
 
   ;;==Defaults and guards
   if n_elements(lun) eq 0 then lun = -1
-  if n_elements(filebase) eq 0 then filebase = 'xy2kt_frames'
+  if n_elements(filebase) eq 0 then filebase = 'xy2kt_movie'
   filebase = strip_extension(filebase)
   if n_elements(filetype) eq 0 then filetype = 'mp4'
   if n_elements(plot_kw) eq 0 then plot_kw = dictionary()
