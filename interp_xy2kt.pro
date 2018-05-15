@@ -10,6 +10,12 @@ function interp_xy2kt, fdata, $
                        dx=dx, $
                        dy=dy
 
+  ;;==Get dimensions of input array
+  fsize = size(fdata)
+  ndims = fsize[0]
+  nx = fsize[1]
+  ny = fsize[2]
+
   ;;==Defaults and guards
   if n_elements(lun) eq 0 then lun = -1
   if n_elements(lambda) eq 0 then lambda = 3.0
@@ -27,11 +33,7 @@ function interp_xy2kt, fdata, $
      printf, lun,"               value of lambda ("+str_lam+")."
   endif
 
-  ;;==Get dimensions of input array
-  fsize = size(fdata)
-  ndims = fsize[0]
-  nx = fsize[1]
-  ny = fsize[2]
+  ;;==Check dimensions
   proceed = 0B
   case ndims of 
      2: begin
