@@ -24,7 +24,7 @@ function interp_xy2kt_rms, data, $
 
      ;;==Create hash key
      l_val = lambda[il]
-     str_lam = string(l_val,format='(f5.1)')
+     str_lam = string(l_val,format='(f06.2)')
      str_lam = strcompress(str_lam,/remove_all)
 
      ;;==Calculate the interpolated power

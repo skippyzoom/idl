@@ -63,7 +63,7 @@ function interp_xy2kt, fdata, $
      if ~keyword_set(array) then xy2kt = hash()
      for il=0,nl-1 do begin
         l_val = lambda[il]
-        str_lam = string(l_val,format='(f5.1)')
+        str_lam = string(l_val,format='(f06.2)')
         str_lam = strcompress(str_lam,/remove_all)
         k_val = 2*!pi/l_val
         kx_min = xdata[nkx/2+1]
