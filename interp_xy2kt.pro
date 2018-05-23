@@ -68,7 +68,7 @@ function interp_xy2kt, fdata, $
         k_val = 2*!pi/l_val
         kx_min = xdata[nkx/2+1]
         ky_min = ydata[nky/2+1]
-        t_size = 8*fix(k_val/min([kx_min,ky_min]))
+        t_size = 8*long(k_val/min([kx_min,ky_min]))
         t_interp = theta[0] + $
                    (theta[1]-theta[0])*dindgen(t_size)/t_size
         x_interp = cos(t_interp)*k_val/kx_min + nkx/2
