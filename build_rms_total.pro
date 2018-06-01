@@ -18,21 +18,20 @@ function build_rms_total, proj_path, $
   path = expand_path(proj_path)+path_sep()+run[0]
   s_obj = obj_new('IDL_Savefile',expand_path(path)+path_sep()+save_name)
   s_obj->restore, data_name
-  ;; restore, filename=expand_path(path)+path_sep()+save_name, $
-  ;;          /verbose
+  !NULL = execute('ktt_rms = '+data_name)
 
   ;;==Get wavelengths
-  lambda = den1ktt_rms.keys()
+  lambda = ktt_rms.keys()
   lambda = lambda.sort()
   nl = n_elements(lambda)
 
   ;;==Get number of time steps
-  nt = n_elements(den1ktt_rms[lambda[0]])
+  nt = n_elements(ktt_rms[lambda[0]])
 
   ;;==Sum over all wavelengths
   rms_total = fltarr(nr,nt)*0.0
   for il=0,nl-1 do $
-     rms_total[0,*] += den1ktt_rms[lambda[il]]
+     rms_total[0,*] += ktt_rms[lambda[il]]
 
   ;;==Get input parameters
   params = set_eppic_params(path=path)
@@ -44,10 +43,9 @@ function build_rms_total, proj_path, $
      path = expand_path(proj_path)+path_sep()+run[ir]
      s_obj = obj_new('IDL_Savefile',expand_path(path)+path_sep()+save_name)
      s_obj->restore, data_name
-     ;; restore, filename=expand_path(path)+path_sep()+save_name, $
-     ;;          /verbose
+     !NULL = execute('ktt_rms = '+data_name)
      for il=0,nl-1 do $
-        rms_total[ir,*] += den1ktt_rms[lambda[il]]
+        rms_total[ir,*] += ktt_rms[lambda[il]]
 
   endfor
 
