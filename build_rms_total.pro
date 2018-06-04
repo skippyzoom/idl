@@ -1,15 +1,14 @@
 ;+
-; Helper function for den1ktt_rms_total
+; Helper function for *_rms_total scripts
 ;-
 function build_rms_total, proj_path, $
                           run, $
                           save_name, $
-                          lun=lun, $
-                          data_name=data_name
+                          data_name, $
+                          lun=lun
 
   ;;==Defaults
   if n_elements(lun) eq 0 then lun = -1
-  if n_elements(data_name) eq 0 then data_name = 'den1ktt_rms'
 
   ;;==Get number of runs
   nr = n_elements(run)
@@ -33,11 +32,6 @@ function build_rms_total, proj_path, $
   for il=0,nl-1 do $
      rms_total[0,*] += ktt_rms[lambda[il]]
 
-  ;;==Get input parameters
-  params = set_eppic_params(path=path)
-  nt_max = calc_timesteps(path=path)
-  params['nt_max'] = nt_max
-
   ;;==Loop over remaining save files
   for ir=1,nr-1 do begin
      path = expand_path(proj_path)+path_sep()+run[ir]
@@ -46,7 +40,6 @@ function build_rms_total, proj_path, $
      !NULL = execute('ktt_rms = '+data_name)
      for il=0,nl-1 do $
         rms_total[ir,*] += ktt_rms[lambda[il]]
-
   endfor
 
   ;;==Return the summed array
