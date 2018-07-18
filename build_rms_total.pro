@@ -1,5 +1,8 @@
 ;+
 ; Helper function for *_rms_total scripts
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
 ;-
 function build_rms_total, proj_path, $
                           run, $
@@ -24,23 +27,29 @@ function build_rms_total, proj_path, $
   lambda = lambda.sort()
   nl = n_elements(lambda)
 
-  ;;==Get number of time steps
-  nt = n_elements(ktt_rms[lambda[0]])
-
-  ;;==Sum over all wavelengths
-  rms_total = fltarr(nr,nt)*0.0
-  for il=0,nl-1 do $
-     rms_total[0,*] += ktt_rms[lambda[il]]
-
-  ;;==Loop over remaining save files
-  for ir=1,nr-1 do begin
+  ;;==Get max number of time steps
+  nt = 0L
+  for ir=0,nr-1 do begin
      path = expand_path(proj_path)+path_sep()+run[ir]
      s_obj = obj_new('IDL_Savefile',expand_path(path)+path_sep()+save_name)
      s_obj->restore, data_name
      !NULL = execute('ktt_rms = '+data_name)
      for il=0,nl-1 do $
-        rms_total[ir,*] += ktt_rms[lambda[il]]
+        nt = max([nt,n_elements(ktt_rms[lambda[il]])])
   endfor
+
+  ;;==Sum over all wavelengths for each run
+  rms_total = hash(run)
+  for ir=0,nr-1 do begin
+     path = expand_path(proj_path)+path_sep()+run[ir]
+     s_obj = obj_new('IDL_Savefile',expand_path(path)+path_sep()+save_name)
+     s_obj->restore, data_name
+     !NULL = execute('ktt_rms = '+data_name)
+     ktt_rms_sum = make_array(size(ktt_rms[lambda[0]],/dim),value=0.0)
+     for il=0,nl-1 do $
+        ktt_rms_sum += ktt_rms[lambda[il]]
+     rms_total[run[ir]] = ktt_rms_sum
+  endfor     
 
   ;;==Return the summed array
   return, rms_total
