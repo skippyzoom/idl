@@ -1,4 +1,4 @@
-function ktw_image_frame, fdata,tdata,vdata, $
+function ktw_image_frame, fdata,xdata,ydata, $
                           lun=lun, $
                           power=power, $
                           normalize=normalize, $
@@ -10,7 +10,11 @@ function ktw_image_frame, fdata,tdata,vdata, $
   if keyword_set(power) then fdata = fdata^2
   if keyword_set(log) then fdata = 10*alog10(fdata)
 
-  frm = image(fdata,tdata,vdata,_EXTRA=ex)
+  if n_elements(xdata) gt 0 && $
+     n_elements(ydata) gt 0 then $
+        frm = image(fdata,xdata,ydata,_EXTRA=ex) $
+  else $
+     frm = image(fdata,_EXTRA=ex)
 
   return, frm
 end
