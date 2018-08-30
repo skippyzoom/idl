@@ -7,6 +7,9 @@
 ;
 ; Created by Matt Young
 ;------------------------------------------------------------------------------
+; **Output fdata is not positive definite when input fdata is. That
+; seems like a serious error. In any case, it makes this function
+; useless for EPPIC nvsqr arrays.**
 ;-
 function high_pass_filter, fdata, $
                            lambda_max, $
@@ -46,6 +49,7 @@ function high_pass_filter, fdata, $
           ny/2-dky:ny/2+dky, $
           nz/2-dkz:nz/2+dkz] = 0.0
   fdata = fft(fftdata,/inverse,/center)
+  fdata = real_part(fdata)
 
   return, fdata
 end
