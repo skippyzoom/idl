@@ -63,8 +63,8 @@ function interp_xy2kt, fdata, $
      if ~keyword_set(array) then xy2kt = hash()
      for il=0,nl-1 do begin
         l_val = lambda[il]
-        str_lam = string(l_val,format='(f06.2)')
-        str_lam = strcompress(str_lam,/remove_all)
+        ;; str_lam = string(l_val,format='(f06.2)')
+        ;; str_lam = strcompress(str_lam,/remove_all)
         k_val = 2*!pi/l_val
         kx_min = xdata[nkx/2+1]
         ky_min = ydata[nky/2+1]
@@ -77,7 +77,8 @@ function interp_xy2kt, fdata, $
         for it=0,nt-1 do $
            f_interp[*,it] = interpolate(fdata[*,*,it],x_interp,y_interp)
         if keyword_set(array) then return, f_interp
-        xy2kt[str_lam] = {f_interp:f_interp, t_interp:t_interp}
+        ;; xy2kt[str_lam] = {f_interp:f_interp, t_interp:t_interp}
+        xy2kt[l_val] = {f_interp:f_interp, t_interp:t_interp}
      endfor
 
      return, xy2kt
