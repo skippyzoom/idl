@@ -30,47 +30,64 @@ function get_rms_indices, path, $
   ; FB_FLOW_ANGLE ;
   ;---------------;
   
+  ;;==2-D 30 mV/m
+  rms_time[get_base_dir()+path_sep()+ $
+           'fb_flow_angle/2D/h0-Ey0_030-full_output/'] = $
+     [[0,time.nt/2-1],[time.nt/2,time.nt-1]]
+  rms_time[get_base_dir()+path_sep()+ $
+           'fb_flow_angle/2D/h1-Ey0_030-full_output/'] = $
+     [[0,time.nt/2-1],[time.nt/2,time.nt-1]]
+  rms_time[get_base_dir()+path_sep()+ $
+           'fb_flow_angle/2D/h2-Ey0_030-full_output/'] = $
+     [[0,time.nt/2-1],[time.nt/2,time.nt-1]]
   ;;==2-D 50 mV/m
   rms_time[get_base_dir()+path_sep()+ $
            'fb_flow_angle/2D/h0-Ey0_050-full_output/'] = $
-     [[find_closest(time.stamp,40), $
-       find_closest(time.stamp,110)], $
+     [[find_closest(time.stamp,68.10), $
+       find_closest(time.stamp,80.64)], $
       [find_closest(time.stamp,280), $
        time.nt-1]]
   rms_time[get_base_dir()+path_sep()+ $
            'fb_flow_angle/2D/h1-Ey0_050-full_output/'] = $
-     [[find_closest(time.stamp,40), $
-       find_closest(time.stamp,110)], $
+     [[find_closest(time.stamp,77.06), $
+       find_closest(time.stamp,89.60)], $
       [find_closest(time.stamp,280), $
        time.nt-1]]
   rms_time[get_base_dir()+path_sep()+ $
            'fb_flow_angle/2D/h2-Ey0_050-full_output/'] = $
-     [[find_closest(time.stamp,40), $
-       find_closest(time.stamp,110)], $
+     [[find_closest(time.stamp,77.06), $
+       find_closest(time.stamp,89.60)], $
+      [find_closest(time.stamp,280), $
+       time.nt-1]]
+  ;;==2-D 70 mV/m
+  rms_time[get_base_dir()+path_sep()+ $
+           'fb_flow_angle/2D/h0-Ey0_070-full_output/'] = $
+     [[find_closest(time.stamp,37.63), $
+       find_closest(time.stamp,51.18)], $
+      [find_closest(time.stamp,280), $
+       time.nt-1]]
+  rms_time[get_base_dir()+path_sep()+ $
+           'fb_flow_angle/2D/h1-Ey0_070-full_output/'] = $
+     [[find_closest(time.stamp,37.63), $
+       find_closest(time.stamp,51.18)], $
+      [find_closest(time.stamp,280), $
+       time.nt-1]]
+  rms_time[get_base_dir()+path_sep()+ $
+           'fb_flow_angle/2D/h2-Ey0_070-full_output/'] = $
+     [[find_closest(time.stamp,37.63), $
+       find_closest(time.stamp,51.18)], $
       [find_closest(time.stamp,280), $
        time.nt-1]]
   ;;==3-D 30 mV/m
   rms_time[get_base_dir()+path_sep()+ $
            'fb_flow_angle/3D/h0-Ey0_030-full_output/'] = $
      [[0,time.nt/2-1],[time.nt/2,time.nt-1]]
-     ;; [[find_closest(time.stamp,20), $
-     ;;   find_closest(time.stamp,50)], $
-     ;;  [find_closest(time.stamp,75), $
-     ;;   time.nt-1]]
   rms_time[get_base_dir()+path_sep()+ $
            'fb_flow_angle/3D/h1-Ey0_030-full_output/'] = $
      [[0,time.nt/2-1],[time.nt/2,time.nt-1]]
-     ;; [[find_closest(time.stamp,22), $
-     ;;   find_closest(time.stamp,52)], $
-     ;;  [find_closest(time.stamp,75), $
-     ;;   time.nt-1]]
   rms_time[get_base_dir()+path_sep()+ $
            'fb_flow_angle/3D/h2-Ey0_030-full_output/'] = $
      [[0,time.nt/2-1],[time.nt/2,time.nt-1]]
-     ;; [[find_closest(time.stamp,32), $
-     ;;   find_closest(time.stamp,62)], $
-     ;;  [find_closest(time.stamp,75), $
-     ;;   time.nt-1]]
   ;;==3-D 50 mV/m
   rms_time[get_base_dir()+path_sep()+ $
            'fb_flow_angle/3D/h0-Ey0_050-full_output/'] = $
