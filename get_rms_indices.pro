@@ -8,7 +8,9 @@
 ; member of the time dictionary, divided by params.nout, if you know
 ; the time range in term of time steps. You could also simply provide
 ; the output indices if you know them (e.g., you know you want the
-; first and last quarters of the run).
+; first and last quarters of the run). Beware that using find_closest
+; is more robust to changes in the time dictionary than is prodiving
+; a relative index such as time.nt/2.
 ;
 ; Created by Matt Young.
 ;------------------------------------------------------------------------------
