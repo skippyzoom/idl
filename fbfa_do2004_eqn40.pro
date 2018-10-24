@@ -2,11 +2,14 @@ function fbfa_do2004_eqn40, path, $
                             lun=lun, $
                             nkx=nkx, $
                             nky=nky, $
-                            double=double
+                            double=double, $
+                            angle=angle
+
 
   if n_elements(lun) eq 0 then lun = -1
   if n_elements(nkx) eq 0 then nkx = 64
   if n_elements(nky) eq 0 then nky = 64
+  if n_elements(angle) eq 0 then angle = 'theta'
 
   params = set_eppic_params(path=path)
   moments = read_moments(path=path)
@@ -24,7 +27,7 @@ function fbfa_do2004_eqn40, path, $
   mi = params.md1
   qi = abs(params.qd1)
   ki = wci/nui[alt]
-  ti = 600.
+  ti = mean(moments.dist1.T)
   vti = sqrt(kb*ti/mi)
   wce = abs(moments.dist0.wc)
   me = params.md0
@@ -48,20 +51,44 @@ function fbfa_do2004_eqn40, path, $
   out_type = keyword_set(double) ? 5 : 4
   re = make_array(nkx,nky,type=out_type)
   im = make_array(nkx,nky,type=out_type)
-  for ikx=0,nkx-1 do begin
-     for iky=0,nky-1 do begin
-        kx = kxvec[ikx]
-        ky = kyvec[iky]
-        kr = sqrt(kx^2 + ky^2)
-        na = ki*nui[alt]*(u0/kr/vti)*(ky*kx*(cos(beta)^2-sin(beta)^2) + $
-                                 cos(beta)*sin(beta)*(ky^2-kx^2))
-        nb = u0*(kx*cos(beta)+ky*sin(beta))
-        db = nb
-        da = nui[alt]
-        re[ikx,iky] = (na*da - nb*db)/(da^2 + db^2)
-        im[ikx,iky] = (na*db + nb*da)/(da^2 + db^2)
-     endfor
-  endfor
+
+  case 1B of
+     strcmp(angle,'theta'): begin
+        for ikx=0L,nkx-1 do begin
+           for iky=0L,nky-1 do begin
+              kx = kxvec[ikx]
+              ky = kyvec[iky]
+              kr = sqrt(kx^2 + ky^2)
+              na = ki*nui[alt]*(u0/kr/vti)^2* $
+                   (ky*kx*(cos(beta)^2-sin(beta)^2) + $
+                    cos(beta)*sin(beta)*(ky^2-kx^2))
+              nb = u0*(kx*cos(beta)+ky*sin(beta))
+              db = nb
+              da = nui[alt]
+              re[ikx,iky] = (na*da + nb*db)/(da^2 + db^2)
+              im[ikx,iky] = (na*db - nb*da)/(da^2 + db^2)
+           endfor
+        endfor
+     end
+     strcmp(angle,'chi'): begin
+        for ikx=0L,nkx-1 do begin
+           for iky=0L,nky-1 do begin
+              kx = kxvec[ikx]
+              ky = kyvec[iky]
+              kr = sqrt(kx^2 + ky^2)
+              na = ki*nui[alt]*(u0/kr/vti)^2*kx*ky
+              nb = u0*kx
+              db = nb
+              da = nui[alt]
+              re[ikx,iky] = (na*da + nb*db)/(da^2 + db^2)
+              im[ikx,iky] = (na*db - nb*da)/(da^2 + db^2)
+           endfor
+        endfor
+     end
+     else: begin
+        printf, lun, "[FBFA_DO2004_EQN40] Angle may be 'theta' or 'chi'"
+     end
+  endcase
   re *= (2.0/3.0)
   im *= (2.0/3.0)
 
