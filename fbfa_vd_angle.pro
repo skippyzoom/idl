@@ -25,7 +25,7 @@ function fbfa_vd_angle, path
   bigth = sqrt((me*nue[alt])/(mi*nui[alt]))
 
   num = (1+ki^2)+bigth^2*(1+ke^2)
-  den = ke*(1+ki^2)+bigth^2*ki*(1+ke^2)
+  den = bigth^2*ki*(1+ke^2)-ke*(1+ki^2)
 
-  return, atan(-num/den)
+  return, atan(num/den)
 end
