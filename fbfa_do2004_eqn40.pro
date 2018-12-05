@@ -63,8 +63,8 @@ function fbfa_do2004_eqn40, path, $
                    (ky*kx*(cos(beta)^2-sin(beta)^2) + $
                     cos(beta)*sin(beta)*(ky^2-kx^2))
               nb = u0*(kx*cos(beta)+ky*sin(beta))
-              db = nb
               da = nui[alt]
+              db = nb
               re[ikx,iky] = (na*da + nb*db)/(da^2 + db^2)
               im[ikx,iky] = (na*db - nb*da)/(da^2 + db^2)
            endfor
@@ -78,8 +78,8 @@ function fbfa_do2004_eqn40, path, $
               kr = sqrt(kx^2 + ky^2)
               na = ki*nui[alt]*(u0/kr/vti)^2*kx*ky
               nb = u0*kx
-              db = nb
               da = nui[alt]
+              db = nb
               re[ikx,iky] = (na*da + nb*db)/(da^2 + db^2)
               im[ikx,iky] = (na*db - nb*da)/(da^2 + db^2)
            endfor
