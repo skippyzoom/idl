@@ -32,15 +32,15 @@ function build_multirun_kttrms, mr_ktt, $
   nl = n_elements(lambda)
 
   ;;==Loop over runs to build RMS hash
-  kttrms = hash(run)
+  mr_kttrms = hash(run)
   for ir=0,nr-1 do begin
      current = mr_ktt[run[ir]]
      nt = n_elements(current.time.index)
      tmp = make_array(nt,value=0,/float)
      for il=0,nl-1 do $
         tmp += rms((current[data_name])[lambda[il]].f_interp,dim=1)
-     kttrms[run[ir]] = tmp
+     mr_kttrms[run[ir]] = tmp
   endfor
 
-  return, kttrms
+  return, mr_kttrms
 end
