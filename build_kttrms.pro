@@ -20,7 +20,7 @@ function build_kttrms, ktt, $
   ;;==Get number of time steps
   nt = n_elements(ktt[all_lambdas[0]].f_interp)
 
-  ;;==Loop over runs to build RMS hash
+  ;;==Loop over wavelengths to build RMS array
   kttrms = make_array(nt,value=0,/float)
   for il=0,nl-1 do $
      kttrms += rms(ktt[lambda[il]].f_interp,dim=1)
