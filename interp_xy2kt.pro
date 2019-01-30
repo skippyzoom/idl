@@ -1,27 +1,65 @@
+;+
+; Interpolate 2-D spectral data from Cartesian (kx,ky) to polar
+; (k,theta).
+;
+; This function does not perform an FFT but is designed to work with
+; an array of spectral amplitudes (i.e., a real-valued spectral
+; array). Give a 2-D array of real data called 'data', the user could 
+; execute fdata = abs(fft(data)) to create an appropriate input array.
+; This function is not the same as a simple interpolation from
+; Cartesian to polar coordinates, though it is similar.
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
+;                                 **PARAMETERS**
+; FDATA (required)
+;    Real-valued array of spectral data to interpolate.
+; LUN (default: -1)
+;    Logical unit number for printing runtime messages.
+; LAMBDA (default: 3.0)
+;    The wavelength from which to calculate the spectral radius (i.e.,
+;    wavenumber), k, according to k=2*!pi/lambda.
+; ARRAY (default: unset)
+;    Set this keyword to return an array of interpolants for a single
+;    value of LAMBDA, rather than a dictionary containing multiple
+;    arrays. 
+; THETA (default: [0,2*!pi])
+;    Range of angles over which to interpolate.
+; DEGREES (default: unset)
+;    Set this keyword to indicate that THETA is in degrees. This
+;    function will convert THETA to radians before continuing.
+; DX (default: 1.0)
+;    X-dimension cell width in real space.
+; DY (default: 1.0)
+;    Y-dimension cell width in real space.
+; <return> (dictionary or float)
+;    A dictionary of structures, keyed by wavelength, each containing
+;    an array of interpolated theta values, called t_interp, and an
+;    array of interpolants. The t_interp array will always be 1D but
+;    its size will vary with wavenumber. The f_interp array will be 1D
+;    if FDATA does not contain a third (i.e., time or frequency)
+;    dimension, or 2D if it does. If there is an error, this function
+;    will return !NULL.
+;-
 function interp_xy2kt, fdata, $
                        lun=lun, $
-                       array=array, $
                        lambda=lambda, $
+                       array=array, $
                        theta=theta, $
                        degrees=degrees, $
-                       radians=radians, $
-                       nkx=nkx, $
-                       nky=nky, $
                        dx=dx, $
                        dy=dy
 
   ;;==Get dimensions of input array
   fsize = size(fdata)
   ndims = fsize[0]
-  nx = fsize[1]
-  ny = fsize[2]
+  nkx = fsize[1]
+  nky = fsize[2]
 
   ;;==Defaults and guards
   if n_elements(lun) eq 0 then lun = -1
   if n_elements(lambda) eq 0 then lambda = 3.0
   if n_elements(theta) eq 0 then theta = [0,2*!pi]
-  if n_elements(nkx) eq 0 then nkx = nx
-  if n_elements(nky) eq 0 then nky = ny
   if n_elements(dx) eq 0 then dx = 1.0
   if n_elements(dy) eq 0 then dy = 1.0
   if keyword_set(array) and n_elements(lambda) gt 1 then begin
