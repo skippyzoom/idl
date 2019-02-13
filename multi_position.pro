@@ -2,20 +2,25 @@
 ; Calculate an array of plot positions for graphics
 ; routines, given the total number of requested plots.
 ;
-; NP: Number of plots, either a scalar or an array of
-;     [ncols,nrows].
-; EDGES: Either an 4-element array of the form 
-;        [left,bottom,right,top] that specifies the
-;        global graphics edges, or a [nplots,2] array
-;        that specifies the left and bottom edges for
-;        each panel.
-; BUFFERS: A 2-element array of the form [width,height]
-;          That specifies the buffers between adjacent
-;          panels. The function ignores this keyword
-;          when WIDTH and HEIGHT are set.
-; WIDTH: Width of individual panels when edges is [nplots,2]
-; HEIGHT: Height of individual panels when edges is [nplots,2]
-;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
+;                                 **PARAMETERS**
+; NP (required) 
+;    Number of plots, either a scalar or an array of [ncols,nrows].
+; EDGES (default: [0.0,0.0,1.0,1.0]) 
+;    Either an 4-element array of the form [left,bottom,right,top]
+;    that specifies the global graphics edges, or a [nplots,2] array 
+;    that specifies the left and bottom edges for each panel. 
+; BUFFERS (default: [0.0,0.0]) 
+;    A 2-element array of the form [width,height] That specifies the
+;    buffers between adjacent panels. The function ignores this
+;    keyword when WIDTH and HEIGHT are set. 
+; WIDTH (default: unset) 
+;    Width of individual panels when edges is [nplots,2].
+; HEIGHT (default: unset) 
+;    Height of individual panels when edges is [nplots,2].
+; <return> (float array)
+;    Normalized positions for NP graphics frames.
 ;-
 function multi_position, np, $
                          edges=edges,buffers=buffers, $
