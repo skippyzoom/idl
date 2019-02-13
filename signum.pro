@@ -1,16 +1,31 @@
 ;+
-; Apparently, this wasn't introduced into IDL until 8.3.
-; I'm not sure if this fully replicates the IDL function,
-; but it works for now.
+; Signum function.
 ;
-; Written 29Jun2016 (may)
-; Added support for complex numbers 01Sep2016 (may)
+; This function returns the sign of the input value. There is also an
+; IDL built-in signum.pro, introduced in 8.3. This function and the
+; built-in handle complex numbers differently.
+;
+; Created by Matt Young.
+;------------------------------------------------------------------------------
+;                                 **PARAMETERS**
+; X (required)
+;    Number of which to determine the sign.
+; <return> (type of X)
+;    -1, 0, or +1 if X is finite, +/-NaN if X is NaN, or +/-Inf if X
+;    is Inf.
 ;-
-
 function signum, x
+
+  ;;==Determine the number of elements in X.
   n = n_elements(x)
+
+  ;;==Allocate a return array.
   sgn = make_array(n,type=size(x,/type))
+
+  ;;==Loop over elements of X
   for i=0,n-1 do begin
+
+     ;;==Check possible cases for X
      case 1 of
         x[i] eq 0: sgn[i] = 0
         finite(x[i],/infinity,sign=1): sgn[i] = !values.f_infinity
@@ -26,7 +41,11 @@ function signum, x
               sgn[i] = x[i]/abs(x[i])
         end
      endcase
+
   endfor
 
+  ;;==Return a scalar if X has one element
+  if n eq 1 then sgn = sgn[0]
   return, sgn
+
 end
